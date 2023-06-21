@@ -5,14 +5,18 @@ import com.yuuu.annotation.SystemLog;
 import com.yuuu.constants.SystemConstants;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.entity.User;
+import com.yuuu.enums.AppHttpCodeEnum;
+import com.yuuu.exception.SystemException;
 import com.yuuu.service.UserService;
 import com.yuuu.utils.RedisCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +59,8 @@ public class UserController {
     }
 
     @PostMapping("/sendVerificationCode")
-    public ResponseResult sendVerificationCode(@RequestParam("email") String email) {//这是后端写好的接口
+    public ResponseResult sendVerificationCode(@RequestBody Map<String, String> data) {//这是后端写好的接口
+        String nemail = data.get("nemail");
         // Generate a random verification code
         String verificationCode = String.format("%06d", new Random().nextInt(999999));
         // Save the verification code in Redis with a time-to-live of 5 minutes
@@ -63,12 +68,17 @@ public class UserController {
         // Send the verification code to the user's email address
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("***REMOVED***");
-        message.setTo(email);
+        message.setTo(nemail);
         message.setSubject("邂逅相遇，适我愿兮。阁下接住~~~");
         message.setSentDate(new DateTime(Instant.now()));
         message.setText("【YuuuBlog】登录验证码: " + verificationCode + "，10分钟内有效。切勿将验证码提供给他人！");
         System.out.println(message);
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (MailException e) {
+            throw new SystemException(AppHttpCodeEnum.EMAIL_ERROR);
+        }
+
         return ResponseResult.okResult("验证码已发送，请耐心等待");
     }
 

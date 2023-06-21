@@ -30,7 +30,7 @@ public class UserController {
         return userService.getUserList(pageNum,pageSize,userListDto);
     }
 
-    //TODO 添加用户创建时间有误
+
     @PostMapping
     public ResponseResult addUser(@RequestBody UserAddDto userAddDto){
         return userService.addUser(userAddDto);

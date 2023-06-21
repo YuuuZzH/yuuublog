@@ -1,5 +1,6 @@
 package com.yuuu.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,6 +20,7 @@ import com.yuuu.exception.SystemException;
 import com.yuuu.mapper.UserMapper;
 import com.yuuu.service.UserService;
 import com.yuuu.utils.BeanCopyUtils;
+import com.yuuu.utils.RedisCache;
 import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +52,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private RedisCache redisCache;
+
 
     @Override
     public ResponseResult userInfo() {
@@ -73,32 +78,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return ResponseResult.okResult();
     }
 
-    //TODO 注册功能完善
+
     @Override
     public ResponseResult register(User user) {
         //非空校验
-        if (!StringUtils.hasText(user.getUserName())){
+        if (!StrUtil.isBlank(user.getUserName())){
             throw new SystemException(AppHttpCodeEnum.NOT_NULL);
         }
-        if (!StringUtils.hasText(user.getNickName())){
+        if (!StrUtil.isBlank(user.getNickName())){
             throw new SystemException(AppHttpCodeEnum.NOT_NULL);
         }
-        if (!StringUtils.hasText(user.getPassword())){
+        if (!StrUtil.isBlank(user.getPassword())){
             throw new SystemException(AppHttpCodeEnum.NOT_NULL);
         }
-        if (!StringUtils.hasText(user.getEmail())){
-            throw new SystemException(AppHttpCodeEnum.NOT_NULL);
+        if (!StrUtil.isBlank(user.getEmail())){
+            throw new RuntimeException("邮箱不能为空！");
         }
 
         //唯一性校验
         if (userNameIsExist(user.getUserName())){
             throw new SystemException(AppHttpCodeEnum.USERNAME_EXIST);
         }
-        if (emailIsExist(user.getNickName())){
+        if (emailIsExist(user.getEmail())){
             throw new SystemException(AppHttpCodeEnum.EMAIL_EXIST);
         }
         if (nickNameIsExist(user.getNickName())){
             throw new SystemException(AppHttpCodeEnum.NOT_UNIQUE);
+        }
+        String emailCaptcha = user.getEmailCaptcha();
+        String cacheObject = redisCache.getCacheObject(SystemConstants.MAIL_KEY + emailCaptcha);
+        if (!emailCaptcha.equals(cacheObject)){
+            return ResponseResult.errorResult(601,"验证码不对诶~");
+        }else {
+            redisCache.deleteObject(SystemConstants.CAPTCHA_KEY + cacheObject);
         }
         //密码加密
         String password = passwordEncoder.encode(user.getPassword());
@@ -111,13 +123,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public ResponseResult getUserList(Integer pageNum, Integer pageSize, UserListDto userListDto) {
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.hasText(userListDto.getUserName())){
+        if (StrUtil.isBlank(userListDto.getUserName())){
             queryWrapper.like(User::getUserName,userListDto.getUserName());
         }
-        if (StringUtils.hasText(userListDto.getPhoneNumber())){
+        if (StrUtil.isBlank(userListDto.getPhoneNumber())){
             queryWrapper.eq(User::getPhoneNumber,userListDto.getPhoneNumber());
         }
-        if (StringUtils.hasText(userListDto.getStatus())){
+        if (StrUtil.isBlank(userListDto.getStatus())){
             queryWrapper.eq(User::getStatus,userListDto.getStatus());
         }
         Page<User> page = new Page<>(pageNum,pageSize);
@@ -131,16 +143,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public ResponseResult addUser(UserAddDto userAddDto) {
         //非空校验
-        if (!StringUtils.hasText(userAddDto.getUserName())){
+        if (StrUtil.isBlank(userAddDto.getUserName())){
             throw new SystemException(AppHttpCodeEnum.NOT_NULL);
         }
-        if (!StringUtils.hasText(userAddDto.getNickName())){
+        if (StrUtil.isBlank(userAddDto.getNickName())){
             throw new SystemException(AppHttpCodeEnum.NOT_NULL);
         }
-        if (!StringUtils.hasText(userAddDto.getPassword())){
+        if (StrUtil.isBlank(userAddDto.getPassword())){
             throw new SystemException(AppHttpCodeEnum.NOT_NULL);
         }
-        if (!StringUtils.hasText(userAddDto.getEmail())){
+
+        if (StrUtil.isBlank(userAddDto.getEmail())){
             throw new SystemException(AppHttpCodeEnum.NOT_NULL);
         }
 
@@ -148,7 +161,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (userNameIsExist(userAddDto.getUserName())){
             throw new SystemException(AppHttpCodeEnum.USERNAME_EXIST);
         }
-        if (emailIsExist(userAddDto.getNickName())){
+        if (emailIsExist(userAddDto.getEmail())){
             throw new SystemException(AppHttpCodeEnum.EMAIL_EXIST);
         }
         if (nickNameIsExist(userAddDto.getNickName())){

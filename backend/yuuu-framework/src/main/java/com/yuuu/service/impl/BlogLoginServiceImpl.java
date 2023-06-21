@@ -47,7 +47,7 @@ public class BlogLoginServiceImpl implements BlogLoginService {
         String captchaValue = user.getCaptcha();
         String cacheKey = redisCache.getCacheObject(SystemConstants.CAPTCHA_KEY + captchaValue);
         if (cacheKey == null || !captchaValue.equals(cacheKey)){
-            return ResponseResult.errorResult(516,"验证码错误，请重新输入验证码");
+            return ResponseResult.errorResult(602,"请再检查一下验证码哟~");
         }else {
             redisCache.deleteObject(SystemConstants.CAPTCHA_KEY + captchaValue);
         }

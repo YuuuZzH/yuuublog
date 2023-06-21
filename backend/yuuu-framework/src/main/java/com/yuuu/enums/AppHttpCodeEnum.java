@@ -14,8 +14,12 @@ public enum AppHttpCodeEnum {
     FILE_TYPE_ERROR(507, "文件格式错误"),
     UPDATE_ERROR(509, "非法修改"),
     NOT_NULL(510, "信息不能为空"),
+    EMAIL_ERROR(603,"邮箱不太对诶！"),
     NOT_UNIQUE(510, "信息已存在"),
     LOGIN_ERROR(505,"用户名或密码错误");
+
+
+
     int code;
     String msg;
 

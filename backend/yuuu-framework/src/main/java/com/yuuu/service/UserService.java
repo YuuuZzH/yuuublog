@@ -2,6 +2,7 @@ package com.yuuu.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yuuu.domain.ResponseResult;
+import com.yuuu.domain.dto.UpdatePasswordDto;
 import com.yuuu.domain.dto.UserAddDto;
 import com.yuuu.domain.dto.UserChangeDto;
 import com.yuuu.domain.dto.UserListDto;
@@ -34,5 +35,7 @@ public interface UserService extends IService<User> {
     ResponseResult changeStatus(UserChangeDto user);
 
     ResponseResult updateUser(UserUpdateVo userUpdateVo);
+
+    ResponseResult updatePassword(UpdatePasswordDto user);
 }
 

@@ -7,6 +7,7 @@ package com.yuuu.controller;
  * CreatedTime: 2023-06-01 14:33:14:33
  */
 
+import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.yuuu.constants.SystemConstants;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.utils.CaptchaUtil;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,27 +36,27 @@ public class CaptchaController {
     @Autowired
     private RedisCache redisCache;
 
-    @GetMapping
-    public ResponseResult getCaptcha() throws IOException {
-       
-        String captchaCode = CaptchaUtil.generateCaptchaCode();
-        // 设置验证码过期时间 60s
-        redisCache.setCacheObject(SystemConstants.CAPTCHA_KEY + captchaCode, captchaCode, 60, TimeUnit.SECONDS);
+    private DefaultKaptcha producer;
 
-        // 生成验证码图片
-        BufferedImage captchaImage = CaptchaUtil.generateCaptchaImage(captchaCode);
-
-        // 将验证码图片转换为Base64编码
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(captchaImage, "png", baos);
-        byte[] imageBytes = baos.toByteArray();
-        String captchaImageBase64 = Base64.getEncoder().encodeToString(imageBytes);
-
-        // 返回验证码和图片Base64编码给前端
+    public CaptchaController(DefaultKaptcha producer) {
+        this.producer = producer;
+    }
+    @GetMapping()
+    public ResponseResult captcha(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        // 生成验证码
+        String text = producer.createText();
+        BufferedImage image = producer.createImage(text);
+        // 将验证码存入 redis
+        request.getSession().setAttribute("captcha", text);
+        redisCache.setCacheObject(SystemConstants.CAPTCHA_KEY + text, text, 60, TimeUnit.SECONDS);
+        // 生成验证码背景图的 base64 编码
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", bos);
+        String base64Image = Base64.getEncoder().encodeToString(bos.toByteArray());
+        // 返回验证码图片
         Map<String, Object> data = new HashMap<>();
-        data.put("captchaCode", captchaCode);
-        data.put("captchaImageBase64", captchaImageBase64);
+        data.put("captchaCode", text);
+        data.put("captchaImageBase64", base64Image);
         return ResponseResult.okResult(data);
     }
-
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import com.yuuu.annotation.SystemLog;
 import com.yuuu.constants.SystemConstants;
 import com.yuuu.domain.ResponseResult;
+import com.yuuu.domain.dto.UpdatePasswordDto;
 import com.yuuu.domain.entity.User;
 import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.exception.SystemException;
@@ -73,13 +74,43 @@ public class UserController {
         message.setSentDate(new DateTime(Instant.now()));
         message.setText("【YuuuBlog】登录验证码: " + verificationCode + "，10分钟内有效。切勿将验证码提供给他人！");
         System.out.println(message);
+        System.out.println(mailSender);
         try {
             mailSender.send(message);
         } catch (MailException e) {
             throw new SystemException(AppHttpCodeEnum.EMAIL_ERROR);
         }
-
         return ResponseResult.okResult("验证码已发送，请耐心等待");
+    }
+
+    @PostMapping("/sendCodeForUpdatePassword")
+    public ResponseResult sendCodeForUpdatePassword(@RequestBody Map<String, String> data) {//这是后端写好的接口
+        String emailPassword = data.get("emailPassword");
+        // Generate a random verification code
+        String verificationCode = String.format("%06d", new Random().nextInt(999999));
+        // Save the verification code in Redis with a time-to-live of 5 minutes
+        redisCache.setCacheObject(SystemConstants.MAIL_KEY + verificationCode,verificationCode,600, TimeUnit.SECONDS);
+        // Send the verification code to the user's email address
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("***REMOVED***");
+        message.setTo(emailPassword);
+        message.setSubject("验证码来咯，这次可不要再忘记密码啦~~~");
+        message.setSentDate(new DateTime(Instant.now()));
+        message.setText("【YuuuBlog】登录验证码: " + verificationCode + "，10分钟内有效。切勿将验证码提供给他人！高山仰止，景行行止，虽不能至，心向往之。");
+        System.out.println(message);
+        System.out.println(mailSender);
+        try {
+            mailSender.send(message);
+        } catch (MailException e) {
+            throw new SystemException(AppHttpCodeEnum.EMAIL_ERROR);
+        }
+        return ResponseResult.okResult("验证码已发送，请耐心等待");
+    }
+
+    @PostMapping("/updatePassword")
+    public ResponseResult updatePassword(@RequestBody UpdatePasswordDto user){
+
+        return userService.updatePassword(user);
     }
 
 }

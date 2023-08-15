@@ -18,4 +18,6 @@ public interface ArticleMapper extends BaseMapper<Article> {
     void deleteArticleTagById(Long id);
 
     void insertArticleTag(@Param("articleId") Long id,@Param("tags") List<Long> tags);
+
+    List<String> getArticleByInput(String inputValue);
 }

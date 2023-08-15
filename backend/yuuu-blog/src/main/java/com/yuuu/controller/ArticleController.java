@@ -1,5 +1,6 @@
 package com.yuuu.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.service.ArticleService;
 import org.mybatis.spring.annotation.MapperScan;
@@ -45,4 +46,18 @@ public class ArticleController {
         return articleService.updateViewCount(articleId);
     }
 
+    @GetMapping("/getArticleByInput")
+    public ResponseResult getArticleByInput(@RequestParam String inputValue){
+        if (StrUtil.isBlank(inputValue)){
+            return new ResponseResult();
+        }
+        return articleService.getArticleByInput(inputValue);
+    }
+    @GetMapping("/search")
+    public ResponseResult articleDetailByTitle(@RequestParam String title){
+        if (StrUtil.isBlank(title)){
+            return ResponseResult.errorResult(614,"文章标题错误");
+        }
+        return articleService.articleDetailByTitle(title);
+    }
 }

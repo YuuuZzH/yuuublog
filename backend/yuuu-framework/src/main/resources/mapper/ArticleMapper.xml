@@ -11,4 +11,10 @@
     <delete id="deleteArticleTagById">
         delete from yuuu_article_tag where article_id = #{articleId}
     </delete>
+    <select id="getArticleByInput" resultType="java.lang.String">
+        SELECT title FROM yuuu_article
+        WHERE title LIKE CONCAT('%', #{inputValue}, '%') and `status` = '0' and del_flag = 0
+    </select>
+
+
 </mapper>

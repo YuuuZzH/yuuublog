@@ -6,18 +6,20 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author: yuuu
- * Description: 修改密码
+ * Description:
  * Email: ***REMOVED***
- * CreatedTime: 2023-07-04 19:45:19:45
+ * CreatedTime: 2023-07-08 09:56:9:56
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdatePasswordDto {
+public class ChangePassword {
+
     //邮箱
     private String emailPassword;
     //密码
     private String confirmNewPassword;
     //验证码
     private String emailCaptchaUpdate;
+
 }

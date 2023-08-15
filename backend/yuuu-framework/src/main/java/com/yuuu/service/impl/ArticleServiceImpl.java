@@ -14,6 +14,7 @@ import com.yuuu.domain.entity.Category;
 import com.yuuu.domain.vo.*;
 import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.mapper.ArticleMapper;
+import com.yuuu.mapper.ArticleTagMapper;
 import com.yuuu.service.ArticleService;
 import com.yuuu.service.ArticleTagService;
 import com.yuuu.service.CategoryService;
@@ -25,8 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.yuuu.constants.SystemConstants.ARTICLE_STATUS_NORMAL;
@@ -49,6 +49,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private ArticleTagService articleTagService;
 
     @Autowired
+    private ArticleService articleService;
+
+    @Autowired
     private RedisCache redisCache;
 
     @Override
@@ -56,12 +59,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         //查询热门文章，返回ResponseResult结果
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         //1.正式发布
-        wrapper.eq(Article::getStatus,ARTICLE_STATUS_NORMAL);
+        wrapper.eq(Article::getStatus, ARTICLE_STATUS_NORMAL);
         //2.按浏览量降序排列
         wrapper.orderByDesc(Article::getViewCount);
         //3.最多查询10条数据
-        Page<Article> page = new Page<>(1,10);
-        page(page,wrapper);
+        Page<Article> page = new Page<>(1, 10);
+        page(page, wrapper);
         List<Article> articles = page.getRecords();
         //bean复制
         List<HotArticleVo> articleVoList = BeanCopyUtils.copyBeanList(articles, HotArticleVo.class);
@@ -72,13 +75,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ResponseResult articleList(Integer pageNum, Integer pageSize, Long categoryId) {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         //分类条件
-        queryWrapper.eq(Objects.nonNull(categoryId) && categoryId > 0,Article::getCategoryId,categoryId);
+        queryWrapper.eq(Objects.nonNull(categoryId) && categoryId > 0, Article::getCategoryId, categoryId);
         //正式发布的文章
         queryWrapper.eq(Article::getStatus, SystemConstants.CATEGORY_STATUS_NORMAL);
         //是否置顶，置顶的按访问量排
         queryWrapper.orderByDesc(Article::getIsTop).orderByDesc(Article::getViewCount);
-        Page page = new Page(pageNum,pageSize);
-        page(page,queryWrapper);
+        Page page = new Page(pageNum, pageSize);
+        page(page, queryWrapper);
         //查询categoryName
         List<Article> records = page.getRecords();
         //根据id去查name
@@ -91,7 +94,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 .collect(Collectors.toList());
         //封装查询结果
         List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(records, ArticleListVo.class);
-        PageVo pageVo = new PageVo(articleListVos,page.getTotal());
+        PageVo pageVo = new PageVo(articleListVos, page.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 
@@ -113,16 +116,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return ResponseResult.okResult(articleDetailVo);
     }
 
+
     @Override
     public ResponseResult updateViewCount(Long articleId) {
-        redisCache.incrementCacheMapValue(SystemConstants.VIEW_COUNT,articleId.toString(),1);
+        redisCache.incrementCacheMapValue(SystemConstants.VIEW_COUNT, articleId.toString(), 1);
         return ResponseResult.okResult();
     }
-
     @Override
     @Transactional
     public ResponseResult add(ArticleDto articleDto) {
-        if (StrUtil.isBlank(articleDto.getTitle()) || StrUtil.isBlank(articleDto.getContent())){
+        if (StrUtil.isBlank(articleDto.getTitle()) || StrUtil.isBlank(articleDto.getContent())) {
             return ResponseResult.errorResult(AppHttpCodeEnum.NOT_NULL);
         }
         //添加博客
@@ -142,17 +145,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ResponseResult articleListAdmin(Integer pageNum, Integer pageSize, ArticleListDto articleListDto) {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.hasText(articleListDto.getTitle())){
-            queryWrapper.like(Article::getTitle,articleListDto.getTitle());
+        if (StringUtils.hasText(articleListDto.getTitle())) {
+            queryWrapper.like(Article::getTitle, articleListDto.getTitle());
         }
-        if (StringUtils.hasText(articleListDto.getSummary())){
-            queryWrapper.like(Article::getSummary,articleListDto.getSummary());
+        if (StringUtils.hasText(articleListDto.getSummary())) {
+            queryWrapper.like(Article::getSummary, articleListDto.getSummary());
         }
-        Page<Article> page = new Page<>(pageNum,pageSize);
-        page(page,queryWrapper);
+        Page<Article> page = new Page<>(pageNum, pageSize);
+        page(page, queryWrapper);
         List<Article> records = page.getRecords();
         List<ArticleListAdminVo> articleListAdminVos = BeanCopyUtils.copyBeanList(records, ArticleListAdminVo.class);
-        return ResponseResult.okResult(new PageVo(articleListAdminVos,page.getTotal()));
+        return ResponseResult.okResult(new PageVo(articleListAdminVos, page.getTotal()));
     }
 
     @Override
@@ -167,7 +170,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 .collect(Collectors.toList());
         //封装Vo返回
         ArticleByIdVo articleByIdVo = new ArticleByIdVo();
-        BeanUtils.copyProperties(article,articleByIdVo);
+        BeanUtils.copyProperties(article, articleByIdVo);
         articleByIdVo.setTags(tags);
         return ResponseResult.okResult(articleByIdVo);
     }
@@ -179,10 +182,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         updateById(article1);
         //先删除以前的，再建立新的
         List<Long> tags = article.getTags();
-        if (Objects.nonNull(tags) && tags.size() > 0){
+        if (Objects.nonNull(tags) && tags.size() > 0) {
             baseMapper.deleteArticleTagById(article.getId());
-            baseMapper.insertArticleTag(article.getId(),tags);
-        }else {
+            baseMapper.insertArticleTag(article.getId(), tags);
+        } else {
             baseMapper.deleteArticleTagById(article.getId());
         }
         return ResponseResult.okResult();
@@ -192,10 +195,43 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ResponseResult deleteArticle(Long id) {
         boolean b = removeById(id);
-        if (b){
+        if (b) {
             return ResponseResult.okResult();
-        }else{
+        } else {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);
         }
     }
+
+    @Override
+    public ResponseResult getArticleByInput(String inputValue) {
+        List<String> list = baseMapper.getArticleByInput(inputValue);
+        if (list != null && list.size() > 0){
+            return ResponseResult.okResult(list);
+        }else{
+            return ResponseResult.okResult(Collections.emptyList());
+        }
+    }
+
+    @Override
+    public ResponseResult articleDetailByTitle(String title) {
+        LambdaQueryWrapper<Article> qw = new LambdaQueryWrapper<>();
+        qw.eq(Article::getTitle,title);
+        Article article = getOne(qw);
+        if (article == null){
+            return ResponseResult.errorResult(616,"您输入的数据有误");
+        }
+        LambdaQueryWrapper<ArticleTag> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ArticleTag::getArticleId, article.getId());
+        //根据文章id查询文章标签集合
+        List<ArticleTag> list = articleTagService.list(queryWrapper);
+        //得到标签id的集合
+        List<Long> tags = list.stream().map(ArticleTag::getTagId)
+                .collect(Collectors.toList());
+        //封装Vo返回
+        ArticleByIdVo articleByIdVo = new ArticleByIdVo();
+        BeanUtils.copyProperties(article, articleByIdVo);
+        articleByIdVo.setTags(tags);
+        return ResponseResult.okResult(articleByIdVo);
+    }
+
 }

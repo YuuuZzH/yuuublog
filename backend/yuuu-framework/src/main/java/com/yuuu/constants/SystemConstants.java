@@ -41,7 +41,8 @@ public class SystemConstants {
         /**
          * 域名地址
          */
-        public static final String URL_PATH = "http://rr2wi3rfl.bkt.clouddn.com/";
+        public static final String URL_PATH = "http://qiniu.yuuu.online/";
+
 
         /**
          * 文章访问量

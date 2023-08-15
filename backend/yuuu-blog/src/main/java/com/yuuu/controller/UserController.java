@@ -1,10 +1,11 @@
 package com.yuuu.controller;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.StrUtil;
 import com.yuuu.annotation.SystemLog;
 import com.yuuu.constants.SystemConstants;
 import com.yuuu.domain.ResponseResult;
-import com.yuuu.domain.dto.UpdatePasswordDto;
+import com.yuuu.domain.dto.ChangePassword;
 import com.yuuu.domain.entity.User;
 import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.exception.SystemException;
@@ -108,9 +109,11 @@ public class UserController {
     }
 
     @PostMapping("/updatePassword")
-    public ResponseResult updatePassword(@RequestBody UpdatePasswordDto user){
+    public ResponseResult updatePassword(@RequestBody ChangePassword user){
 
         return userService.updatePassword(user);
     }
+
+
 
 }

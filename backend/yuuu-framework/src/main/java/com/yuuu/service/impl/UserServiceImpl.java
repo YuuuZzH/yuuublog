@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yuuu.constants.SystemConstants;
-import com.yuuu.domain.dto.UpdatePasswordDto;
 import com.yuuu.domain.dto.UserChangeDto;
+import com.yuuu.domain.dto.ChangePassword;
 import com.yuuu.domain.entity.Role;
 import com.yuuu.domain.entity.UserRole;
 import com.yuuu.domain.vo.*;
@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public ResponseResult updateUserInfo(User user) {
         //校验请求是否为当前用户发出
         Long userId = SecurityUtils.getUserId();
-        if (userId == user.getId()) {
+        if (!Objects.equals(userId, user.getId())) {
             throw new SystemException(AppHttpCodeEnum.UPDATE_ERROR);
         }
         updateById(user);
@@ -249,7 +249,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public ResponseResult updatePassword(UpdatePasswordDto user) {
+    public ResponseResult updatePassword(ChangePassword user) {
         String email = user.getEmailPassword();
         String password = user.getConfirmNewPassword();
         String captcha = user.getEmailCaptchaUpdate();
@@ -279,8 +279,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User oldUser = list.get(0);
         oldUser.setPassword(password);
         //修改密码
-        updateById(oldUser);
-        return ResponseResult.okResult();
+        boolean b = updateById(oldUser);
+        System.out.println("b = " + b);
+        if (b){
+            return ResponseResult.okResult();
+        }else {
+            return ResponseResult.errorResult(639,"修改失败");
+        }
+
     }
 
     private boolean userNameIsExist(String s) {

@@ -21,6 +21,7 @@ public enum AppHttpCodeEnum {
     EMAIL_ISNULL(604, "邮箱不能为空"),
     PASSWORD_ISNULL(605, "密码不能为空"),
     CAPTCHA_ISNULL(606, "验证码不能为空"),
+    AVATAR_IS_ERROR(608,"图片路径错误"),
     NO_USER(607, "用户尚未注册，请先完成注册");
 
 

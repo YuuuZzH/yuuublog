@@ -46,6 +46,7 @@ public class ArticleController {
         return articleService.updateViewCount(articleId);
     }
 
+
     @GetMapping("/getArticleByInput")
     public ResponseResult getArticleByInput(@RequestParam String inputValue){
         if (StrUtil.isBlank(inputValue)){

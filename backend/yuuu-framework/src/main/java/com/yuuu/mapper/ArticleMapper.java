@@ -2,6 +2,7 @@ package com.yuuu.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yuuu.domain.entity.Article;
+import com.yuuu.domain.vo.ArticleInputVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -19,5 +20,5 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     void insertArticleTag(@Param("articleId") Long id,@Param("tags") List<Long> tags);
 
-    List<String> getArticleByInput(String inputValue);
+    List<ArticleInputVo> getArticleByInput(String inputValue);
 }

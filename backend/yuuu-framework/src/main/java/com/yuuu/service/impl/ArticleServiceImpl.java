@@ -204,7 +204,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public ResponseResult getArticleByInput(String inputValue) {
-        List<String> list = baseMapper.getArticleByInput(inputValue);
+        List<ArticleInputVo> list = baseMapper.getArticleByInput(inputValue);
         if (list != null && list.size() > 0){
             return ResponseResult.okResult(list);
         }else{

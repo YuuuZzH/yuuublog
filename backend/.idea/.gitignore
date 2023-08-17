@@ -56,4 +56,35 @@ hs_err_pid*
 
 # Mac
 .DS_Store
+# IntelliJ
+.idea/
 
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+
+# Gradle
+build/
+.gradle/
+.gradle/
+.gradle/
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Other
+.vscode/
+.DS_Store

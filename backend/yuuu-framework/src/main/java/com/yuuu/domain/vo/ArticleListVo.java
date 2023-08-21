@@ -37,5 +37,7 @@ public class ArticleListVo {
     private Long viewCount;
     //缩略图
     private String thumbnail;
+    //点赞量
+    private Long likes;
     private Date createTime;
 }

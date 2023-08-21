@@ -44,5 +44,7 @@ public class CommentVo {
     private String username;
 
     private List<CommentVo> children;
+    //点赞量
+    private Long likes;
 
 }

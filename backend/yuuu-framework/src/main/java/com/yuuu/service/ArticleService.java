@@ -37,4 +37,5 @@ public interface ArticleService extends IService<Article> {
     ResponseResult getArticleByInput(String inputValue);
 
     ResponseResult articleDetailByTitle(String title);
+
 }

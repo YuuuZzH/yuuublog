@@ -71,6 +71,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return ResponseResult.okResult();
     }
 
+    @Override
+    public ResponseResult getLikes(Long id) {
+        Long likes = getById(id).getLikes();
+        return ResponseResult.okResult(likes);
+    }
 
 
     /**

@@ -34,4 +34,9 @@ public class CommentController {
     public ResponseResult linkCommentList(Integer pageNum, Integer pageSize){
         return commentService.getCommentList(SystemConstants.LINK_COMMENT,null,pageNum,pageSize);
     }
+
+    @GetMapping("/likes/{id}")
+    public ResponseResult getLikes(@PathVariable("id") Long id){
+        return commentService.getLikes(id);
+    }
 }

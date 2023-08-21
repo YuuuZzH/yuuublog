@@ -11,15 +11,19 @@ import com.yuuu.domain.dto.ArticleListDto;
 import com.yuuu.domain.entity.Article;
 import com.yuuu.domain.entity.ArticleTag;
 import com.yuuu.domain.entity.Category;
+import com.yuuu.domain.entity.Liked;
 import com.yuuu.domain.vo.*;
 import com.yuuu.enums.AppHttpCodeEnum;
+import com.yuuu.exception.SystemException;
 import com.yuuu.mapper.ArticleMapper;
 import com.yuuu.mapper.ArticleTagMapper;
 import com.yuuu.service.ArticleService;
 import com.yuuu.service.ArticleTagService;
 import com.yuuu.service.CategoryService;
+import com.yuuu.service.LikedService;
 import com.yuuu.utils.BeanCopyUtils;
 import com.yuuu.utils.RedisCache;
+import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +53,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private ArticleTagService articleTagService;
 
     @Autowired
-    private ArticleService articleService;
+    private LikedService likedService;
 
     @Autowired
     private RedisCache redisCache;
@@ -233,5 +237,4 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleByIdVo.setTags(tags);
         return ResponseResult.okResult(articleByIdVo);
     }
-
 }

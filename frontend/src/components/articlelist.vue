@@ -17,6 +17,7 @@
                     <i class="fa fa-fw fa-user"></i>发表于
                     <i class="fa fa-fw fa-clock-o"></i><span v-html="showInitDate(item.createTime,'all')">{{showInitDate(item.createTime,'all')}}</span> •
                     <i class="fa fa-fw fa-eye"></i>{{item.viewCount}} 次围观 •
+                    <i class="fa fa-fw fa-heart"></i>{{ item.likes }} 次点赞 •
 
                 </h2>
                 <div class="ui label">

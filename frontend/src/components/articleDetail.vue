@@ -17,34 +17,45 @@
       <h2>
         <i class="fa fa-fw fa-user"></i>发表于 <span>{{ detailObj.createTime }}</span> •
         <i class="fa fa-fw fa-eye"></i>{{ detailObj.viewCount }} 次围观 •
+        <i class="fa fa-fw fa-heart"></i>{{ detailObj.likes }} 次点赞 •
       </h2>
       <div class="ui label">
         <a :href="'#/Share?classId=' + detailObj.categoryId">{{ detailObj.categoryName }}</a>
       </div>
     </header>
     <div class="article-content markdown-body" v-html="detailObj.content"></div>
-
-    <div class="donate">
-      <div class="donate-word">
-        <span @click="pdonate = !pdonate">赞赏</span>
+    <div style="display: grid; grid-template-columns: 75% 12% 13%;">
+      <div class="donate">
+        <div class="donate-word">
+          <span @click="pdonate = !pdonate">赞赏</span>
+        </div>
+        <el-row :class="pdonate ? 'donate-body' : 'donate-body donate-body-show'" :gutter="30">
+          <el-col :span="12" class="donate-item">
+            <div class="donate-tip">
+              <img :src="detailObj.wechat_image ? detailObj.wechat_image : 'static/img/wx_pay.png'"
+                :onerror="$store.state.errorImg" />
+              <span>微信扫一扫，向我赞赏</span>
+            </div>
+          </el-col>
+          <el-col :span="12" class="donate-item">
+            <div class="donate-tip">
+              <img :src="detailObj.alipay_image ? detailObj.alipay_image : 'static/img/ali_pay.jpg'"
+                :onerror="$store.state.errorImg" />
+              <span>支付宝扫一扫，向我赞赏</span>
+            </div>
+          </el-col>
+        </el-row>
       </div>
-      <el-row :class="pdonate ? 'donate-body' : 'donate-body donate-body-show'" :gutter="30">
-        <el-col :span="12" class="donate-item">
-          <div class="donate-tip">
-            <img :src="detailObj.wechat_image ? detailObj.wechat_image : 'static/img/wx_pay.png'"
-              :onerror="$store.state.errorImg" />
-            <span>微信扫一扫，向我赞赏</span>
-          </div>
-        </el-col>
-        <el-col :span="12" class="donate-item">
-          <div class="donate-tip">
-            <img :src="detailObj.alipay_image ? detailObj.alipay_image : 'static/img/ali_pay.jpg'"
-              :onerror="$store.state.errorImg" />
-            <span>支付宝扫一扫，向我赞赏</span>
-          </div>
-        </el-col>
-      </el-row>
+      <div style="margin-top: 37px;">
+
+        <img style="width: 35px; height: 35px; cursor: pointer;" :src="iconSrc" @click="toggleLike" />
+        <img style="width: 35px; height: 35px; cursor: pointer;" :src="iconSrcDis" @click="toggleDisLike" />
+      </div>
+      <div style="margin-top: 37px;">
+        <el-button type="primary" @click="forwardPage" icon="el-icon-share"></el-button>
+      </div>
     </div>
+
   </div>
 </template>
 
@@ -62,6 +73,10 @@ export default {
       haslogin: false,//是否已经登录
       title: '',//文章标题
       userId: '',//用户id
+      iconSrc: "static/img/wdz.png", // Default icon
+      iconSrcDis: "static/img/wdc.png",
+      isLiked: false, // User's like status
+      isDisLiked: false, // User's like status
     }
   },
   methods: { //事件处理器
@@ -69,6 +84,62 @@ export default {
       // console.log(detailObj.create_time,date,full);
       return initDate(date, full);
     },
+    fetchLikeStatus() {
+      if (this.haslogin) {
+        request.get(`/like/article/${this.aid}`)
+          .then((response) => {
+            // console.log("res",response)
+            if (response === 1) {
+              this.isLiked = true;
+            }
+            this.iconSrc = this.isLiked ? "static/img/ydz.png" : "static/img/wdz.png";
+          })
+      }
+    },
+    toggleLike() {
+      request.post(`/like/article/${this.aid}`)
+        .then((response) => {
+          if (this.isLiked) {
+            this.isLiked = false;
+            this.iconSrc = "static/img/wdz.png";
+          } else {
+            this.isLiked = true;
+            this.iconSrc = "static/img/ydz.png";
+          }
+        })
+    },
+    toggleDisLike() {
+      if (this.isDisLiked) {
+        this.isDisLiked = false;
+        this.iconSrcDis = "static/img/wdc.png";
+      } else {
+        this.isDisLiked = true;
+        this.iconSrcDis = "static/img/ydc.png";
+      }
+    },
+    forwardPage() {
+      // Get the current page's URL
+      const currentPageURL = window.location.href;
+
+      // Create a temporary input element to copy the URL to the clipboard
+      const tempInput = document.createElement("input");
+      tempInput.value = currentPageURL;
+      document.body.appendChild(tempInput);
+
+      // Select the text in the input element
+      tempInput.select();
+      tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+      // Copy the text to the clipboard
+      document.execCommand("copy");
+
+      // Remove the temporary input element
+      document.body.removeChild(tempInput);
+
+      // Provide feedback to the user
+      alert("当前文章链接已复制，快去分享给小伙伴吧！");
+    },
+
     getArticleDetail: function () {
       getArticle(this.aid).then((response) => {
         this.detailObj = response
@@ -105,6 +176,7 @@ export default {
     var that = this;
 
     this.routeChange();
+    this.fetchLikeStatus();
   },
 
 }

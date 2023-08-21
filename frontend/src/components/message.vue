@@ -42,18 +42,36 @@
                                 <div class="i-name">
                                     {{ item.username }}
                                 </div>
-                                <!-- <div class="i-class">
-                                    {{item.label}}
-                                </div> -->
+                                <div class="i-class">
+                                    {{ item.label }}
+                                </div>
                                 <div class="i-time">
                                     <time>{{ item.createTime }}</time>
                                 </div>
                             </header>
                             <section>
                                 <p v-html="analyzeEmoji(item.content)">{{analyzeEmoji(item.content)}}</p>
-                                <div v-if="haslogin" class="tmsg-replay" @click="respondMsg(item.id, item.id, item.createBy)">
+                                <div v-if="haslogin" class="tmsg-replay"
+                                    @click="respondMsg(item.id, item.id, item.createBy)">
                                     回复
                                 </div>
+                                <div style="display: flex;">
+                                    <div>
+                                        <img width="20px" height="20px"
+                                            :src="isLiked[item.id] ? 'static/img/yzpl.png' : 'static/img/wzpl.png'"
+                                            @click="toggleLike(item.id)" />
+                                    </div>
+                                    <!-- <div style="margin-top: 3px;" v-if="likes[index].likes != 0">
+                                        {{ likes[index].likes }}
+                                    </div> -->
+                                    <div style="margin-top: 3px;">
+                                        <span v-for="e in likes" :key="e.id">
+                                            <span v-if="e.id == item.id && e.likes != 0">{{ e.likes }}</span>
+                                        </span>
+                                    </div>
+
+                                </div>
+
                             </section>
                         </article>
                         <ul v-show="item.children" class="tmsg-commentlist" style="padding-left:60px;">
@@ -70,10 +88,25 @@
                                     </header>
                                     <section>
                                         <p v-html="analyzeEmoji(citem.content)">{{citem.content}}</p>
-                                        <div v-show="haslogin" class="tmsg-replay"
-                                            @click="respondMsg(item.id, citem.id, citem.createBy)">
-                                            回复
+                                        <div>
+                                            <div v-show="haslogin" class="tmsg-replay"
+                                                @click="respondMsg(item.id, citem.id, citem.createBy)">
+                                                回复
+                                            </div>
+                                            <div style="display: flex;">
+                                                <div>
+                                                    <img width="20px" height="20px"
+                                                        :src="isLiked[citem.id] ? 'static/img/yzpl.png' : 'static/img/wzpl.png'"
+                                                        @click="toggleLike(citem.id)" />
+                                                </div>
+                                                <div style="margin-top: 3px;">
+                                                    <span v-for="e in likes" :key="e.id">
+                                                        <span v-if="e.id == citem.id && e.likes != 0">{{ e.likes }}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     </section>
                                 </article>
                             </li>
@@ -91,12 +124,18 @@
 <script>
 import { sendComment, getArticleComment, getLinkComment } from '../api/comment.js'
 import { getToken } from '../utils/auth.js'
+import request from "@/utils/request.js"
 export default {
     data() { //选项 / 数据
         return {
             respondBox: '',//评论表单
             listDom: '',//评论列表
             tmsgBox: '',//总评论盒子
+            iconSrc: [],
+            commentIds: [],//评论id
+            isLiked: {},//某条评论是否点赞
+            comments: [],//记录点赞的评论
+            likes: [],
             // 查询参数
             queryParams: {
                 pageNum: 1,
@@ -204,9 +243,73 @@ export default {
                 //加载更多
                 this.commentList = this.commentList.concat(msg);
             }
-
+            this.commentList.forEach(element => {
+                this.commentIds.push(element.id)
+                this.likes.push({ 'id': element.id, 'likes': element.likes })
+                let children = element.children != null ? element.children : [];
+                children.forEach(child => {
+                    this.commentIds.push(child.id)
+                    this.likes.push({ 'id': child.id, 'likes': child.likes })
+                })
+            });
             this.hasMore = result.total > this.commentList.length
+            this.fetchLikeStatus();
         },
+        getLikes(id) {
+            request.get(`/comment/likes/${id}`)
+                .then(response => {
+                    this.likes.forEach(element => {
+                        if (element.id == id) {
+                            element.likes = response;
+                        }
+                    })
+                })
+        },
+        fetchLikeStatus() {
+            if (this.haslogin) {
+                // console.log(this.commentIds)
+                const intCommentIds = this.commentIds.map(id => parseInt(id));
+                request.post('/like/comment', {
+                    commentIds: intCommentIds
+                })
+                    .then((response) => {
+                        response.forEach(id => {
+                            this.$set(this.isLiked, id, true);
+                        })
+                        // this.isLiked = true;
+                        // this.iconSrc = this.isLiked ? "static/img/yzpl.png" : "static/img/wzpl.png";
+                    })
+            }
+        },
+        toggleLike(id) {
+            // Check if the comment is already liked
+            if (this.isLiked[id]) {
+                // If liked, send a request to unlike
+                request.post(`/like/comment/${id}`)
+                    .then(() => {
+                        // Update isLiked and iconSrc
+                        this.$set(this.isLiked, id, false);
+                        this.iconSrc[id] = 'static/img/wzpl.png';
+                        this.getLikes(id);
+                    })
+                    .catch((error) => {
+                        console.error('Failed to unlike comment:', error);
+                    });
+            } else {
+                // If not liked, send a request to like
+                request.post(`/like/comment/${id}`)
+                    .then(() => {
+                        // Update isLiked and iconSrc
+                        this.$set(this.isLiked, id, true);
+                        this.iconSrc[id] = 'static/img/yzpl.png';
+                        this.getLikes(id);
+                    })
+                    .catch((error) => {
+                        console.error('Failed to like comment:', error);
+                    });
+            }
+        },
+
         //选择表情包
         choseEmoji: function (inner) {
             this.textarea += '[' + inner + ']';
@@ -308,7 +411,7 @@ export default {
                 getArticleComment(that.queryParams).then((response) => {
                     that.setData(initData, response);
                 })
-            }else {//其他评论
+            } else {//其他评论
                 if (that.$route.name == 'FriendsLink') {
                     that.type = 1
                     getLinkComment(that.queryParams).then((response) => {
@@ -1085,4 +1188,5 @@ export default {
     font-size: 12px;
     color: #64609E;
     cursor: pointer;
-}</style>
+}
+</style>

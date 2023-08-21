@@ -17,6 +17,7 @@
       <h2>
         <i class="fa fa-fw fa-user"></i>发表于 <span>{{ detailObj.createTime }}</span> •
         <i class="fa fa-fw fa-eye"></i>{{ detailObj.viewCount }} 次围观 •
+        <i class="fa fa-fw fa-heart"></i>{{ detailObj.likes }} 次点赞 •
       </h2>
       <div class="ui label">
         <a :href="'#/Share?classId=' + detailObj.categoryId">{{ detailObj.categoryName }}</a>

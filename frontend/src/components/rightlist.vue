@@ -3,14 +3,10 @@
   <div class="rightlistBox">
     <section>
       <div class="r1-head">
-        <img
-          :src="
-            this.$store.state.themeObj.center_smailimg
-              ? this.$store.state.themeObj.center_smailimg
-              : 'static/img/img01.jpg'
-          "
-          alt=""
-        />
+        <img :src="this.$store.state.themeObj.center_smailimg
+          ? this.$store.state.themeObj.center_smailimg
+          : 'static/img/img01.jpg'
+          " alt="" />
         <h1 v-if="this.$store.state.themeObj.user_start != 0">
           <span>请别再唤我为孤独之人</span>
         </h1>
@@ -20,43 +16,20 @@
         <div class="catch-me">
           <div class="">
             <el-tooltip class="item" content="Github" placement="top">
-              <a :href="catchMeObj.git" target="_blank"
-                ><i class="fa fa-fw fa-github"></i
-              ></a>
+              <a :href="catchMeObj.git" target="_blank"><i class="fa fa-fw fa-github"></i></a>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="QQ" placement="top">
-              <a :href="catchMeObj.qq" target="_blank"
-                ><i class="fa fa-fw fa-qq"></i
-              ></a>
+              <a :href="catchMeObj.qq" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
             </el-tooltip>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="微博"
-              placement="top"
-            >
-              <a :href="catchMeObj.sina" target="_blank"
-                ><i class="fa fa-fw fa-weibo"></i
-              ></a>
+            <el-tooltip class="item" effect="dark" content="微博" placement="top">
+              <a :href="catchMeObj.sina" target="_blank"><i class="fa fa-fw fa-weibo"></i></a>
             </el-tooltip>
           </div>
           <div class="">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="微信"
-              placement="top"
-            >
-              <a :href="catchMeObj.wechat" target="_blank"
-                ><i class="fa fa-fw fa-wechat"></i
-              ></a>
+            <el-tooltip class="item" effect="dark" content="微信" placement="top">
+              <a :href="catchMeObj.wechat" target="_blank"><i class="fa fa-fw fa-wechat"></i></a>
             </el-tooltip>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="CSDN"
-              placement="top"
-            >
+            <el-tooltip class="item" effect="dark" content="CSDN" placement="top">
               <a :href="catchMeObj.csdn" target="_blank"><i class="">C</i></a>
             </el-tooltip>
           </div>
@@ -74,39 +47,38 @@
         </li>
       </ul>
     </section>
+    <section class="rs4">
+      <h2 class="ui label">登录信息</h2>
+      <br>
+      <div v-if="IpInfo.ip" style="font-family: 楷体">
+        登录设备:<span>{{ IpInfo.dev }}</span> &nbsp;<i class="fa fa-ellipsis-v"></i> &nbsp;
+        IP:<span>{{ IpInfo.ip }}</span><br>
+        位置:<span v-if="IpInfo.address">{{ IpInfo.address }}</span> <span v-else>暂无位置信息</span> <br>
+        <p id="showTime">时间：{{ formattedTime }}</p>
+      </div>
+      <div v-else>
+        <span>登陆后查看</span>
+      </div>
+
+    </section>
     <hr>
     <section class="rs4">
       <a href="http://beian.miit.gov.cn/">
-豫ICP备2023004704号</a>
+        豫ICP备2023004704号</a>
     </section>
     <!-- 右侧上滑小图片 -->
-    <div
-      v-if="this.$store.state.themeObj.user_start != 0"
-      :class="gotoTop ? 'toTop hidden' : 'toTop goTop hidden'"
-      @click="toTopfun"
-    >
-      <img
-        :src="
-          this.$store.state.themeObj.right_img
-            ? this.$store.state.themeObj.right_img
-            : 'static/img/scroll.png'
-        "
-        alt=""
-      />
+    <div v-if="this.$store.state.themeObj.user_start != 0" :class="gotoTop ? 'toTop hidden' : 'toTop goTop hidden'"
+      @click="toTopfun">
+      <img :src="this.$store.state.themeObj.right_img
+        ? this.$store.state.themeObj.right_img
+        : 'static/img/scroll.png'
+        " alt="" />
     </div>
-    <div
-      v-else
-      :class="gotoTop ? 'toTophui hidden' : 'toTophui goTophui hidden'"
-      @click="toTopfun"
-    >
-      <img
-        :src="
-          this.$store.state.themeObj.right_img
-            ? this.$store.state.themeObj.right_img
-            : 'static/img/scroll.png'
-        "
-        alt=""
-      />
+    <div v-else :class="gotoTop ? 'toTophui hidden' : 'toTophui goTophui hidden'" @click="toTopfun">
+      <img :src="this.$store.state.themeObj.right_img
+        ? this.$store.state.themeObj.right_img
+        : 'static/img/scroll.png'
+        " alt="" />
     </div>
   </div>
 </template>
@@ -114,16 +86,19 @@
 
 <script>
 import { hotArticleList } from "../api/article";
+import request from "@/utils/request.js"
 export default {
   data() {
     //选项 / 数据
     return {
       fixDo: false,
       loveme: false,
+      IpInfo: "",//ip
       gotoTop: false, //返回顶部
       going: false, //是否正在执行上滑动作
       browseList: "", //热门文章 浏览量最多
       artCommentList: "", //最新评论
+      formattedTime: "",
       catchMeObj: {
         //个人信息
         git: "https://github.com",
@@ -156,9 +131,34 @@ export default {
         }
       }, 30);
     },
+    getTime() {
+      let myClock = setInterval(() => {
+        let date = new Date();
+        // 获取日期的各个部分
+        let year = date.getFullYear();
+        let month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份补齐两位数
+        let day = date.getDate().toString().padStart(2, '0'); // 天数补齐两位数
+        let hours = date.getHours().toString().padStart(2, '0'); // 小时补齐两位数
+        let minutes = date.getMinutes().toString().padStart(2, '0'); // 分钟补齐两位数
+        let seconds = date.getSeconds().toString().padStart(2, '0'); // 秒数补齐两位数
+
+        // 获取星期的文本表示
+        let weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+        let dayOfWeek = weekdays[date.getDay()];
+
+        // 将各部分拼接成格式化的时间字符串
+        this.formattedTime = `${year}-${month}-${day} 星期${dayOfWeek} ${hours}:${minutes}:${seconds}`;
+      }, 1000);
+    },
+
     getHotArticleList() {
       hotArticleList().then((response) => {
         this.browseList = response;
+      });
+    },
+    getIpList() {
+      request.post("/ip").then((response) => {
+        this.IpInfo = response
       });
     },
   },
@@ -187,7 +187,8 @@ export default {
     };
     //查询浏览量最多的10篇文章数据
     this.getHotArticleList();
-
+    this.getIpList();
+    this.getTime();
   },
 };
 </script>
@@ -196,6 +197,7 @@ export default {
 .rightlistBox {
   position: relative;
 }
+
 .rightlistBox section {
   transition: all 0.2s linear;
   position: relative;
@@ -204,10 +206,12 @@ export default {
   margin-bottom: 20px;
   border-radius: 5px;
 }
+
 .rightlistBox section:hover {
   transform: translate(0, -2px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
+
 .rightlistBox .r1-head {
   text-align: center;
   border-radius: 4px 4px 0 0;
@@ -215,10 +219,12 @@ export default {
   position: relative;
   /*box-shadow: inset 0 -70px 100px -50px rgba(0,0,0,.5);*/
 }
+
 .rightlistBox .r1-head img {
   width: 100%;
   min-height: 100px;
 }
+
 .rightlistBox .r1-head h1 {
   position: absolute;
   bottom: 5px;
@@ -231,28 +237,34 @@ export default {
   width: 130px;
   left: 50%;
 }
+
 .rightlistBox .r1-head h1 span {
   opacity: 0.3;
 }
+
 .rightlistBox .r1-body p {
   font-size: 14px;
   margin: 5px 0 8px 0;
   font-weight: 700;
   text-align: center;
 }
+
 .rightlistBox .r1-body .catch-me {
   text-align: center;
 }
+
 .rightlistBox .r1-body .catch-me a {
   display: inline-block;
   margin-bottom: 7px;
   position: relative;
   text-decoration: none;
 }
+
 .rightlistBox .r1-body .catch-me a:hover i {
   color: #fff;
   background: #f4692c;
 }
+
 .rightlistBox .r1-body .catch-me a i {
   display: inline-block;
   font-size: 18px;
@@ -272,11 +284,13 @@ export default {
   /*padding:10px 0 4px 0;*/
   min-height: 100px;
 }
+
 .rightlistBox .rs2.fixed {
   position: fixed;
   top: 40px;
   width: 22%;
 }
+
 .rightlistBox .rs2 p {
   color: #df2050;
   cursor: pointer;
@@ -289,6 +303,7 @@ export default {
   margin-top: 10px;
   font-weight: 500;
 }
+
 .rightlistBox .rs2 div {
   color: #df2050;
   cursor: pointer;
@@ -301,6 +316,7 @@ export default {
   left: 0;
   top: 30px;
 }
+
 .rightlistBox .rs2 div i.heart {
   display: inline-block;
   text-align: center;
@@ -317,23 +333,28 @@ export default {
   transition-duration: 0s;
   vertical-align: middle;
 }
+
 .rightlistBox .rs2 div i.heart:hover {
   transform: scale(1.15);
   -webkit-transform: scale(1.15);
 }
+
 .rightlistBox .rs2 div i.heart.active {
   -webkit-transition-duration: 1s;
   transition-duration: 1s;
   background-position: -2800px 0;
 }
+
 .rightlistBox .rs2 div span {
   margin-left: -30px;
 }
+
 /**********排队来说*************/
 .rightlistBox .rs3 .rs3-item {
   font-size: 13px;
   line-height: 20px;
 }
+
 .rightlistBox .rs3 .rs3-item a {
   display: block;
   padding: 5px;
@@ -341,40 +362,50 @@ export default {
   border-bottom: 1px solid #ddd;
   margin: 5px 0;
 }
+
 .rightlistBox .rs3 .rs3-item a:hover {
   background: rgba(230, 244, 250, 0.5);
   border-radius: 5px;
 }
+
 .rightlistBox .rs3 .rs3-photo {
   float: left;
 }
+
 .rightlistBox .rs3 .rs3-photo img {
   border-radius: 50%;
   width: 32px;
   height: 32px;
   object-fit: cover;
 }
+
 .rightlistBox .rs3 .rs3-inner {
   margin-left: 40px;
 }
+
 .rightlistBox .rs3 .rs3-inner .rs3-author {
   font-weight: 700;
 }
+
 .rightlistBox .rs3 .rs3-inner .rs3-text {
   font-size: 12px;
   text-align: justify;
 }
+
 .rightlistBox .rs3 .rs3-item:last-child a {
   border-bottom: none;
 }
+
 /************排队看这些***************/
 .rightlistBox .rs4 li {
   padding: 8px 0;
   text-align: justify;
 }
+
 .rightlistBox .rs4 li a {
   font-weight: 600;
 }
+
 .rightlistBox .rs4 li a:hover {
   color: #64609e;
 }
@@ -391,14 +422,17 @@ export default {
   transition: all 0.5s 0.3s ease-in-out;
   cursor: pointer;
 }
+
 .goTop {
   top: -950px;
 }
+
 .toTop img,
 .toTophui img {
   width: 100%;
   height: auto;
 }
+
 .toTophui {
   position: fixed;
   right: 10px;
@@ -410,20 +444,24 @@ export default {
   cursor: pointer;
   animation: toflow 2s ease-in-out infinite;
 }
+
 @keyframes toflow {
   0% {
     /*top:400px;*/
     transform: scale(0.95) translate(0, 10px);
   }
+
   50% {
     /*top:410px;*/
     transform: scale(1) translate(0, 0px);
   }
+
   100% {
     /*top:400px;*/
     transform: scale(0.95) translate(0, 10px);
   }
 }
+
 .goTophui {
   bottom: 120vh;
 }

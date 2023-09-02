@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EasyCodeTableSetting">
+    <option name="tableInfoMap">
+      <map>
+        <entry key="yuuu_blog.yuuu_liked">
+          <value>
+            <TableInfoDTO>
+              <option name="fullColumn">
+                <list>
+                  <ColumnInfoDTO>
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="id" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="comment" value="文章id" />
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="articleId" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="comment" value="用户id" />
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="userId" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="comment" value="文章是否点赞，1点赞，0未点赞" />
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="isLikeA" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="comment" value="评论id" />
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="commentId" />
+                    <option name="type" value="java.lang.Long" />
+                  </ColumnInfoDTO>
+                  <ColumnInfoDTO>
+                    <option name="comment" value="评论是否点赞，1点赞，0未点赞" />
+                    <option name="custom" value="false" />
+                    <option name="ext" value="{}" />
+                    <option name="name" value="isLikeC" />
+                    <option name="type" value="java.lang.Integer" />
+                  </ColumnInfoDTO>
+                </list>
+              </option>
+              <option name="name" value="YuuuLiked" />
+              <option name="preName" value="yuuu_" />
+              <option name="saveModelName" value="yuuu-framework" />
+              <option name="savePackageName" value="" />
+              <option name="savePath" value="./yuuu-framework/src/main/java" />
+              <option name="templateGroupName" value="MybatisPlus" />
+            </TableInfoDTO>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

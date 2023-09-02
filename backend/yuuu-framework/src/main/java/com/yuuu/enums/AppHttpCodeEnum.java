@@ -15,7 +15,7 @@ public enum AppHttpCodeEnum {
     FILE_TYPE_ERROR(507, "文件格式错误"),
     UPDATE_ERROR(509, "非法修改"),
     NOT_NULL(510, "信息不能为空"),
-    EMAIL_ERROR(603, "验证码发送失败，请稍后再试！"),
+    EMAIL_ERROR(603, "验证码发送失败，请稍后再试！ps:可以联系博主，他的qq账号又出问题了~~~"),
     NOT_UNIQUE(510, "信息已存在"),
     LOGIN_ERROR(505, "用户名或密码错误"),
     EMAIL_ISNULL(604, "邮箱不能为空"),

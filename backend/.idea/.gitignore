@@ -13,7 +13,7 @@
 .project
 .classpath
 .settings/
-
+*.yml
 # Intellij
 *.ipr
 *.iml

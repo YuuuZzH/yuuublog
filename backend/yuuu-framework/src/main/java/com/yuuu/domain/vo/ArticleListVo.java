@@ -19,10 +19,11 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleListVo {
-    @TableId
     private Long id;
     //标题
     private String title;
+    // 文章分类Id
+    private Long categoryId;
     //文章内容
     private String content;
     //所属分类名

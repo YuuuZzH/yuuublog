@@ -2,9 +2,13 @@ package com.yuuu.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.yuuu.domain.ResponseResult;
+import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.service.ArticleService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -57,8 +61,14 @@ public class ArticleController {
     @GetMapping("/search")
     public ResponseResult articleDetailByTitle(@RequestParam String title){
         if (StrUtil.isBlank(title)){
-            return ResponseResult.errorResult(614,"文章标题错误");
+            return ResponseResult.errorResult(AppHttpCodeEnum.INPUT_ERROR);
         }
         return articleService.articleDetailByTitle(title);
     }
+
+    @GetMapping("/download/{id}")
+    public ResponseResult download(@PathVariable("id") Long id) {
+        return articleService.download(id);
+    }
+
 }

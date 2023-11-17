@@ -19,11 +19,20 @@ import java.util.List;
 
 @Configuration
 public class MobileConfig implements WebMvcConfigurer {
+
+    /**
+     * @author yuuu
+     * @description 设备解析Bean
+     */
     @Bean
     public DeviceResolverHandlerInterceptor deviceResolverHandlerInterceptor() {
         return new DeviceResolverHandlerInterceptor();
     }
 
+    /**
+     * @author yuuu
+     * @description 解析设备信息
+     */
     @Bean
     public DeviceHandlerMethodArgumentResolver
     deviceHandlerMethodArgumentResolver() {

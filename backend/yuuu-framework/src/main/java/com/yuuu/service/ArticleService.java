@@ -6,6 +6,9 @@ import com.yuuu.domain.dto.ArticleListDto;
 import com.yuuu.domain.entity.Article;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.vo.ArticleByIdVo;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 
 /**
  * @BelongsProject:YuuuBlog
@@ -38,4 +41,5 @@ public interface ArticleService extends IService<Article> {
 
     ResponseResult articleDetailByTitle(String title);
 
+    ResponseResult download(Long id);
 }

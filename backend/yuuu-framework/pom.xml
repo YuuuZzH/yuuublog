@@ -109,8 +109,17 @@
             <artifactId>hutool-all</artifactId>
             <version>5.7.17</version>
         </dependency>
-
-
+        <!-- https://mvnrepository.com/artifact/com.atlassian.commonmark/commonmark -->
+        <dependency>
+            <groupId>com.atlassian.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>0.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.2</version>
+        </dependency>
     </dependencies>
 
 </project>

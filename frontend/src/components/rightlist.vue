@@ -157,9 +157,11 @@ export default {
       });
     },
     getIpList() {
-      request.post("/ip").then((response) => {
-        this.IpInfo = response
-      });
+      if (localStorage.getItem("userInfo")) {
+        request.post("/ip").then((response) => {
+          this.IpInfo = response
+        });
+      }
     },
   },
   components: {

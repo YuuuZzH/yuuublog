@@ -64,8 +64,7 @@
 			</div>
 			<div class="h-information">
 
-				<img :src="this.$store.state.themeObj.head_portrait ? this.$store.state.themeObj.head_portrait : 'static/img/tou.png'"
-					alt="">
+				<img :src="userInfoObj.avatar ? userInfoObj.avatar : 'static/img/tou.png'" alt="">
 
 				<h2 class="h-description">
 
@@ -80,6 +79,7 @@
 import { logout } from '../api/user'
 import { removeToken } from '../utils/auth'
 import { getCategoryList } from '../api/category'
+import { getUserInfo } from '../api/user.js'//获取用户信息，保存用户信息
 import request from "@/utils/request.js"
 import {
 	Typeit
@@ -95,12 +95,13 @@ export default {
 			pMenu: true, //手机端菜单打开
 			// path:'',//当前打开页面的路径
 			input: '', //input输入内容
+			userInfoObj: '',//用户的信息
 			headBg: 'url(static/img/headbg05.jpg)', //头部背景图
 			headTou: '', //头像
 			projectList: '', //项目列表
 			inputValue: '',//搜索关键字
 			suggestions: [],//关键字返回列表,
-			aid : ''
+			aid: ''
 		}
 	},
 	methods: { //事件处理器
@@ -145,7 +146,7 @@ export default {
 			// console.log("item",item)
 			if (item.value === '没有匹配项') {
 				event.preventDefault()
-			}else{
+			} else {
 				this.aid = item.id
 			}
 		},
@@ -173,9 +174,17 @@ export default {
 		},
 		searchContent() {//按关键字搜索文章
 			// this.$router.push({ name: 'DetailArticle', params: { inputValue: inputValue } });
-			const routeData = this.$router.resolve({ name: 'DetailArticle', query: { aid: this.aid } });
-			window.open(routeData.href, '_blank');
-			this.inputValue = '';
+			if (this.id === undefined || this.aid === '') {
+				this.$router.push({ name: 'NotFind' });
+				this.inputValue = '';
+				setTimeout(() => {
+					this.$router.push({ path: '/' }); // 你的首页路径
+				}, 3000);
+			} else {
+				const routeData = this.$router.resolve({ name: 'DetailArticle', query: { aid: this.aid } });
+				window.open(routeData.href, '_blank');
+				this.inputValue = '';
+			}
 		},
 		// 用户退出登录
 		userlogout: function () {
@@ -220,6 +229,17 @@ export default {
 			}
 			//获取分类
 			this.getCategoryList()
+			if (localStorage.getItem('userInfo')) {
+				that.haslogin = true;
+				that.userInfo = JSON.parse(localStorage.getItem('userInfo'));
+				that.userId = that.userInfo.id;
+				getUserInfo(that.userId).then((response) => {
+					that.userInfoObj = response;
+					that.userInfoObj.head_start = 0;
+				})
+			} else {
+				that.haslogin = false;
+			}
 
 			if ((this.$route.name == "Share" || this.$route.name == "Home") && this.$store.state.keywords) {
 				this.input = this.$store.state.keywords;

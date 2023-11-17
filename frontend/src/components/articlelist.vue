@@ -18,10 +18,10 @@
                     <i class="fa fa-fw fa-clock-o"></i><span v-html="showInitDate(item.createTime,'all')">{{showInitDate(item.createTime,'all')}}</span> •
                     <i class="fa fa-fw fa-eye"></i>{{item.viewCount}} 次围观 •
                     <i class="fa fa-fw fa-heart"></i>{{ item.likes }} 次点赞 •
-
                 </h2>
+                
                 <div class="ui label">
-                    <a :href="'#/Share?classId='+item.class_id">{{item.categoryName}}</a>
+                    <a :href="'#/Share?classId='+item.categoryId">{{item.categoryName}}</a>
                 </div>
             </header>
             <div class="article-content">

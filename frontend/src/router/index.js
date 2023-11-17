@@ -44,6 +44,14 @@ export default new Router({
 			name: 'Share'
 		}, //分类
 		{
+			path: '/notFind',
+			component: resolve => require(['../pages/NotFind.vue'], resolve),
+			meta: {
+				auth: true
+			},
+			name: 'NotFind'
+		}, //404
+		{
 			path: '/DetailArticle',
 			component: resolve => require(['../pages/DetailArticle.vue'], resolve),
 			meta: {

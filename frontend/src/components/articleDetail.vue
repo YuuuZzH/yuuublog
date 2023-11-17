@@ -24,37 +24,37 @@
       </div>
     </header>
     <div class="article-content markdown-body" v-html="detailObj.content"></div>
-    <div style="display: grid; grid-template-columns: 75% 12% 13%;">
-      <div class="donate">
-        <div class="donate-word">
-          <span @click="pdonate = !pdonate">赞赏</span>
-        </div>
-        <el-row :class="pdonate ? 'donate-body' : 'donate-body donate-body-show'" :gutter="30">
-          <el-col :span="12" class="donate-item">
-            <div class="donate-tip">
-              <img :src="detailObj.wechat_image ? detailObj.wechat_image : 'static/img/wx_pay.png'"
-                :onerror="$store.state.errorImg" />
-              <span>微信扫一扫，向我赞赏</span>
-            </div>
-          </el-col>
-          <el-col :span="12" class="donate-item">
-            <div class="donate-tip">
-              <img :src="detailObj.alipay_image ? detailObj.alipay_image : 'static/img/ali_pay.jpg'"
-                :onerror="$store.state.errorImg" />
-              <span>支付宝扫一扫，向我赞赏</span>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-      <div style="margin-top: 37px;">
 
-        <img style="width: 35px; height: 35px; cursor: pointer;" :src="iconSrc" @click="toggleLike" />
-        <img style="width: 35px; height: 35px; cursor: pointer;" :src="iconSrcDis" @click="toggleDisLike" />
+    <div class="donate">
+      <div class="donate-word">
+        <span @click="pdonate = !pdonate">赞赏</span>
+        <div class="btnMenuCss">
+          <img style="width: 35px; height: 35px; cursor: pointer;" :src="iconSrc" @click="toggleLike" />
+          <img style="width: 35px; height: 35px; cursor: pointer;" :src="iconSrcDis" @click="toggleDisLike" />
+          <el-button style="margin-left: 5px;" size="small" type="primary" @click="forwardPage"
+            icon="el-icon-share"></el-button>
+          <el-button size="small" type="primary" @click="downloadById" icon="el-icon-download"></el-button>
+        </div>
       </div>
-      <div style="margin-top: 37px;">
-        <el-button type="primary" @click="forwardPage" icon="el-icon-share"></el-button>
-      </div>
+      <el-row :class="pdonate ? 'donate-body' : 'donate-body donate-body-show'" :gutter="30">
+        <el-col :span="12" class="donate-item">
+          <div class="donate-tip">
+            <img :src="detailObj.wechat_image ? detailObj.wechat_image : 'static/img/wx_pay.png'"
+              :onerror="$store.state.errorImg" />
+            <span>微信扫一扫，向我赞赏</span>
+          </div>
+        </el-col>
+        <el-col :span="12" class="donate-item">
+          <div class="donate-tip">
+            <img :src="detailObj.alipay_image ? detailObj.alipay_image : 'static/img/ali_pay.jpg'"
+              :onerror="$store.state.errorImg" />
+            <span>支付宝扫一扫，向我赞赏</span>
+          </div>
+        </el-col>
+      </el-row>
     </div>
+
+
 
   </div>
 </template>
@@ -63,7 +63,9 @@
 import { initDate } from '../utils/server.js'
 import { getArticle, updateViewCount } from '../api/article.js'
 import { mavonEditor } from 'mavon-editor'
+import * as FileSaver from 'file-saver';
 import request from "@/utils/request.js"
+import mammoth from 'mammoth'
 export default {
   data() { //选项 / 数据
     return {
@@ -108,6 +110,27 @@ export default {
           }
         })
     },
+    async downloadById() {
+      try {
+        const response = await request.get(`/article/download/${this.aid}`, {}, { responseType: 'blob' });
+        const content = response.content;
+            const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const link = document.createElement('a');
+            link.style.display = 'none';
+            link.href = URL.createObjectURL(blob);
+            link.download = response.title + '.docx';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+            this.$message.success('客官莫急，已经在飞速下载了~(推荐使用WPS)');
+          
+      } catch (error) {
+        console.error('下载失败', error);
+        this.$message.error('下载失败，请重试或联系管理员');
+      }
+    }
+    ,
     toggleDisLike() {
       if (this.isDisLiked) {
         this.isDisLiked = false;
@@ -146,7 +169,14 @@ export default {
         const markdownIt = mavonEditor.getMarkdownIt()
         // markdownIt.re
         this.detailObj.content = markdownIt.render(response.content);
-      })
+      }).catch(
+        (error) => {
+          this.$router.push({ name: 'NotFind' });
+          setTimeout(() => {
+            this.$router.push({ path: '/' }); // 你的首页路径
+          }, 3000);
+        }
+      )
     },
     routeChange: function () {
       var that = this;
@@ -183,6 +213,14 @@ export default {
 </script>
 
 <style lang="less">
+.btnMenuCss {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 25px;
+  top: 0;
+}
+
 .detailBox .article-content {
   font-size: 15px;
   white-space: normal;
@@ -343,6 +381,7 @@ export default {
 .donate-word {
   margin: 40px 0;
   text-align: center;
+  position: relative;
 }
 
 .donate-word span {

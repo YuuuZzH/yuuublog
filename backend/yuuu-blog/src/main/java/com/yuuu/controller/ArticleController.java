@@ -11,6 +11,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * @BelongsProject:YuuuBlog
  * @BelongsPackage:com.yuuu.controller
@@ -67,8 +69,8 @@ public class ArticleController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseResult download(@PathVariable("id") Long id) {
-        return articleService.download(id);
+    public CompletableFuture<ResponseResult> download(@PathVariable("id") Long id) {
+        return articleService.downloadAsync(id);
     }
 
 }

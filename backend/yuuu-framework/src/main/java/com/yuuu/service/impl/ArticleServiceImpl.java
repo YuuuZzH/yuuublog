@@ -45,6 +45,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static com.yuuu.constants.SystemConstants.ARTICLE_STATUS_NORMAL;
@@ -256,9 +259,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return ResponseResult.okResult(articleByIdVo);
     }
 
+    private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
-
-    @Override
+    /*@Override
     public ResponseResult download(Long id) {
         Article article = getById(id);
         // 示例Markdown内容
@@ -269,6 +272,23 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         data.put("title", article.getTitle());
         data.put("content", htmlContent);
         return ResponseResult.okResult(data);
+    }*/
+
+    @Override
+    public CompletableFuture<ResponseResult> downloadAsync(Long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Article article = getById(id);
+                String markdownContent = article.getContent();
+                Map<String, String> data = new HashMap<>();
+                String htmlContent = parseMarkdownToHtml(markdownContent);
+                data.put("title", article.getTitle());
+                data.put("content", htmlContent);
+                return ResponseResult.okResult(data);
+            } catch (Exception e) {
+                throw new RuntimeException("下载失败", e);
+            }
+        }, executorService);
     }
     private String parseMarkdownToHtml(String markdownContent) {
         Parser parser = Parser.builder().build();

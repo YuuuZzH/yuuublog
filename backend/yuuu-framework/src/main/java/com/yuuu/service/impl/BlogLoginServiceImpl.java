@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @BelongsProject:YuuuBlog
@@ -55,9 +56,9 @@ public class BlogLoginServiceImpl implements BlogLoginService {
         //获取userId，生成token
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
         String userId = loginUser.getUser().getId().toString();
-        String jwt = JwtUtil.createJWT(userId);
+        String jwt = JwtUtil.createJWT(userId,1800L);
         //把用户信息存入redis
-        redisCache.setCacheObject(SystemConstants.BLOG_LOGIN_KEY + userId,loginUser);
+        redisCache.setCacheObject(SystemConstants.BLOG_LOGIN_KEY + userId,loginUser,1800, TimeUnit.SECONDS);
         //把token和userInfo封装返回
         //把user转换为userInfo
         UserInfoVo userInfoVo = BeanCopyUtils.copyBean(loginUser.getUser(), UserInfoVo.class);

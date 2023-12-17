@@ -10,6 +10,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * @BelongsProject:YuuuBlog
  * @BelongsPackage:com.yuuu.service
@@ -41,5 +43,5 @@ public interface ArticleService extends IService<Article> {
 
     ResponseResult articleDetailByTitle(String title);
 
-    ResponseResult download(Long id);
+    CompletableFuture<ResponseResult> downloadAsync(Long id);
 }

@@ -36,6 +36,7 @@
                         <li>
                             <span class="leftTitle">性别</span>
                             <template>
+                            
                               <el-radio class="radio" v-model="userInfoObj.sex" label="0">男</el-radio>
                               <el-radio class="radio" v-model="userInfoObj.sex" label="1">女</el-radio>
                             </template>
@@ -76,7 +77,7 @@
                         </li>
                         <li>
                             <span class="leftTitle">性别</span>
-                            <span>{{userInfoObj.sex==0?'男':'女'}}</span>
+                            <span>{{userInfoObj.sex == null ?  "未知" : userInfoObj.sex == 0  ?'男':'女'}}</span>
                         </li>
 
                      

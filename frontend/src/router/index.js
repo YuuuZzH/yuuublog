@@ -94,6 +94,14 @@ export default new Router({
 			name: 'Login'
 		}, //注册登录
 		{
+			path: '/Loading',
+			component: resolve => require(['../pages/Loading.vue'], resolve),
+			meta: {
+				auth: false
+			},
+			name: 'Loading'
+		}, //注册登录
+		{
 			path: '/UserInfo',
 			component: resolve => require(['../pages/UserInfo.vue'], resolve),
 			meta: {

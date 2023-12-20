@@ -57,6 +57,35 @@
                 <div class="lr-btn tcolors-bg" @click="changePassword">确定</div>
             </div>
 
+
+            <!-- 绑定第三方登录信息 -->
+            <div v-if="login == 9" class="changePasswordBox">
+                <div class="lr-title">
+                    <h1>请完成绑定</h1>
+                </div>
+                <el-alert v-show="changePasswordErr" :title="changePasswordTitle" type="error" show-icon :closable="false">
+                </el-alert>
+                <el-input style="margin-bottom: 30px;" type="text" placeholder="邮箱" v-model="emailPassword">
+                </el-input>
+                <!-- 验证码 -->
+                <el-row>
+                    <el-col :span="14">
+                        <el-input type="text" placeholder="验证码" v-model="emailCaptchaUpdate">
+                        </el-input>
+                    </el-col>
+                    <el-col :span="10">
+                        <el-button style="width:100%;text-align: left;margin-bottom: 30px" type="primary" plain
+                            icon="el-icon-message" @click="sendCodeForUpdatePassword" :disabled="isButtonDisabled2">
+                            发送验证码
+                        </el-button>
+                    </el-col>
+                </el-row>
+
+                <el-alert v-show="uemailErr" title="邮箱不能为空" type="error" show-icon :closable="false">
+                </el-alert>
+                <div class="lr-btn tcolors-bg" @click="oauthWithGithub">确定</div>
+            </div>
+
             <!-- 登录 -->
             <div v-if="login == 1" class="loginBox">
                 <div class="lr-title">
@@ -78,10 +107,14 @@
                 </div>
                 <h3><a href="#/Login?login=2">忘记密码？</a></h3>
                 <div class="lr-btn tcolors-bg" @click="gotoHome">登录</div>
+
                 <div class="otherLogin">
-                    <a href="javascript:void(0)"><i class="fa fa-fw fa-wechat"></i></a>
-                    <a href="javascript:void(0)"><i class="fa fa-fw fa-qq"></i></a>
-                    <a href="javascript:void(0)"><i class="fa fa-fw fa-weibo"></i></a>
+                    <a href="https://github.com/login/oauth/authorize?client_id=cdf2d217f805b03b6e63&state=github">
+                        <i class="fa fa-fw fa-github" style="background-color: black;"></i>
+                    </a>
+                    <a href="javascript:void(0)" @click="showAlert">
+                        <i class="fa fa-fw fa-qq"></i></a>
+                    <a href="javascript:void(0)" @click="showAlert"><i class="fa fa-fw fa-weibo"></i></a>
                 </div>
             </div>
             <!-- 注册 -->
@@ -137,6 +170,7 @@
 <script>
 import { userLogin, userRegister, sendVerificationCode, sendCodeForUpdatePassword, changePassword } from '../api/user.js'
 import { setToken } from '../utils/auth.js'
+import axios from 'axios'
 import { getCaptchaImg } from '@/api/captcha.js';
 import request from "@/utils/request.js"
 export default {
@@ -186,6 +220,7 @@ export default {
     mounted() {
         // 页面加载时刷新验证码
         this.refreshCaptcha();
+        this.oauth();
     },
     methods: { //事件处理器
         routeChange: function () {
@@ -194,12 +229,12 @@ export default {
             that.urlstate = that.$route.query.urlstate == undefined ? 0 : that.$route.query.urlstate;//获取传参的usrlstate状态码
             // console.log(that.login,that.urlstate);
         },
-        
-        changePassword:function () {
+
+        changePassword: function () {
             if (this.newPassword !== this.confirmNewPassword) {
                 this.changePasswordErr = true;
                 this.changePasswordTitle = '两次密码不匹配';
-            }else if(!this.emailCaptchaUpdate){
+            } else if (!this.emailCaptchaUpdate) {
                 this.$message.error('验证码不能为空');
             } else {
                 request.post('/user/updatePassword', {
@@ -223,6 +258,10 @@ export default {
                         console.log(error);
                     });
             }
+        },
+       
+        showAlert() {
+            alert("暂未接入，请使用Github登录")
         },
         sendCodeForUpdatePassword() {
             if (!this.emailPassword) {
@@ -253,6 +292,45 @@ export default {
                     this.timeLeft1 = 60;
 
                 });
+            }
+        },
+        oauth() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            if (code && code != '') {
+                axios.post('/user/oauth?code=',{code}).then(response => {
+                    console.log(response);
+                }) 
+            }
+        },
+        oauthWithGithub() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            if (!this.emailCaptchaUpdate) {
+                this.$message.error('验证码不能为空');
+            } else {
+                request.post('/user/oauth/github?code='+code, {
+                    emailPassword: this.emailPassword,
+                    confirmNewPassword: this.confirmNewPassword,
+                    emailCaptchaUpdate: this.emailCaptchaUpdate,
+                })
+                    .then((response) => {
+                        console.log(response)
+                        this.$alert('绑定成功', '', {
+                            confirmButtonText: '确定'
+                        })
+                        this.isButtonDisabled2 = false;
+                        this.emailPassword = '';
+                        this.emailCaptchaUpdate = '';
+                        setToken(response.token)
+                        localStorage.setItem("userInfo", JSON.stringify(response.userInfo))
+                        this.$router.push({ path: '/' });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
             }
         },
         sendVerificationCode() {
@@ -358,8 +436,8 @@ export default {
                 that.fullscreenLoading = true;
                 userRegister(that.nusername, that.nnickName, that.nemail, that.npassword, that.emailCaptcha).then((response) => {
                     this.$alert('注册成功', '', {
-                            confirmButtonText: '确定'
-                        })
+                        confirmButtonText: '确定'
+                    })
                     //注册成功后调整到登录
                     that.goLogin()
                 }).catch((error) => {
@@ -391,14 +469,16 @@ export default {
 </script>
 
 <style>
- @font-face {
-        font-family: 'CustomFont';
-        src: url('http://qiniu.yuuu.online/No.39-ShangShouZhiZunShuFaTi-2.ttf') format('truetype');
-    }
-    .wenzi {
-        font-size: 24px;
-        font-family: 'CustomFont';
-    }
+@font-face {
+    font-family: 'CustomFont';
+    src: url('http://qiniu.yuuu.online/No.39-ShangShouZhiZunShuFaTi-2.ttf') format('truetype');
+}
+
+.wenzi {
+    font-size: 24px;
+    font-family: 'CustomFont';
+}
+
 .container {
     opacity: 0.80;
 }
@@ -505,7 +585,7 @@ export default {
     text-align: center;
     margin-left: -40px;
     margin-right: -40px;
-    visibility: hidden;
+    /* visibility: hidden; */
 }
 
 .loginBox .otherLogin p {

@@ -39,5 +39,8 @@ public interface UserService extends IService<User> {
     ResponseResult updatePassword(ChangePassword user);
 
 
+    ResponseResult oauthGithub(ChangePassword user,String code);
+
+    ResponseResult oauth(String code);
 }
 

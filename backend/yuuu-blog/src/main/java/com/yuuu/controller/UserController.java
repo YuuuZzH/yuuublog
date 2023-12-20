@@ -59,12 +59,12 @@ public class UserController {
     public ResponseResult register(@RequestBody User user){
         return userService.register(user);
     }
-
+    private Random random = new Random();
     @PostMapping("/sendVerificationCode")
     public ResponseResult sendVerificationCode(@RequestBody Map<String, String> data) {//这是后端写好的接口
         String nemail = data.get("nemail");
         // Generate a random verification code
-        String verificationCode = String.format("%06d", new Random().nextInt(999999));
+        String verificationCode = String.format("%06d", this.random.nextInt(999999));
         // Save the verification code in Redis with a time-to-live of 5 minutes
         redisCache.setCacheObject(SystemConstants.MAIL_KEY + verificationCode,verificationCode,600, TimeUnit.SECONDS);
         // Send the verification code to the user's email address
@@ -88,18 +88,16 @@ public class UserController {
     public ResponseResult sendCodeForUpdatePassword(@RequestBody Map<String, String> data) {//这是后端写好的接口
         String emailPassword = data.get("emailPassword");
         // Generate a random verification code
-        String verificationCode = String.format("%06d", new Random().nextInt(999999));
+        String verificationCode = String.format("%06d", this.random.nextInt(999999));
         // Save the verification code in Redis with a time-to-live of 5 minutes
         redisCache.setCacheObject(SystemConstants.MAIL_KEY + verificationCode,verificationCode,600, TimeUnit.SECONDS);
         // Send the verification code to the user's email address
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("***REMOVED***");
         message.setTo(emailPassword);
-        message.setSubject("验证码来咯，这次可不要再忘记密码啦~~~");
+        message.setSubject("验证码来咯~~~");
         message.setSentDate(new DateTime(Instant.now()));
-        message.setText("【YuuuBlog】登录验证码: " + verificationCode + "，10分钟内有效。切勿将验证码提供给他人！高山仰止，景行行止，虽不能至，心向往之。");
-        System.out.println(message);
-        System.out.println(mailSender);
+        message.setText("【YuuuBlog】登录验证码: " + verificationCode + "，10分钟内有效。切勿将验证码提供给他人！\n高山仰止，景行行止，虽不能至，心向往之。");
         try {
             mailSender.send(message);
         } catch (MailException e) {
@@ -113,6 +111,17 @@ public class UserController {
 
         return userService.updatePassword(user);
     }
+
+    @PostMapping("/oauth/github")
+    public ResponseResult oauth(@RequestBody ChangePassword user,@RequestParam String code){
+        return userService.oauthGithub(user,code);
+    }
+
+    @PostMapping ("/oauth")
+    public ResponseResult oauth(@RequestParam String code,@RequestParam String state){
+        return userService.oauth(code);
+    }
+
 
 
 

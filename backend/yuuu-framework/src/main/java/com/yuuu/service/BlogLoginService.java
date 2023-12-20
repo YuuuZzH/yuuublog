@@ -2,6 +2,7 @@ package com.yuuu.service;
 
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.dto.UserLoginDto;
+import com.yuuu.domain.entity.User;
 
 /**
  * @BelongsProject:YuuuBlog

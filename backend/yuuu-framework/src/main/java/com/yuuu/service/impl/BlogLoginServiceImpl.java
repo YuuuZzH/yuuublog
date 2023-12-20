@@ -4,6 +4,7 @@ import com.yuuu.constants.SystemConstants;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.dto.UserLoginDto;
 import com.yuuu.domain.entity.LoginUser;
+import com.yuuu.domain.entity.User;
 import com.yuuu.domain.vo.BlogUserLoginVo;
 import com.yuuu.domain.vo.UserInfoVo;
 import com.yuuu.service.BlogLoginService;
@@ -56,7 +57,7 @@ public class BlogLoginServiceImpl implements BlogLoginService {
         //获取userId，生成token
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
         String userId = loginUser.getUser().getId().toString();
-        String jwt = JwtUtil.createJWT(userId,1800L);
+        String jwt = JwtUtil.createJWT(userId);
         //把用户信息存入redis
         redisCache.setCacheObject(SystemConstants.BLOG_LOGIN_KEY + userId,loginUser,1800, TimeUnit.SECONDS);
         //把token和userInfo封装返回
@@ -77,4 +78,6 @@ public class BlogLoginServiceImpl implements BlogLoginService {
         redisCache.deleteObject(SystemConstants.BLOG_LOGIN_KEY + id);
         return ResponseResult.okResult();
     }
+
+
 }

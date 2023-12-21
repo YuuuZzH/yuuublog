@@ -339,12 +339,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getEmail, email);
-        // String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY + captcha);
-        // if (!captcha.equals(cacheCaptcha)) {
-        //     return ResponseResult.errorResult(601, "请再检查一下验证码~");
-        // } else {
-        //     redisCache.deleteObject(SystemConstants.MAIL_KEY + captcha);
-        // }
+        String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY + captcha);
+        if (!captcha.equals(cacheCaptcha)) {
+            return ResponseResult.errorResult(601, "请再检查一下验证码~");
+        } else {
+            redisCache.deleteObject(SystemConstants.MAIL_KEY + captcha);
+        }
         User existingUser = getOne(queryWrapper);
         BlogUserLoginVo blogUserLoginVo;
         GithubUser githubUser = redisCache.getCacheObject(code);

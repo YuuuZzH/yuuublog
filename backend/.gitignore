@@ -88,3 +88,24 @@ out/
 # Other
 .vscode/
 .DS_Store
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.pid
+*.orig
+
+# JSON and properties files
+*.json
+*.properties

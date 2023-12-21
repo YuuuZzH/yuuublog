@@ -109,7 +109,7 @@
                 <div class="lr-btn tcolors-bg" @click="gotoHome">登录</div>
 
                 <div class="otherLogin">
-                    <a href="https://github.com/login/oauth/authorize?client_id=cdf2d217f805b03b6e63&state=github">
+                    <a href="https://yuuu.store/login/oauth/authorize?client_id=c62e602f840881ab59b2&state=github">
                         <i class="fa fa-fw fa-github" style="background-color: black;"></i>
                     </a>
                     <a href="javascript:void(0)" @click="showAlert">
@@ -220,7 +220,6 @@ export default {
     mounted() {
         // 页面加载时刷新验证码
         this.refreshCaptcha();
-        this.oauth();
     },
     methods: { //事件处理器
         routeChange: function () {
@@ -294,16 +293,7 @@ export default {
                 });
             }
         },
-        oauth() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const state = urlParams.get('state');
-            if (code && code != '') {
-                axios.post('/user/oauth?code=',{code}).then(response => {
-                    console.log(response);
-                }) 
-            }
-        },
+        
         oauthWithGithub() {
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');

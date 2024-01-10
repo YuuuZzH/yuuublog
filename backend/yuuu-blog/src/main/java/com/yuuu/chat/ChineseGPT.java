@@ -22,7 +22,7 @@ public class ChineseGPT {
         //测试：访问聚合数据的地区新闻api
         HashMap<String, String> msg = new HashMap<>();
         msg.put("role","user");
-        msg.put("content", "帮我写一篇关于介绍吉林市的小短文，大概100字左右");
+        msg.put("content", "帮我写一篇关于介绍洛阳市的小短文，大概100字左右");
         ArrayList<HashMap> messages = new ArrayList<>();
         messages.add(msg);
         HashMap<String, Object> requestBody = new HashMap<>();

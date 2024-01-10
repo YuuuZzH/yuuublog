@@ -29,7 +29,16 @@ public class SystemConstants {
         /**
          * redis的key
          */
-        public static final String BLOG_LOGIN_KEY = "bloglogin:";
+        public static final String BLOG_LOGIN_KEY = "blog:login:";
+
+        /**
+         * redis消息唯一的key
+         */
+        public static final String BLOG_CHAT_KEY = "chat:user:";
+        /**
+         * redis聊天限流的key
+         */
+        public static final String BLOG_CHAT_COUNTER = "chat:counter:";
         /**
          * 根评论id
          */

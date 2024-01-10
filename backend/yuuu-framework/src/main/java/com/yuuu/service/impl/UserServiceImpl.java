@@ -69,6 +69,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private String clientId;
     private String clientSecret;
 
+    private final RestTemplate restTemplate;
+
+    public UserServiceImpl(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
 
     @Override
     public ResponseResult userInfo() {
@@ -393,7 +399,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         headers.set("Authorization", "Bearer " + oauthToken);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-        RestTemplate restTemplate = new RestTemplate();
+        // RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String body = responseEntity.getBody();
@@ -418,7 +424,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
+        // RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {

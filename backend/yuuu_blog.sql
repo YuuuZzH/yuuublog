@@ -11,7 +11,7 @@
  Target Server Version : 80028 (8.0.28)
  File Encoding         : 65001
 
- Date: 21/08/2023 17:28:11
+ Date: 21/12/2023 16:01:18
 */
 
 SET NAMES utf8mb4;
@@ -98,7 +98,7 @@ CREATE TABLE `sys_role`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role
@@ -114,6 +114,7 @@ INSERT INTO `sys_role` VALUES (16, '1', '1', 1, '0', '1', NULL, NULL, NULL, NULL
 INSERT INTO `sys_role` VALUES (17, 'cscg', 'cscg', 1, '0', '1', NULL, NULL, NULL, NULL, 'cscg');
 INSERT INTO `sys_role` VALUES (18, '菜单管理员', 'menuManage', 1, '1', '0', NULL, NULL, NULL, NULL, '管理菜单');
 INSERT INTO `sys_role` VALUES (19, '测试管理员', 'cs', 1, '0', '1', NULL, NULL, NULL, NULL, '测试');
+INSERT INTO `sys_role` VALUES (20, '观察者', 'watch', 0, '0', '0', NULL, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_role_menu
@@ -134,8 +135,6 @@ INSERT INTO `sys_role_menu` VALUES (2, 102);
 INSERT INTO `sys_role_menu` VALUES (2, 1013);
 INSERT INTO `sys_role_menu` VALUES (2, 1014);
 INSERT INTO `sys_role_menu` VALUES (2, 1015);
-INSERT INTO `sys_role_menu` VALUES (2, 1016);
-INSERT INTO `sys_role_menu` VALUES (2, 2000);
 INSERT INTO `sys_role_menu` VALUES (3, 2);
 INSERT INTO `sys_role_menu` VALUES (3, 3);
 INSERT INTO `sys_role_menu` VALUES (3, 4);
@@ -281,6 +280,26 @@ INSERT INTO `sys_role_menu` VALUES (18, 1016);
 INSERT INTO `sys_role_menu` VALUES (19, 1);
 INSERT INTO `sys_role_menu` VALUES (19, 100);
 INSERT INTO `sys_role_menu` VALUES (19, 1001);
+INSERT INTO `sys_role_menu` VALUES (20, 1);
+INSERT INTO `sys_role_menu` VALUES (20, 100);
+INSERT INTO `sys_role_menu` VALUES (20, 101);
+INSERT INTO `sys_role_menu` VALUES (20, 102);
+INSERT INTO `sys_role_menu` VALUES (20, 1001);
+INSERT INTO `sys_role_menu` VALUES (20, 1002);
+INSERT INTO `sys_role_menu` VALUES (20, 1005);
+INSERT INTO `sys_role_menu` VALUES (20, 1006);
+INSERT INTO `sys_role_menu` VALUES (20, 1008);
+INSERT INTO `sys_role_menu` VALUES (20, 1009);
+INSERT INTO `sys_role_menu` VALUES (20, 1012);
+INSERT INTO `sys_role_menu` VALUES (20, 1013);
+INSERT INTO `sys_role_menu` VALUES (20, 1014);
+INSERT INTO `sys_role_menu` VALUES (20, 2017);
+INSERT INTO `sys_role_menu` VALUES (20, 2018);
+INSERT INTO `sys_role_menu` VALUES (20, 2022);
+INSERT INTO `sys_role_menu` VALUES (20, 2023);
+INSERT INTO `sys_role_menu` VALUES (20, 2024);
+INSERT INTO `sys_role_menu` VALUES (20, 2027);
+INSERT INTO `sys_role_menu` VALUES (20, 2028);
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -294,6 +313,7 @@ CREATE TABLE `sys_user`  (
   `type` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '用户类型：0代表普通用户，1代表管理员',
   `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '账号状态（0正常 1停用）',
   `email` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '邮箱',
+  `github_id` int NULL DEFAULT NULL COMMENT 'GitHub用户唯一标识符',
   `phone_number` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '手机号',
   `sex` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户性别（0男，1女，2未知）',
   `avatar` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '头像',
@@ -304,18 +324,19 @@ CREATE TABLE `sys_user`  (
   `del_flag` int NULL DEFAULT 0 COMMENT '删除标志（0代表未删除，1代表已删除）',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `username`(`user_name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14787164048681 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 14787164048683 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 'yuuu', 'yuuu', '$2a$10$Jnq31rRkNV3RNzXe0REsEOSKaYK8UgVZZqlNlNXqn.JeVcj2NdeZy', '1', '0', '23412332@qq.com', '18888888888', '0', 'http://qiniu.yuuu.online/2023/08/11/8dbfd3b51126440ca7a2b239cc628b5c.jpg', NULL, '2022-01-05 09:01:56', 1, '2022-01-30 15:37:03', 0);
-INSERT INTO `sys_user` VALUES (3, 'sg3', 'sg333', '$2a$10$ydv3rLkteFnRx9xelQ7elOiVhFvXOooA98xCqk/omh7G94R.K/E3O', '1', '0', '23412332@qq.com', NULL, '1', 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/06/0a79ba5e9f574985a3b5692274d22df8.png', NULL, '2022-01-05 13:28:43', NULL, '2022-01-05 13:28:43', 0);
-INSERT INTO `sys_user` VALUES (4, 'sg2', '1235', '$2a$10$kY4T3SN7i4muBccZppd2OOkhxMN6yt8tND1sF89hXOaFylhY2T3he', '1', '0', '23412332@qq.com', '19098790742', '0', NULL, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `sys_user` VALUES (5, 'sg2233', 'tteqe', '', '1', '0', NULL, '18246845873', '1', NULL, NULL, '2022-01-06 03:51:13', NULL, '2022-01-06 07:00:50', 1);
-INSERT INTO `sys_user` VALUES (6, 'sangeng', 'sangeng', '$2a$10$Jnq31rRkNV3RNzXe0REsEOSKaYK8UgVZZqlNlNXqn.JeVcj2NdeZy', '1', '0', '', '17777777777', '0', NULL, NULL, '2022-01-16 06:54:26', NULL, '2022-01-16 07:06:34', 0);
-INSERT INTO `sys_user` VALUES (14787164048677, '测试', '测试1', '$2a$10$Jcg9J4oxVSgA8w2TnAvJVeM83Qoiiiuk6MVjr7BP39Z3EMURvdrw6', '0', '0', '13273022864@163.com', NULL, '0', NULL, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `sys_user` VALUES (14787164048680, 'yuu', 'yuu', '$2a$10$Iz05TpIsYZohJFQNZI5sye3TIkdVAF4IZD0SnTV8p/54gmxJwQZ2K', '0', '0', '***REMOVED***', NULL, '0', 'http://qiniu.yuuu.online/2023/08/17/1eb90d0db4844f4fbdb3f7c330982c0e.jpg', NULL, NULL, NULL, NULL, 0);
+INSERT INTO `sys_user` VALUES (1, 'yuuu', 'yuuu', '$2a$10$Jnq31rRkNV3RNzXe0REsEOSKaYK8UgVZZqlNlNXqn.JeVcj2NdeZy', '1', '0', '23412332@qq.com', NULL, '18888888888', '0', 'http://qiniu.yuuu.online/2023/08/11/8dbfd3b51126440ca7a2b239cc628b5c.jpg', NULL, '2022-01-05 09:01:56', 1, '2022-01-30 15:37:03', 0);
+INSERT INTO `sys_user` VALUES (3, 'sg3', 'sg333', '$2a$10$ydv3rLkteFnRx9xelQ7elOiVhFvXOooA98xCqk/omh7G94R.K/E3O', '1', '0', '23412332@qq.com', NULL, NULL, '1', 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/06/0a79ba5e9f574985a3b5692274d22df8.png', NULL, '2022-01-05 13:28:43', NULL, '2022-01-05 13:28:43', 0);
+INSERT INTO `sys_user` VALUES (4, 'sg2', '1235', '$2a$10$kY4T3SN7i4muBccZppd2OOkhxMN6yt8tND1sF89hXOaFylhY2T3he', '1', '0', '23412332@qq.com', NULL, '19098790742', '0', NULL, NULL, NULL, NULL, NULL, 1);
+INSERT INTO `sys_user` VALUES (5, 'sg2233', 'tteqe', '', '1', '0', NULL, NULL, '18246845873', '1', NULL, NULL, '2022-01-06 03:51:13', NULL, '2022-01-06 07:00:50', 1);
+INSERT INTO `sys_user` VALUES (6, 'sangeng', 'sangeng', '$2a$10$Jnq31rRkNV3RNzXe0REsEOSKaYK8UgVZZqlNlNXqn.JeVcj2NdeZy', '1', '0', '', NULL, '17777777777', '0', NULL, NULL, '2022-01-16 06:54:26', NULL, '2022-01-16 07:06:34', 0);
+INSERT INTO `sys_user` VALUES (14787164048677, '测试', '测试1', '$2a$10$Jcg9J4oxVSgA8w2TnAvJVeM83Qoiiiuk6MVjr7BP39Z3EMURvdrw6', '0', '0', '13273022864@163.com', 96107776, NULL, '0', NULL, NULL, NULL, NULL, NULL, 0);
+INSERT INTO `sys_user` VALUES (14787164048680, 'yuu', 'yuu', '$2a$10$Iz05TpIsYZohJFQNZI5sye3TIkdVAF4IZD0SnTV8p/54gmxJwQZ2K', '0', '0', '***REMOVED***', NULL, NULL, '0', 'http://qiniu.yuuu.online/2023/12/19/0f85179fc03e44cbb9579c62bcd98d13.png', NULL, NULL, NULL, NULL, 0);
+INSERT INTO `sys_user` VALUES (14787164048681, 'luabu', 'MDQ6VXNlcjYxNzcxMDMw', '$2a$10$ey03U2M.dmJvNmUgRGUDiuupok.BREUzb4flkSHe4js4BuiAnX28q', '0', '0', '2939804365@qq.com', NULL, NULL, NULL, 'https://avatars.githubusercontent.com/u/61771030?v=4', NULL, NULL, NULL, NULL, 0);
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -338,6 +359,7 @@ INSERT INTO `sys_user_role` VALUES (14787164048672, 12);
 INSERT INTO `sys_user_role` VALUES (14787164048673, 2);
 INSERT INTO `sys_user_role` VALUES (14787164048675, 2);
 INSERT INTO `sys_user_role` VALUES (14787164048676, 2);
+INSERT INTO `sys_user_role` VALUES (14787164048680, 20);
 
 -- ----------------------------
 -- Table structure for yuuu_article
@@ -366,22 +388,22 @@ CREATE TABLE `yuuu_article`  (
 -- ----------------------------
 -- Records of yuuu_article
 -- ----------------------------
-INSERT INTO `yuuu_article` VALUES (1, 'SpringSecurity从入门到精通', '## 课程介绍\n![image20211219121555979.png](https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/31/e7131718e9e64faeaf3fe16404186eb4.png)\n\n## 0. 简介1\n\n​	**Spring Security** 是 Spring 家族中的一个安全管理框架。相比与另外一个安全框架**Shiro**，它提供了更丰富的功能，社区资源也比Shiro丰富。\n\n​	一般来说中大型的项目都是使用**SpringSecurity** 来做安全框架。小项目有Shiro的比较多，因为相比与SpringSecurity，Shiro的上手更加的简单。\n\n​	 一般Web应用的需要进行**认证**和**授权**。\n\n​		**认证：验证当前访问系统的是不是本系统的用户，并且要确认具体是哪个用户**\n\n​		**授权：经过认证后判断当前用户是否有权限进行某个操作**\n\n​	而认证和授权也是SpringSecurity作为安全框架的核心功能。\n\n\n\n## 1. 快速入门\n\n### 1.1 准备工作\n\n​	我们先要搭建一个简单的SpringBoot工程\n\n① 设置父工程 添加依赖\n\n~~~~\n    <parent>\n        <groupId>org.springframework.boot</groupId>\n        <artifactId>spring-boot-starter-parent</artifactId>\n        <version>2.5.0</version>\n    </parent>\n    <dependencies>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-web</artifactId>\n        </dependency>\n        <dependency>\n            <groupId>org.projectlombok</groupId>\n            <artifactId>lombok</artifactId>\n            <optional>true</optional>\n        </dependency>\n    </dependencies>\n~~~~\n\n② 创建启动类\n\n~~~~\n@SpringBootApplication\npublic class SecurityApplication {\n\n    public static void main(String[] args) {\n        SpringApplication.run(SecurityApplication.class,args);\n    }\n}\n\n~~~~\n\n③ 创建Controller\n\n~~~~java\n\nimport org.springframework.web.bind.annotation.RequestMapping;\nimport org.springframework.web.bind.annotation.RestController;\n\n@RestController\npublic class HelloController {\n\n    @RequestMapping(\"/hello\")\n    public String hello(){\n        return \"hello\";\n    }\n}\n\n~~~~\n\n\n\n### 1.2 引入SpringSecurity\n\n​	在SpringBoot项目中使用SpringSecurity我们只需要引入依赖即可实现入门案例。\n\n~~~~xml\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-security</artifactId>\n        </dependency>\n~~~~\n\n​	引入依赖后我们在尝试去访问之前的接口就会自动跳转到一个SpringSecurity的默认登陆页面，默认用户名是user,密码会输出在控制台。\n\n​	必须登陆之后才能对接口进行访问。\n\n\n\n## 2. 认证\n\n### 2.1 登陆校验流程\n![image20211215094003288.png](https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/31/414a87eeed344828b5b00ffa80178958.png)', 'SpringSecurity框架教程-Spring Security+JWT实现项目级前端分离认证授权', 1, 'https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/31/948597e164614902ab1662ba8452e106.png', '1', '0', 165, '0', NULL, '2022-01-23 23:20:11', NULL, '2023-08-21 10:13:32', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (1, 'SpringSecurity从入门到精通', '## 课程介绍\n![image20211219121555979.png](https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/31/e7131718e9e64faeaf3fe16404186eb4.png)\n\n## 0. 简介1\n\n​	**Spring Security** 是 Spring 家族中的一个安全管理框架。相比与另外一个安全框架**Shiro**，它提供了更丰富的功能，社区资源也比Shiro丰富。\n\n​	一般来说中大型的项目都是使用**SpringSecurity** 来做安全框架。小项目有Shiro的比较多，因为相比与SpringSecurity，Shiro的上手更加的简单。\n\n​	 一般Web应用的需要进行**认证**和**授权**。\n\n​		**认证：验证当前访问系统的是不是本系统的用户，并且要确认具体是哪个用户**\n\n​		**授权：经过认证后判断当前用户是否有权限进行某个操作**\n\n​	而认证和授权也是SpringSecurity作为安全框架的核心功能。\n\n\n\n## 1. 快速入门\n\n### 1.1 准备工作\n\n​	我们先要搭建一个简单的SpringBoot工程\n\n① 设置父工程 添加依赖\n\n~~~~\n    <parent>\n        <groupId>org.springframework.boot</groupId>\n        <artifactId>spring-boot-starter-parent</artifactId>\n        <version>2.5.0</version>\n    </parent>\n    <dependencies>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-web</artifactId>\n        </dependency>\n        <dependency>\n            <groupId>org.projectlombok</groupId>\n            <artifactId>lombok</artifactId>\n            <optional>true</optional>\n        </dependency>\n    </dependencies>\n~~~~\n\n② 创建启动类\n\n~~~~\n@SpringBootApplication\npublic class SecurityApplication {\n\n    public static void main(String[] args) {\n        SpringApplication.run(SecurityApplication.class,args);\n    }\n}\n\n~~~~\n\n③ 创建Controller\n\n~~~~java\n\nimport org.springframework.web.bind.annotation.RequestMapping;\nimport org.springframework.web.bind.annotation.RestController;\n\n@RestController\npublic class HelloController {\n\n    @RequestMapping(\"/hello\")\n    public String hello(){\n        return \"hello\";\n    }\n}\n\n~~~~\n\n\n\n### 1.2 引入SpringSecurity\n\n​	在SpringBoot项目中使用SpringSecurity我们只需要引入依赖即可实现入门案例。\n\n~~~~xml\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-security</artifactId>\n        </dependency>\n~~~~\n\n​	引入依赖后我们在尝试去访问之前的接口就会自动跳转到一个SpringSecurity的默认登陆页面，默认用户名是user,密码会输出在控制台。\n\n​	必须登陆之后才能对接口进行访问。\n\n\n\n## 2. 认证\n\n### 2.1 登陆校验流程\n![image20211215094003288.png](https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/31/414a87eeed344828b5b00ffa80178958.png)', 'SpringSecurity框架教程-Spring Security+JWT实现项目级前端分离认证授权', 2, 'https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/31/948597e164614902ab1662ba8452e106.png', '1', '0', 170, '0', NULL, '2022-01-23 23:20:11', NULL, '2023-12-19 16:17:33', 0, 2);
 INSERT INTO `yuuu_article` VALUES (2, 'weq', 'adadaeqe', 'adad', 2, 'https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/15/fd2e9460c58a4af3bbeae5d9ed581688.png', '1', '0', 24, '0', NULL, '2022-01-21 14:58:30', NULL, NULL, 0, NULL);
-INSERT INTO `yuuu_article` VALUES (3, 'dad', 'asdasda', 'sadad', 1, 'https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/15/737a0ed0b8ea430d8700a12e76aa1cd1.png', '1', '0', 33, '0', NULL, '2022-01-18 14:58:34', NULL, NULL, 1, NULL);
+INSERT INTO `yuuu_article` VALUES (3, 'dad', 'asdasda', 'sadad', 1, 'https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/15/737a0ed0b8ea430d8700a12e76aa1cd1.png', '1', '0', 33, '0', NULL, '2022-01-18 14:58:34', NULL, NULL, 0, NULL);
 INSERT INTO `yuuu_article` VALUES (5, 'sdad', '![Snipaste_20220115_165812.png](https://sg-blog-oss.oss-cn-beijing.aliyuncs.com/2022/01/15/1d9d283f5d874b468078b183e4b98b71.png)\r\n\r\n## sda \r\n\r\n222\r\n### sdasd newnewnew', NULL, 2, '', '1', '0', 46, '0', NULL, '2022-01-17 14:58:37', NULL, NULL, 0, NULL);
-INSERT INTO `yuuu_article` VALUES (8, '111', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '111', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-16 13:37:35', 1, '2023-03-16 13:37:35', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (9, '1234', '111', '1234', 1, '', '1', '0', 0, '0', 1, '2023-03-17 05:10:00', 1, '2023-03-17 05:10:00', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (10, '12345', '111', '12345', 1, '', '0', '0', 0, '1', 1, '2023-03-17 05:11:14', 1, '2023-03-17 05:11:14', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (11, '11111', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '11111', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 10:39:36', 1, '2023-03-19 10:39:36', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (13, '1112', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '1112', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:13:50', 1, '2023-03-19 11:13:50', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (14, '11', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '1', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:16:01', 1, '2023-03-19 11:16:01', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (15, '14', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '14', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:18:57', 1, '2023-03-19 11:18:57', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (16, '16', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '16', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:21:42', 1, '2023-03-19 11:26:02', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (17, '最后测评', '测试111', '测试成功', 1, '', '0', '0', 0, '0', 1, '2023-03-19 11:49:55', 1, '2023-03-19 11:51:16', 1, NULL);
+INSERT INTO `yuuu_article` VALUES (8, '111', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '111', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-16 13:37:35', 1, '2023-03-16 13:37:35', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (9, '1234', '111', '1234', 1, '', '1', '0', 0, '0', 1, '2023-03-17 05:10:00', 1, '2023-03-17 05:10:00', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (10, '12345', '111', '12345', 1, '', '0', '0', 0, '1', 1, '2023-03-17 05:11:14', 1, '2023-03-17 05:11:14', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (11, '11111', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '11111', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 10:39:36', 1, '2023-03-19 10:39:36', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (13, '1112', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '1112', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:13:50', 1, '2023-03-19 11:13:50', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (14, '11', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '1', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:16:01', 1, '2023-03-19 11:16:01', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (15, '14', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '14', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:18:57', 1, '2023-03-19 11:18:57', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (16, '16', '11111![微信图片_20211208162758.jpg](http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/fec2e9b4cf294cd7bd9d501e924ad9ff.jpg)', '16', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/03/16/3e7ad08fc40d4da39a46ac412566b0af.png', '1', '0', 0, '0', 1, '2023-03-19 11:21:42', 1, '2023-03-19 11:26:02', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (17, '最后测评', '测试111', '测试成功', 1, '', '0', '0', 0, '0', 1, '2023-03-19 11:49:55', 1, '2023-03-19 11:51:16', 0, NULL);
 INSERT INTO `yuuu_article` VALUES (18, '新建文章测试', '# 1 ', NULL, 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/05/31/7b4fd82aeba64a75904e1ede0a41aa22.jpg', '1', '1', 0, '0', 1, '2023-05-31 17:22:39', 1, '2023-05-31 21:02:37', 0, NULL);
-INSERT INTO `yuuu_article` VALUES (19, '', '', NULL, NULL, '', '1', '1', 0, '0', 1, '2023-05-31 17:23:34', 1, '2023-05-31 17:23:34', 1, NULL);
-INSERT INTO `yuuu_article` VALUES (20, '测试保存草稿箱', '', NULL, NULL, '', '1', '1', 0, '0', 1, '2023-05-31 17:24:57', 1, '2023-05-31 17:24:57', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (19, '2', '', NULL, 2, '', '1', '1', 0, '0', 1, '2023-05-31 17:23:34', 1, '2023-05-31 17:23:34', 0, NULL);
+INSERT INTO `yuuu_article` VALUES (20, '测试保存草稿箱', '', NULL, 2, '', '1', '1', 0, '0', 1, '2023-05-31 17:24:57', 1, '2023-05-31 17:24:57', 0, NULL);
 INSERT INTO `yuuu_article` VALUES (21, '21点01分', '# 2023', '2023', 1, '', '1', '0', 3, '0', 1, '2023-05-31 21:02:12', 1, '2023-05-31 21:02:12', 0, NULL);
 INSERT INTO `yuuu_article` VALUES (22, '111', '### 字号一\n#### 字号二', '111', 1, 'http://rr2wi3rfl.bkt.clouddn.com/2023/06/07/0311b83b8d94430cad6bf14d769195d3.jpg', '0', '0', 5, '0', 1, '2023-06-07 17:54:01', 1, '2023-06-07 17:54:01', 0, NULL);
 
@@ -441,7 +463,7 @@ CREATE TABLE `yuuu_category`  (
 -- ----------------------------
 INSERT INTO `yuuu_category` VALUES (1, 'java', -1, 'wsd', '0', NULL, NULL, NULL, NULL, 0);
 INSERT INTO `yuuu_category` VALUES (2, 'PHP', -1, 'wsd', '0', NULL, NULL, NULL, NULL, 0);
-INSERT INTO `yuuu_category` VALUES (15, 'Spring', -1, 'Spring全家桶', '1', NULL, NULL, NULL, NULL, 1);
+INSERT INTO `yuuu_category` VALUES (15, 'Spring', -1, 'Spring全家桶', '1', NULL, NULL, NULL, NULL, 0);
 
 -- ----------------------------
 -- Table structure for yuuu_comment
@@ -513,7 +535,7 @@ CREATE TABLE `yuuu_liked`  (
   `comment_id` bigint NULL DEFAULT NULL COMMENT '评论id',
   `is_like_c` tinyint NULL DEFAULT NULL COMMENT '评论是否点赞，1点赞，0未点赞',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of yuuu_liked
@@ -521,6 +543,8 @@ CREATE TABLE `yuuu_liked`  (
 INSERT INTO `yuuu_liked` VALUES (25, NULL, 14787164048680, 0, 2, 0);
 INSERT INTO `yuuu_liked` VALUES (26, NULL, 14787164048680, 0, 16, 0);
 INSERT INTO `yuuu_liked` VALUES (27, NULL, 14787164048680, 0, 3, 0);
+INSERT INTO `yuuu_liked` VALUES (28, 1, 14787164048681, 1, NULL, 0);
+INSERT INTO `yuuu_liked` VALUES (29, 1, 14787164048677, 1, NULL, 0);
 
 -- ----------------------------
 -- Table structure for yuuu_link
@@ -570,23 +594,23 @@ CREATE TABLE `yuuu_tag`  (
 -- Records of yuuu_tag
 -- ----------------------------
 INSERT INTO `yuuu_tag` VALUES (1, 'Mybatis', NULL, NULL, NULL, '2022-01-11 09:20:50', 0, 'weqwe');
-INSERT INTO `yuuu_tag` VALUES (2, 'asdas', NULL, '2022-01-11 09:20:55', NULL, '2022-01-11 09:20:55', 1, 'weqw');
-INSERT INTO `yuuu_tag` VALUES (3, 'weqw', NULL, '2022-01-11 09:21:07', NULL, '2022-01-11 09:21:07', 1, 'qweqwe');
+INSERT INTO `yuuu_tag` VALUES (2, 'asdas', NULL, '2022-01-11 09:20:55', NULL, '2022-01-11 09:20:55', 0, 'weqw');
+INSERT INTO `yuuu_tag` VALUES (3, 'weqw', NULL, '2022-01-11 09:21:07', NULL, '2022-01-11 09:21:07', 0, 'qweqwe');
 INSERT INTO `yuuu_tag` VALUES (4, 'Java', NULL, '2022-01-13 15:22:43', NULL, '2022-01-13 15:22:43', 0, 'sdad');
 INSERT INTO `yuuu_tag` VALUES (5, 'WAD', NULL, '2022-01-13 15:22:47', NULL, '2022-01-13 15:22:47', 0, 'ASDAD');
 INSERT INTO `yuuu_tag` VALUES (6, 'CCC', 6, '2023-03-15 14:16:13', 1, '2023-03-16 05:49:07', 0, 'CCC');
-INSERT INTO `yuuu_tag` VALUES (9, NULL, 1, '2023-03-16 01:17:11', NULL, '2023-03-16 01:17:11', 1, NULL);
-INSERT INTO `yuuu_tag` VALUES (10, NULL, 1, '2023-03-16 01:21:58', NULL, '2023-03-16 01:21:58', 1, NULL);
+INSERT INTO `yuuu_tag` VALUES (9, NULL, 1, '2023-03-16 01:17:11', NULL, '2023-03-16 01:17:11', 0, NULL);
+INSERT INTO `yuuu_tag` VALUES (10, NULL, 1, '2023-03-16 01:21:58', NULL, '2023-03-16 01:21:58', 0, NULL);
 INSERT INTO `yuuu_tag` VALUES (11, 'c', 6, '2023-03-16 03:01:05', 1, '2023-03-16 12:44:15', 0, 'c');
-INSERT INTO `yuuu_tag` VALUES (12, NULL, 1, '2023-03-16 03:03:32', NULL, '2023-03-16 03:03:32', 1, NULL);
-INSERT INTO `yuuu_tag` VALUES (13, NULL, 1, '2023-03-16 03:07:30', NULL, '2023-03-16 03:07:30', 1, NULL);
+INSERT INTO `yuuu_tag` VALUES (12, NULL, 1, '2023-03-16 03:03:32', NULL, '2023-03-16 03:03:32', 0, NULL);
+INSERT INTO `yuuu_tag` VALUES (13, NULL, 1, '2023-03-16 03:07:30', NULL, '2023-03-16 03:07:30', 0, NULL);
 INSERT INTO `yuuu_tag` VALUES (14, '1111', 1, '2023-03-16 03:08:18', NULL, '2023-03-16 03:08:18', 0, '1111');
 INSERT INTO `yuuu_tag` VALUES (15, 'C#', 1, '2023-03-16 04:50:44', NULL, '2023-03-16 04:50:44', 0, 'C#');
 INSERT INTO `yuuu_tag` VALUES (16, 'C##', 1, '2023-03-16 04:51:41', NULL, '2023-03-16 04:51:41', 0, 'C##');
-INSERT INTO `yuuu_tag` VALUES (17, 'cs1', 1, '2023-03-16 05:50:09', 1, '2023-03-16 05:50:18', 1, '测试');
+INSERT INTO `yuuu_tag` VALUES (17, 'cs1', 1, '2023-03-16 05:50:09', 1, '2023-03-16 05:50:18', 0, '测试');
 INSERT INTO `yuuu_tag` VALUES (18, '12', 1, '2023-03-16 05:50:50', 1, '2023-03-17 04:16:15', 0, '1');
 INSERT INTO `yuuu_tag` VALUES (19, '2', 1, '2023-03-16 05:50:54', NULL, '2023-03-16 05:50:54', 0, '2');
 INSERT INTO `yuuu_tag` VALUES (20, '3', 1, '2023-03-16 05:50:59', NULL, '2023-03-16 05:50:59', 0, '3');
-INSERT INTO `yuuu_tag` VALUES (21, '1234', 1, '2023-03-17 00:56:03', NULL, '2023-03-17 00:56:03', 1, '1234');
+INSERT INTO `yuuu_tag` VALUES (21, '1234', 1, '2023-03-17 00:56:03', NULL, '2023-03-17 00:56:03', 0, '1234');
 
 SET FOREIGN_KEY_CHECKS = 1;

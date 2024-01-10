@@ -109,7 +109,7 @@
                 <div class="lr-btn tcolors-bg" @click="gotoHome">登录</div>
 
                 <div class="otherLogin">
-                    <a href="https://yuuu.store/login/oauth/authorize?client_id=c62e602f840881ab59b2&state=github">
+                    <a href="https://yuuu.store/login/oauth/authorize?client_id=cdf2d217f805b03b6e63&state=github">
                         <i class="fa fa-fw fa-github" style="background-color: black;"></i>
                     </a>
                     <a href="javascript:void(0)" @click="showAlert">
@@ -461,7 +461,7 @@ export default {
 <style>
 @font-face {
     font-family: 'CustomFont';
-    src: url('http://qiniu.yuuu.online/No.39-ShangShouZhiZunShuFaTi-2.ttf') format('truetype');
+    src: url('../assets/font/AaWeiDuXinDong-NianFengAiNi/AaWeiDuXinDong-NianFengAiNi-2.ttf') format('truetype');
 }
 
 .wenzi {

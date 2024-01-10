@@ -20,7 +20,7 @@
 							<div style="margin-top: 0.4%; margin-left: 50%; width: 25%;display: flex; align-items: center;">
 								<!-- <el-input placeholder="输入搜索内容" v-model="inputValue" clearable>
 								</el-input> -->
-								<el-col :span="12">
+								<el-col :span="12" class="input-close">
 									<el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch"
 										placeholder="输入搜索内容" :trigger-on-focus="false" @select="handleSelect" clearable>
 										<template slot-scope="{ item }">
@@ -174,11 +174,11 @@ export default {
 		},
 		searchContent() {//按关键字搜索文章
 			// this.$router.push({ name: 'DetailArticle', params: { inputValue: inputValue } });
-			if (this.id === undefined || this.aid === '') {
+			if (this.aid === undefined || this.aid === '') {
 				this.$router.push({ name: 'NotFind' });
 				this.inputValue = '';
 				setTimeout(() => {
-					this.$router.push({ path: '/' }); // 你的首页路径
+					this.$router.push({ path: '/' });
 				}, 3000);
 			} else {
 				const routeData = this.$router.resolve({ name: 'DetailArticle', query: { aid: this.aid } });
@@ -293,7 +293,11 @@ export default {
 
 <style>
 /*********头部导航栏********/
-
+.input-close{
+	.el-input__suffix{
+		transform:translateY(-4px);
+	}
+}
 /*头部导航栏盒子*/
 
 .headBack {

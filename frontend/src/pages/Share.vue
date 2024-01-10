@@ -5,10 +5,10 @@
 	<div class="container">
 		<el-row :gutter="30">
 			<el-col :sm="24" :md="16" style="transition:all .5s ease-out;margin-bottom:30px;">
-				<sg-articlelist></sg-articlelist>
+				<yuuu-articlelist></yuuu-articlelist>
 			</el-col>
 			<el-col :sm="24" :md="8">
-				<sg-rightlist></sg-rightlist>
+				<yuuu-rightlist></yuuu-rightlist>
 			</el-col>
 		</el-row>
 	</div>
@@ -31,8 +31,8 @@ export default {
 	},
 	components: { //定义组件
 		'sg-nav': header,
-		'sg-articlelist': articlelist,
-		'sg-rightlist': rightlist,
+		'yuuu-articlelist': articlelist,
+		'yuuu-rightlist': rightlist,
 	},
 
 	created() { //生命周期函数

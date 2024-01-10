@@ -32,6 +32,9 @@
             <el-tooltip class="item" effect="dark" content="CSDN" placement="top">
               <a :href="catchMeObj.csdn" target="_blank"><i class="">C</i></a>
             </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="Gitee" placement="top">
+              <a :href="catchMeObj.gitee" target="_blank"><i class="">G</i></a>
+            </el-tooltip>
           </div>
         </div>
       </div>
@@ -101,12 +104,13 @@ export default {
       formattedTime: "",
       catchMeObj: {
         //个人信息
-        git: "https://github.com",
+        git: "https://github.com/YuuuZzH?tab=repositories",
         qq: "/static/img/qq.png",
         sina: "https://weibo.com",
         wechat: "/static/img/wx.png",
-        csdn: "https://www.csdn.net",
+        csdn: "https://blog.csdn.net/m0_63378258?spm=1000.2115.3001.5343",
         job: "https://www.baidu.com",
+        gitee:"https://gitee.com/yuuu-zehua",
       },
     };
   },
@@ -129,7 +133,7 @@ export default {
           clearInterval(timer);
           timer = null;
         }
-      }, 30);
+      }, 15);
     },
     getTime() {
       let myClock = setInterval(() => {
@@ -417,10 +421,12 @@ export default {
 .toTop {
   position: fixed;
   right: 40px;
-  top: -150px;
+  // top: -150px;
+  top: 0;
   z-index: 99;
   width: 70px;
-  height: 900px;
+  height: 80%;
+  // border: 1px solid #ef0505;
   transition: all 0.5s 0.3s ease-in-out;
   cursor: pointer;
 }
@@ -432,7 +438,7 @@ export default {
 .toTop img,
 .toTophui img {
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
 .toTophui {

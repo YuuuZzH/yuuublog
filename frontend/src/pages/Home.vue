@@ -1,14 +1,14 @@
 <!-- 首页 -->
 <template>
     <div>
-        <sg-navbar></sg-navbar>
+        <yuuu-navbar></yuuu-navbar>
         <div class="container">
             <el-row  :gutter="30">
                 <el-col :sm="24" :md="16" style="transition:all .5s ease-out;margin-bottom:30px;">
-                    <sg-articlelist></sg-articlelist>
+                    <yuuu-articlelist></yuuu-articlelist>
                 </el-col>
                 <el-col :sm="24"  :md="8" >
-                    <sg-rightlist></sg-rightlist>
+                    <yuuu-rightlist></yuuu-rightlist>
                 </el-col>
             </el-row>
         </div>
@@ -30,9 +30,9 @@ import rightlist from '../components/rightlist.vue'
 
         },
         components: { //定义组件
-            'sg-navbar':header,
-            'sg-articlelist':articlelist,
-            'sg-rightlist':rightlist,
+            'yuuu-navbar':header,
+            'yuuu-articlelist':articlelist,
+            'yuuu-rightlist':rightlist,
         },
         created() { //生命周期函数
 

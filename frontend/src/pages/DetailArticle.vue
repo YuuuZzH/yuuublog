@@ -9,7 +9,7 @@
                     <sg-message></sg-message>
                 </el-col>
                 <el-col :sm="24"  :md="8" >
-                    <sg-rightlist></sg-rightlist>
+                    <yuuu-rightlist></yuuu-rightlist>
                 </el-col>
             </el-row>
         </div>
@@ -35,7 +35,7 @@ import message from '../components/message.vue'
             'sg-nav':header,
             'sg-articleDetail':articleDetail,
             'sg-message':message,
-            'sg-rightlist':rightlist,
+            'yuuu-rightlist':rightlist,
         },
         created() { //生命周期函数
 

@@ -8,7 +8,7 @@
 				<sg-reward></sg-reward>
 			</el-col>
 			<el-col :sm="24" :md="8">
-				<sg-rightlist></sg-rightlist>
+				<yuuu-rightlist></yuuu-rightlist>
 			</el-col>
 		</el-row>
 	</div>
@@ -32,7 +32,7 @@ export default {
 	components: { //定义组件
 		'sg-nav': header,
 		'sg-reward': reward,
-		'sg-rightlist': rightlist,
+		'yuuu-rightlist': rightlist,
 	},
 	created() { //生命周期函数
 

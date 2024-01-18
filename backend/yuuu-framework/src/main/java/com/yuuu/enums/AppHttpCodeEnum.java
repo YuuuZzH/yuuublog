@@ -25,7 +25,8 @@ public enum AppHttpCodeEnum {
     NO_ARTICLE(613,"该文章不存在，请重新输入"),
     INPUT_ERROR(614,"您输入的内容有误"),
     NO_USER(607, "用户尚未注册，请先完成注册"),
-    OVERLOCKING(609, "啊哦，一不小心超限制了，请明天再来吧！");
+    OVERLOCKING(609, "啊哦，一不小心超限制了，请明天再来吧！"),
+    RSA_FAIL(610, "RSA解密失败");
 
 
     int code;

@@ -13,7 +13,9 @@ import com.yuuu.service.ChatService;
 import com.yuuu.utils.BeanCopyUtils;
 import com.yuuu.utils.RedisCache;
 import com.yuuu.utils.SecurityUtils;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -37,9 +39,11 @@ import java.util.concurrent.TimeUnit;
  * Description:
  */
 @Service
+@ConfigurationProperties(prefix = "dify")
+@Data
 public class ChatServiceImpl implements ChatService {
 
-    private static final String APIKEY = "app-P6UmxZb4cFvgzlbnTQ0SexKl";
+    private String apiKey;
     private static final String API_URL = "https://api.dify.ai/v1/";
 
     @Autowired
@@ -76,7 +80,7 @@ public class ChatServiceImpl implements ChatService {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE));
-        headers.set("Authorization", "Bearer " + APIKEY);
+        headers.set("Authorization", "Bearer " + apiKey);
         headers.set("User-Agent", "Mozilla/5.0");
         headers.set("Connection", "keep-alive");
         HttpEntity<String> requestEntity = new HttpEntity<>("{\n" +

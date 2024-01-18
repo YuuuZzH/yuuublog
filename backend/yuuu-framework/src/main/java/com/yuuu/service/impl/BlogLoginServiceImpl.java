@@ -7,11 +7,16 @@ import com.yuuu.domain.entity.LoginUser;
 import com.yuuu.domain.entity.User;
 import com.yuuu.domain.vo.BlogUserLoginVo;
 import com.yuuu.domain.vo.UserInfoVo;
+import com.yuuu.enums.AppHttpCodeEnum;
+import com.yuuu.exception.SystemException;
 import com.yuuu.service.BlogLoginService;
 import com.yuuu.utils.BeanCopyUtils;
 import com.yuuu.utils.JwtUtil;
 import com.yuuu.utils.RedisCache;
+import com.yuuu.utils.RsaUtils;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,16 +35,25 @@ import java.util.concurrent.TimeUnit;
  * @Version:1.0
  */
 @Service
+@ConfigurationProperties(prefix = "rsa")
+@Data
 public class BlogLoginServiceImpl implements BlogLoginService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private RedisCache redisCache;
+    private String privateKey;
 
     @Override
     public ResponseResult login(UserLoginDto user) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword());
+        String realPassword;
+        try {
+            realPassword = RsaUtils.decryptByPrivateKey(privateKey,user.getPassword());
+        } catch (Exception e) {
+            throw new SystemException(AppHttpCodeEnum.RSA_FAIL);
+        }
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserName(),realPassword);
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         //判断是否通过认证,密码校验上面的authenticate帮你完成了
         if (Objects.isNull(authenticate)){

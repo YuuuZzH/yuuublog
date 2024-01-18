@@ -170,7 +170,7 @@
 <script>
 import { userLogin, userRegister, sendVerificationCode, sendCodeForUpdatePassword, changePassword } from '../api/user.js'
 import { setToken } from '../utils/auth.js'
-import axios from 'axios'
+import  encryptPassword  from '../utils/encryptPassword'
 import { getCaptchaImg } from '@/api/captcha.js';
 import request from "@/utils/request.js"
 export default {
@@ -379,7 +379,7 @@ export default {
             }
         },
         gotoHome: function () {//用户登录
-            userLogin(this.username, this.password, this.captcha).then((response) => {
+            userLogin(this.username, encryptPassword.encrypt(this.password), this.captcha).then((response) => {
                 // 登录成功记录token和用户信息，登录失败给对应提示
                 setToken(response.token)
                 // 存储用户信息
@@ -461,7 +461,7 @@ export default {
 <style>
 @font-face {
     font-family: 'CustomFont';
-    src: url('../assets/font/AaWeiDuXinDong-NianFengAiNi/AaWeiDuXinDong-NianFengAiNi-2.ttf') format('truetype');
+    src: url('../assets/font/ShangShouZhiZunShuFaTi/No.39-ShangShouZhiZunShuFaTi-2.ttf');
 }
 
 .wenzi {

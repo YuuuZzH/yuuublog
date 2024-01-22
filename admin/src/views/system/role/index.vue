@@ -30,6 +30,7 @@
           type="primary"
           icon="el-icon-search"
           size="mini"
+          :disabled="!$hasPermission('system:role:query')"
           @click="handleQuery"
         >搜索</el-button>
       </el-form-item>
@@ -50,7 +51,7 @@
           plain
           icon="el-icon-delete"
           size="mini"
-          :disabled="multiple"
+          :disabled="multiple || !$hasPermission('system:role:remove')"
           @click="handleDelete"
         >删除</el-button>
       </el-col>
@@ -83,6 +84,7 @@
             v-model="scope.row.status"
             active-value="0"
             inactive-value="1"
+            :disabled="!$hasPermission('system:role:add')"
             @change="handleStatusChange(scope.row)"
           />
         </template>
@@ -103,17 +105,20 @@
         align="center"
         class-name="small-padding fixed-width"
       >
+      
         <template v-if="scope.row.id !== 1" slot-scope="scope">
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
+            icon="el-icon-edit" 
+            :disabled="!$hasPermission('system:role:edit')"
+            @click="handleUpdate(scope.row)" 
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
+            :disabled = "!$hasPermission('system:role:remove')"
             @click="handleDelete(scope.row)"
           >删除</el-button>
         </template>
@@ -194,7 +199,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm" :disabled="!$hasPermission('system:role:add')">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -211,7 +216,7 @@ import {
   changeRoleStatus
 } from '@/api/system/role'
 import { treeselect as menuTreeselect, roleMenuTreeselect } from '@/api/menu'
-
+import hasPermission from '@/directive/permission/hasPermission'
 export default {
   name: 'Role',
   data() {
@@ -432,6 +437,6 @@ export default {
         })
         .catch(() => {})
     }
-  }
+  },
 }
 </script>

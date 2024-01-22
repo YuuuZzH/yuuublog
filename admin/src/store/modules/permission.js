@@ -53,10 +53,10 @@ const permission = {
         getRouters().then(res => {
           // 获取menus 自己组装routers
           const routers = buildRouterTree(res.menus)
-          console.log(routers)
+          // console.log(routers)
           const sdata = JSON.parse(JSON.stringify(routers))
           const rdata = JSON.parse(JSON.stringify(routers))
-          console.log(sdata)
+          // console.log(sdata)
           const sidebarRoutes = filterAsyncRouter(sdata)
           const rewriteRoutes = filterAsyncRouter(rdata, false, true)
           rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })

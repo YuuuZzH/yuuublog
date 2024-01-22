@@ -16,10 +16,13 @@
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/">
-            <el-dropdown-item> 首页 </el-dropdown-item>
+            <el-dropdown-item style="color:black;"> 首页 </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided @click.native="logout">
             <span style="display: block">退出登录</span>
+          </el-dropdown-item>
+          <el-dropdown-item divided>
+            <a href="http://www.yuuu.online">返回前台</a>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -68,7 +71,7 @@ export default {
   position: relative;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
-
+  background-image: url("../../assets/images/backgroundImg.jpg");
   .hamburger-container {
     line-height: 46px;
     height: 100%;

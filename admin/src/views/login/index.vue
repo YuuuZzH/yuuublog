@@ -88,7 +88,7 @@ export default {
     return {
       loginForm: {
         userName: 'root',
-        password: '1234'
+        password: '123456'
       },
       loginRules: {
         userName: [
@@ -202,7 +202,7 @@ $light_gray: #eee;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
-
+  background-image: url("../../assets/images/login-background.jpg");
   .login-form {
     position: relative;
     width: 520px;

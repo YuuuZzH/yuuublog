@@ -55,6 +55,7 @@
               plain
               icon="el-icon-delete"
               size="mini"
+              :disabled="!$hasPermission('content:article:remove')"
               @click="handleDelete"
             >删除</el-button>
           </el-col>
@@ -90,6 +91,7 @@
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
+                :disabled="!$hasPermission('content:article:remove')"
                 @click="handleDelete(scope.row)"
               >删除</el-button>
             </template>

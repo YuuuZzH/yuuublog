@@ -17,6 +17,7 @@ import '@/permission' // permission control
 import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, handleTree } from '@/utils/sg'
 
 import mavonEditor from 'mavon-editor'
+import hasPermission from '@/utils/hasPermission';
 import 'mavon-editor/dist/css/index.css'
 // 全局方法挂载
 Vue.prototype.parseTime = parseTime
@@ -45,6 +46,7 @@ Vue.use(directive)
 Vue.use(ElementUI)
 Vue.use(plugins)
 Vue.use(mavonEditor)
+Vue.use(hasPermission);
 Vue.config.productionTip = false
 
 new Vue({

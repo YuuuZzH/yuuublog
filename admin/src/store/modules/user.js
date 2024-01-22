@@ -7,7 +7,7 @@ const user = {
     name: '',
     avatar: '',
     roles: [],
-    permissions: []
+    permissions: [],
   },
 
   mutations: {

@@ -39,7 +39,7 @@
           plain
           icon="el-icon-delete"
           size="mini"
-          :disabled="multiple"
+          :disabled="!$hasPermission('content:category:remove') || multiple"
           @click="handleDelete"
         >删除</el-button>
       </el-col>
@@ -68,6 +68,7 @@
             v-model="scope.row.status"
             active-value="0"
             inactive-value="1"
+            :disabled="!$hasPermission('content:category:add')"
             @change="handleStatusChange(scope.row)"
           />
         </template>
@@ -85,6 +86,7 @@
             size="mini"
             type="text"
             icon="el-icon-delete"
+            :disabled="!$hasPermission('content:category:remove')"
             @click="handleDelete(scope.row)"
           >删除</el-button>
         </template>
@@ -119,7 +121,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm" :disabled="!$hasPermission('content:category:add')">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -127,7 +129,7 @@
 </template>
 
 <script>
-import { listCategory, getCategory, delCategory, addCategory, updateCategory, exportCategory } from '@/api/content/category'
+import { listCategory, getCategory, delCategory, addCategory, updateCategory, exportCategory,changeCategoryStatus } from '@/api/content/category'
 
 export default {
   name: 'Category',
@@ -215,7 +217,7 @@ export default {
     handleStatusChange(row) {
       const text = row.status === '0' ? '启用' : '停用'
       this.$modal
-        .confirm('确认要"' + text + '""' + row.roleName + '"分类吗？')
+        .confirm('确认要"' + text + '""' + row.name + '"分类吗？')
         .then(function() {
           return changeCategoryStatus(row.id, row.status)
         })

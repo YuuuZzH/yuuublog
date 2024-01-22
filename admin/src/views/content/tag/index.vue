@@ -43,7 +43,7 @@
           plain
           icon="el-icon-delete"
           size="mini"
-          :disabled="multiple"
+          :disabled="!$hasPermission('content:tag:remove') || multiple"
           @click="handleDelete"
         >删除</el-button>
       </el-col>
@@ -74,6 +74,7 @@
             size="mini"
             type="text"
             icon="el-icon-delete"
+            :disabled="!$hasPermission('content:tag:remove')"
             @click="handleDelete(scope.row)"
           >删除</el-button>
         </template>
@@ -105,7 +106,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm" :disabled="!$hasPermission('content:tag:add')">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>

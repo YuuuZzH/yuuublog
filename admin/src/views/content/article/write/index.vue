@@ -87,7 +87,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item>
-            <el-button type="primary" size="medium" @click="handleSubmit">{{ aId?"更新":"发布" }}</el-button>
+            <el-button type="primary" size="medium" @click="handleSubmit" :disabled="!$hasPermission('content:article:publish')">{{ aId?"更新":"发布" }}</el-button>
           </el-form-item>
           <el-form-item>
             <el-button v-if="!aId" type="info" @click="handleSave">保存到草稿箱</el-button>

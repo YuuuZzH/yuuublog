@@ -17,7 +17,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" :disabled="!$hasPermission('system:menu:query')" @click="handleQuery">搜索</el-button>
       </el-form-item>
     </el-form>
 
@@ -67,6 +67,7 @@
             size="mini"
             type="text"
             icon="el-icon-edit"
+            :disabled="!$hasPermission('system:menu:edit')"
             @click="handleUpdate(scope.row)"
           >修改</el-button>
           <el-button
@@ -79,6 +80,7 @@
             size="mini"
             type="text"
             icon="el-icon-delete"
+            :disabled="!$hasPermission('system:menu:remove')"
             @click="handleDelete(scope.row)"
           >删除</el-button>
         </template>
@@ -203,7 +205,7 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm" :disabled="!$hasPermission('system:menu:add')">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>

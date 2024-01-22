@@ -60,9 +60,9 @@ export function exportCategory() {
 }
 
 // 分类状态修改
-export function changeCategoryStatus(categoryId, status) {
+export function changeCategoryStatus(id, status) {
   const data = {
-    categoryId,
+    id,
     status
   }
   return request({

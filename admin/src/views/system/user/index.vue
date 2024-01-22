@@ -46,6 +46,7 @@
               type="primary"
               icon="el-icon-search"
               size="mini"
+              :disabled="!$hasPermission('system:user:query')"
               @click="handleQuery"
             >搜索</el-button>
           </el-form-item>
@@ -67,6 +68,7 @@
               plain
               icon="el-icon-delete"
               size="mini"
+              :disabled="!$hasPermission('system:user:remove')"
               @click="handleDelete"
             >删除</el-button>
           </el-col>
@@ -83,13 +85,14 @@
           <el-table-column prop="id" label="用户编号" align="center" />
           <el-table-column prop="userName" label="用户名称" align="center" />
           <el-table-column prop="nickName" label="用户昵称" align="center" />
-          <el-table-column prop="phonenumber" label="手机号码" align="center" />
+          <el-table-column prop="phoneNumber" label="手机号码" align="center" />
           <el-table-column prop="status" label="状态" align="center">
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.status"
                 active-value="0"
                 inactive-value="1"
+                :disabled="!$hasPermission('system:user:add')"
                 @change="handleStatusChange(scope.row)"
               />
             </template>
@@ -107,12 +110,14 @@
                 size="mini"
                 type="text"
                 icon="el-icon-edit"
+                :disabled="!$hasPermission('system:user:edit')"
                 @click="handleUpdate(scope.row)"
               >修改</el-button>
               <el-button
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
+                :disabled="!$hasPermission('system:user:remove')"
                 @click="handleDelete(scope.row)"
               >删除</el-button>
             </template>
@@ -120,6 +125,8 @@
         </el-table>
       </el-col>
     </el-row>
+
+
     <el-pagination
       :page-size.sync="queryParams.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
@@ -129,6 +136,8 @@
       @current-change="getList"
       @size-change="getList"
     />
+
+
     <!-- 添加或修改参数配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
@@ -215,7 +224,7 @@
         <el-row>
           <el-col :span="24">
             <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择">
+              <el-select v-model="form.roleIds" multiple placeholder="请选择" @change="selectChange">
                 <el-option
                   v-for="item in roleOptions"
                   :key="item.id"
@@ -229,7 +238,7 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm" :disabled="!$hasPermission('system:user:add')">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -318,6 +327,7 @@ export default {
       ids: [],
       // 表单参数
       form: {}
+      
     }
   },
   watch: {},
@@ -325,6 +335,10 @@ export default {
     this.getList()
   },
   methods: {
+    selectChange(value){
+      console.log('value---', value);
+      console.log('value2---', this.form.roleIds);
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -367,32 +381,39 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+     
       this.reset()
       const id = row.id || this.ids
       getUser(id).then((response) => {
-        this.form = response.user
-        this.roleOptions = response.roles
-        this.form.roleIds = response.roleIds
-        this.open = true
         this.title = '修改用户'
-        this.form.password = response.password
+        this.open = true
+
+        // this.form = response.user
+        this.roleOptions = response.roles
+        // this.form.roleIds = response.roleIds
+     
+      
+        // this.form.password = response.password || ''
+        // console.log('this.form**---', this.form);
+        this.form = {...response.user,roleIds:response.roleIds, password:response.password}
+
       })
     },
     // 表单重置
     reset() {
       this.form = {
-        id: undefined,
-        userName: undefined,
-        nickName: undefined,
-        password: undefined,
-        phonenumber: undefined,
-        email: undefined,
-        sex: undefined,
+        id: '',
+        userName: '',
+        nickName: '',
+        password: '',
+        phonenumber: '',
+        email: '',
+        sex: '',
         status: '0',
-        remark: undefined,
+        remark: '',
         roleIds: []
       }
-      this.resetForm('form')
+      // this.resetForm('form')
     },
     /** 新增用户 */
     handleAdd() {

@@ -4,7 +4,10 @@ import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.dto.TagDto;
 import com.yuuu.domain.dto.TagListDto;
 import com.yuuu.domain.vo.PageVo;
+import com.yuuu.enums.AppHttpCodeEnum;
+import com.yuuu.exception.SystemException;
 import com.yuuu.service.TagService;
+import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +32,17 @@ public class TagController {
     }
     @PostMapping
     public ResponseResult addTag(@RequestBody TagListDto tagListDto){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return tagService.addTag(tagListDto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseResult deleteTag(@PathVariable("id") Long id){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return tagService.deleteTag(id);
     }
 
@@ -44,6 +53,9 @@ public class TagController {
 
     @PutMapping
     public ResponseResult updateTag(@RequestBody TagDto tagDto){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         tagDto.setId(Long.valueOf(tagDto.getId()));
         return tagService.updateTag(tagDto);
     }

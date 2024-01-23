@@ -26,8 +26,12 @@ public enum AppHttpCodeEnum {
     INPUT_ERROR(614,"您输入的内容有误"),
     NO_USER(607, "用户尚未注册，请先完成注册"),
     OVERLOCKING(609, "啊哦，一不小心超限制了，请明天再来吧！"),
-    RSA_FAIL(610, "RSA解密失败");
+    RSA_FAIL(610, "RSA解密失败"),
 
+    /** *************后台 admin 异常枚举值 **************/
+    ROLE_USED(701, "该角色正在使用"),
+    NO_PERMISSION(703, "非系统管理员，不允许执行该操作！"),
+    USER_USED(702, "该用户为当前登录人，不可删除");
 
     int code;
     String msg;

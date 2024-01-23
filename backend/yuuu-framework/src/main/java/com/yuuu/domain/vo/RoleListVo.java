@@ -27,5 +27,6 @@ public class RoleListVo {
     private Integer roleSort;
     //角色状态（0正常 1停用）
     private String status;
+    private Date createTime;
 
 }

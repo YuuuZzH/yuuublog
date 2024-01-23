@@ -156,6 +156,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!StrUtil.isBlank(userListDto.getStatus())) {
             queryWrapper.eq(User::getStatus, userListDto.getStatus());
         }
+        Long userId = SecurityUtils.getUserId();
+        queryWrapper.ne(User::getId,1).ne(User::getId,userId);
         Page<User> page = new Page<>(pageNum, pageSize);
         page(page, queryWrapper);
         List<UserListVo> userListVos = BeanCopyUtils.copyBeanList(page.getRecords(), UserListVo.class);
@@ -196,6 +198,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         userAddDto.setPassword(password);
         User user = BeanCopyUtils.copyBean(userAddDto, User.class);
+        Long userId = SecurityUtils.getUserId();
+        user.setCreateBy(userId);
+        user.setCreateTime(new Date());
+        user.setUpdateBy(userId);
+        user.setUpdateTime(new Date());
         save(user);
 
         List<UserRole> userRoles = userAddDto.getRoleIds().stream()
@@ -211,6 +218,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (userId.equals(id)) {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);
         }
+        // 清除中间表
+        LambdaQueryWrapper<UserRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserRole::getUserId,id);
+        userRoleService.remove(queryWrapper);
         boolean b = removeById(id);
         if (b) {
             return ResponseResult.okResult();
@@ -255,6 +266,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public ResponseResult updateUser(UserUpdateVo userUpdateVo) {
         User user = BeanCopyUtils.copyBean(userUpdateVo, User.class);
+        Long userId = SecurityUtils.getUserId();
+        user.setUpdateBy(userId);
+        user.setUpdateTime(new Date());
         updateById(user);
         List<Long> roleIds = userUpdateVo.getRoleIds();
         if (roleIds != null && roleIds.size() > 0) {

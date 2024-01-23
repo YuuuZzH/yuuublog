@@ -37,6 +37,6 @@ public class MenuByIdVo {
     //菜单图标
     private String icon;
     //备注
-    private String remark;
+    private String perms;
 
 }

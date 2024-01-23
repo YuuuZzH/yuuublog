@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -91,6 +92,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     @Override
     public ResponseResult addMenu(Menu menu) {
+        Long userId = SecurityUtils.getUserId();
+        menu.setCreateBy(userId);
+        menu.setCreateTime(new Date());
+        menu.setUpdateBy(userId);
+        menu.setUpdateTime(new Date());
         boolean save = save(menu);
         if (save){
             return ResponseResult.okResult();
@@ -108,6 +114,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     @Override
     public ResponseResult updateMenu(Menu menu) {
+        Long userId = SecurityUtils.getUserId();
+        menu.setUpdateBy(userId);
+        menu.setUpdateTime(new Date());
         //上级菜单不能选择自己
         if (menu.getId().equals(menu.getParentId())){
             return ResponseResult.okResult(500,"修改菜单失败，上级菜单不能选择自己");

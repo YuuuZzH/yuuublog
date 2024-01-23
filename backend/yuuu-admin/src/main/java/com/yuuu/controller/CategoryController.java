@@ -9,8 +9,10 @@ import com.yuuu.domain.entity.Category;
 import com.yuuu.domain.vo.CategoryByIdVo;
 import com.yuuu.domain.vo.ExcelCategoryVo;
 import com.yuuu.enums.AppHttpCodeEnum;
+import com.yuuu.exception.SystemException;
 import com.yuuu.service.CategoryService;
 import com.yuuu.utils.BeanCopyUtils;
+import com.yuuu.utils.SecurityUtils;
 import com.yuuu.utils.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,6 +68,9 @@ public class CategoryController {
 
     @PostMapping
     public ResponseResult addCategory(@RequestBody CategoryDto categoryDto){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return categoryService.addCategory(categoryDto);
     }
 
@@ -76,16 +81,25 @@ public class CategoryController {
 
     @PutMapping
     public ResponseResult updateCategory(@RequestBody CategoryByIdVo category){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return categoryService.updateCategory(category);
     }
-    //TODO 点击按钮修改分类状态
+
     @PutMapping("/changeStatus")
     public ResponseResult changeStatus(@RequestBody CategoryByIdVo categoryByIdVo){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return categoryService.changeStatus(categoryByIdVo);
     }
 
     @DeleteMapping("/{id}")
     public ResponseResult deleteCategory(@PathVariable Long id){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return categoryService.deleteCategory(id);
     }
 }

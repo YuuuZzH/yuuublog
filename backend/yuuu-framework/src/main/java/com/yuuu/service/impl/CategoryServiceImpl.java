@@ -106,7 +106,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> im
 
     @Override
     public ResponseResult changeStatus(CategoryByIdVo categoryByIdVo) {
-        Category category = getById(categoryByIdVo.getId());
+        Category category = getById(Long.valueOf(categoryByIdVo.getId()));
         category.setStatus(categoryByIdVo.getStatus());
         boolean b = updateById(category);
         if (b){

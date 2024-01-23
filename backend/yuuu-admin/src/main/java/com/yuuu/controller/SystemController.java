@@ -3,7 +3,10 @@ package com.yuuu.controller;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.dto.MenuListDto;
 import com.yuuu.domain.entity.Menu;
+import com.yuuu.enums.AppHttpCodeEnum;
+import com.yuuu.exception.SystemException;
 import com.yuuu.service.MenuService;
+import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +31,9 @@ public class SystemController {
 
     @PostMapping
     public ResponseResult addMenu(@RequestBody Menu menu){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return menuService.addMenu(menu);
     }
 
@@ -38,11 +44,17 @@ public class SystemController {
 
     @PutMapping
     public ResponseResult updateMenu(@RequestBody Menu menu){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return menuService.updateMenu(menu);
     }
 
     @DeleteMapping("/{menuId}")
     public ResponseResult deleteMenu(@PathVariable("menuId") Long menuId){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return menuService.deleteMenu(menuId);
     }
 

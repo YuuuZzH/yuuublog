@@ -4,7 +4,10 @@ import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.dto.AddLinkDto;
 import com.yuuu.domain.dto.LinkListDto;
 import com.yuuu.domain.dto.UpdateLinkDto;
+import com.yuuu.enums.AppHttpCodeEnum;
+import com.yuuu.exception.SystemException;
 import com.yuuu.service.LinkService;
+import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +33,9 @@ public class LinkController {
 
     @PostMapping
     public ResponseResult addLink(@RequestBody AddLinkDto addLinkDto){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return linkService.addLink(addLinkDto);
     }
 
@@ -40,12 +46,18 @@ public class LinkController {
 
     @PutMapping
     public ResponseResult updateLink(@RequestBody UpdateLinkDto updateLinkDto){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         updateLinkDto.setId(Long.valueOf(updateLinkDto.getId()));
         return linkService.updateLink(updateLinkDto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseResult deleteLinkById(@PathVariable("id") Long id){
+        if (!SecurityUtils.isAdmin()){
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
+        }
         return linkService.deleteLinkById(id);
     }
 

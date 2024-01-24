@@ -98,11 +98,11 @@
                 </el-alert>
                 <el-input type="text" placeholder="用户名" v-model="username">
                 </el-input>
-                <el-input type="password" placeholder="密码" @keyup.enter.native="loginEnterFun" v-model="password">
+                <el-input type="password" placeholder="密码" v-model="password">
                 </el-input>
 
                 <div class="captchaBox">
-                    <el-input type="text" placeholder="验证码" v-model="captcha"></el-input>
+                    <el-input type="text" placeholder="验证码" @keyup.enter.native="loginEnterFun" v-model="captcha"></el-input>
                     <img class="captchaImg" :src="captchaUrl" @click="refreshCaptcha">
                 </div>
                 <h3><a href="#/Login?login=2">忘记密码？</a></h3>

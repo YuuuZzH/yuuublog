@@ -41,5 +41,4 @@ import rightlist from '../components/rightlist.vue'
 </script>
 
 <style>
-
 </style>

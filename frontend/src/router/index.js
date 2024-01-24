@@ -60,14 +60,6 @@ export default new Router({
 			name: 'DetailArticle'
 		}, //分享详情
 		{
-			path: '/DetailArticleByTitle',
-			component: resolve => require(['../pages/DetailArticleByTitle.vue'], resolve),
-			meta: {
-				auth: true
-			},
-			name: 'DetailArticleByTitle'
-		}, //分享详情
-		{
 			path: '/Reward',
 			component: resolve => require(['../pages/Reward.vue'], resolve),
 			meta: {

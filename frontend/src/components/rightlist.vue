@@ -56,7 +56,9 @@
       <div v-if="IpInfo.ip" style="font-family: 楷体">
         登录设备:<span>{{ IpInfo.dev }}</span> &nbsp;<i class="fa fa-ellipsis-v"></i> &nbsp;
         IP:<span>{{ IpInfo.ip }}</span><br>
-        位置:<span v-if="IpInfo.address">{{ IpInfo.address }}</span> <span v-else>暂无位置信息</span> <br>
+        位置:<span>{{ IpInfo.address }}</span> <br>
+        浏览器:<span>{{ IpInfo.browserInfo }}</span> <br>
+        操作系统:<span>{{ IpInfo.osInfo }}</span> <br>
         <p id="showTime">时间：{{ formattedTime }}</p>
       </div>
       <div v-else>

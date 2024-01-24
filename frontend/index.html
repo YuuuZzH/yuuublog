@@ -10,12 +10,28 @@
     <meta content="black" name="apple-mobile-web-app-status-bar-style">
     <meta content="telephone=no" name="format-detection">
     <meta name="msapplication-tap-highlight" content="no">
-    <!-- <link rel="stylesheet" href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css"> -->
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <script type="text/javascript" charset="UTF-8" src="./static/js/shCore.js"></script>
-   
   </head>
   <body>
     <div id="app"></div>
+
+    <script type="text/javascript">
+      /*  动态标题 */
+      var OriginTitile = document.title,
+        titleTime;
+      document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+          document.title = " 你别走吖 Σ(っ °Д °;) っ ";
+          clearTimeout(titleTime);
+        } else {
+          document.title = "(/≧▽≦/) 你又回来啦！";
+          titleTime = setTimeout(function() {
+            document.title = OriginTitile;
+          }, 2000);
+        }
+      });
+    </script>
   </body>
 </html>
+

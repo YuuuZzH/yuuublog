@@ -16,10 +16,9 @@
 							</el-submenu>
 							<el-menu-item index="/Reward"><i class="fa fa-wa fa-cny"></i> 赞赏</el-menu-item>
 							<el-menu-item index="/Friendslink"><i class="fa fa-wa fa-users"></i>友链</el-menu-item>
-
+							
 							<div style="margin-top: 0.4%; margin-left: 50%; width: 25%;display: flex; align-items: center;">
-								<!-- <el-input placeholder="输入搜索内容" v-model="inputValue" clearable>
-								</el-input> -->
+								
 								<el-col :span="12" class="input-close">
 									<el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch"
 										placeholder="输入搜索内容" :trigger-on-focus="false" @select="handleSelect" clearable>
@@ -32,14 +31,17 @@
 
 								<el-button type="primary" size="small" icon="el-icon-search"
 									@click="searchContent()">搜索</el-button>
-
+									
 							</div>
-
+							
+							
 							<div class="userInfo">
 								<div v-show="!haslogin" class="nologin">
 									<a href="javascript:void(0);" @click="logoinFun(1)">登录&nbsp;</a>|<a
-										href="javascript:void(0);" @click="logoinFun(0)">&nbsp;注册</a>
+										href="javascript:void(0);" @click="logoinFun(0)">&nbsp;注册&nbsp;</a>|
+										<a href="http://www.yuuu.online:8094">进入后台</a>
 								</div>
+								
 								<div v-show="haslogin" class="haslogin">
 									<i class="fa fa-fw fa-user-circle userImg"></i>
 									<ul class="haslogin-info">
@@ -47,8 +49,12 @@
 											<a href="#/UserInfo">个人中心</a>
 										</li>
 										<li>
+											<a href="http://www.yuuu.online:8094">进入后台</a>
+										</li>
+										<li>
 											<a href="javascript:void(0);" @click="userlogout">退出登录</a>
 										</li>
+										
 									</ul>
 								</div>
 							</div>
@@ -174,7 +180,7 @@ export default {
 		},
 		searchContent() {//按关键字搜索文章
 			// this.$router.push({ name: 'DetailArticle', params: { inputValue: inputValue } });
-			if (this.aid === undefined || this.aid === '') {
+			if (this.aid === undefined || this.aid === '' || this.inputValue === '') {
 				this.$router.push({ name: 'NotFind' });
 				this.inputValue = '';
 				setTimeout(() => {
@@ -182,8 +188,8 @@ export default {
 				}, 3000);
 			} else {
 				const routeData = this.$router.resolve({ name: 'DetailArticle', query: { aid: this.aid } });
-				window.open(routeData.href, '_blank');
 				this.inputValue = '';
+				window.open(routeData.href, '_blank');
 			}
 		},
 		// 用户退出登录

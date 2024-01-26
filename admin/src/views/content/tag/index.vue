@@ -55,7 +55,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="id" align="center" prop="id" />
+      <el-table-column label="标签编号" align="center" type="index" width="200" />
       <el-table-column label="标签名" align="center" prop="name" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column

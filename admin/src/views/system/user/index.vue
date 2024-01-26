@@ -82,7 +82,7 @@
 
         <el-table :data="userList" style="width: 100%" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" />
-          <el-table-column prop="id" label="用户编号" align="center" />
+          <el-table-column type="index" label="用户编号" width="120" align="center" />
           <el-table-column prop="userName" label="用户名称" align="center" />
           <el-table-column prop="nickName" label="用户昵称" align="center" />
           <el-table-column prop="phoneNumber" label="手机号码" align="center" />
@@ -156,7 +156,7 @@
           <el-col :span="12">
             <el-form-item label="手机号码" prop="phonenumber">
               <el-input
-                v-model="form.phonenumber"
+                v-model="form.phoneNumber"
                 placeholder="请输入手机号码"
                 maxlength="11"
               />
@@ -402,15 +402,15 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        id: '',
-        userName: '',
-        nickName: '',
-        password: '',
-        phonenumber: '',
-        email: '',
-        sex: '',
+        id: undefined,
+        userName: undefined,
+        nickName: undefined,
+        password: undefined,
+        phonenumber: undefined,
+        email: undefined,
+        sex: undefined,
         status: '0',
-        remark: '',
+        remark: undefined,
         roleIds: []
       }
       // this.resetForm('form')

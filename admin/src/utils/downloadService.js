@@ -55,7 +55,7 @@ downloadService.interceptors.response.use(res => {
   }
   var blob = new Blob([res.data])
   const contentDisposition = res.headers['content-disposition']
-  var fileName = 'test'
+  var fileName = '分类.xlsx'
   if (contentDisposition) {
     fileName = window.decodeURI(res.headers['content-disposition'].split('=')[1], 'UTF-8')
   }

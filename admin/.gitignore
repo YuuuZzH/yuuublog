@@ -14,7 +14,7 @@ build/
 # 忽略日志和缓存文件
 *.log
 *.cache
-
+admin_dist/
 # 忽略临时文件和备份文件
 *.swp
 *.bak

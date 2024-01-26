@@ -2,13 +2,8 @@
   <div class="app-container">
     <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="分类名" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入分类名"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.name" placeholder="请输入分类名" clearable size="small"
+          @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择" clearable>
@@ -24,84 +19,44 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-        >新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
       </el-col>
 
       <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="!$hasPermission('content:category:remove') || multiple"
-          @click="handleDelete"
-        >删除</el-button>
+        <el-button type="danger" plain icon="el-icon-delete" size="mini"
+          :disabled="!$hasPermission('content:category:remove') || multiple" @click="handleDelete">删除</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          v-hasPermission="['content:category:export']"
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          :loading="exportLoading"
-          @click="handleExport"
-        >导出</el-button>
+        <el-button v-hasPermission="['content:category:export']" type="warning" plain icon="el-icon-download" size="mini"
+          :loading="exportLoading" @click="handleExport">导出</el-button>
       </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="categoryList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="id" align="center" prop="id" />
+      <el-table-column label="分类编号" align="center" width="100" type="index" />
       <el-table-column label="分类名" align="center" prop="name" />
       <el-table-column label="描述" align="center" prop="description" />
 
-      <el-table-column  label="状态" align="center">
+      <el-table-column label="状态" align="center">
         <template slot-scope="scope">
-          <el-switch
-            v-model="scope.row.status"
-            active-value="0"
-            inactive-value="1"
-            :disabled="!$hasPermission('content:category:add')"
-            @change="handleStatusChange(scope.row)"
-          />
+          <el-switch v-model="scope.row.status" active-value="0" inactive-value="1"
+            :disabled="!$hasPermission('content:category:add')" @change="handleStatusChange(scope.row)" />
         </template>
       </el-table-column>
 
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            :disabled="!$hasPermission('content:category:remove')"
-            @click="handleDelete(scope.row)"
-          >删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" :disabled="!$hasPermission('content:category:remove')"
+            @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-pagination
-      :page-size.sync="queryParams.pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      :page-sizes="[10, 20, 30, 40]"
-      :current-page.sync="queryParams.pageNum"
-      @current-change="getList"
-      @size-change="getList"
-    />
+    <el-pagination :page-size.sync="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total"
+      :page-sizes="[10, 20, 30, 40]" :current-page.sync="queryParams.pageNum" @current-change="getList"
+      @size-change="getList" />
 
     <!-- 添加或修改分类对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -129,7 +84,7 @@
 </template>
 
 <script>
-import { listCategory, getCategory, delCategory, addCategory, updateCategory, exportCategory,changeCategoryStatus } from '@/api/content/category'
+import { listCategory, getCategory, delCategory, addCategory, updateCategory, exportCategory, changeCategoryStatus } from '@/api/content/category'
 
 export default {
   name: 'Category',
@@ -213,18 +168,18 @@ export default {
       this.queryParams.pageNum = 1
       this.getList()
     },
-     // 分类状态修改
+    // 分类状态修改
     handleStatusChange(row) {
       const text = row.status === '0' ? '启用' : '停用'
       this.$modal
         .confirm('确认要"' + text + '""' + row.name + '"分类吗？')
-        .then(function() {
+        .then(function () {
           return changeCategoryStatus(row.id, row.status)
         })
         .then(() => {
           this.$modal.msgSuccess(text + '成功')
         })
-        .catch(function() {
+        .catch(function () {
           row.status = row.status === '0' ? '1' : '0'
         })
     },
@@ -278,12 +233,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids
-      this.$modal.confirm('是否确认删除分类编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除分类编号为"' + ids + '"的数据项？').then(function () {
         return delCategory(ids)
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess('删除成功')
-      }).catch(() => {})
+      }).catch(() => { })
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -293,7 +248,7 @@ export default {
       }).then(response => {
         // this.$download.name(response.msg)
         this.exportLoading = false
-      }).catch(() => {})
+      }).catch(() => { })
     }
   }
 }

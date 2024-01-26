@@ -63,22 +63,24 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="角色编号" prop="id" width="120" />
+      <el-table-column label="角色编号" align="center" type="index" width="150" />
       <el-table-column
         label="角色名称"
         prop="roleName"
+        align="center"
         :show-overflow-tooltip="true"
-        width="150"
+       
       />
       <el-table-column
         label="权限字符"
+        align="center"
         prop="roleKey"
         :show-overflow-tooltip="true"
-        width="150"
+       
       />
-      <el-table-column label="显示顺序" prop="roleSort" width="100" />
+      <el-table-column label="显示顺序" align="center" prop="roleSort" />
 
-      <el-table-column label="状态" align="center" width="100">
+      <el-table-column label="状态" align="center" >
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -94,7 +96,7 @@
         label="创建时间"
         align="center"
         prop="createTime"
-        width="180"
+        
       >
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>

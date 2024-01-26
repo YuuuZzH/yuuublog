@@ -62,7 +62,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="id" align="center" prop="id" />
+      <el-table-column label="友链编号" align="center" type="index" width="150" />
       <el-table-column label="名称" align="center" prop="name" />
       <el-table-column label="描述" align="center" prop="description" />
       <el-table-column label="logo" align="center" prop="logo" type="img">

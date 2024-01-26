@@ -15,9 +15,13 @@ public enum AppHttpCodeEnum {
     FILE_TYPE_ERROR(507, "文件格式错误"),
     UPDATE_ERROR(509, "非法修改"),
     NOT_NULL(510, "信息不能为空"),
-    EMAIL_ERROR(603, "请检查邮箱或稍后再试"),
-    NOT_UNIQUE(510, "信息已存在"),
+    NOT_UNIQUE(511, "信息已存在"),
     LOGIN_ERROR(505, "用户名或密码错误"),
+
+
+    /** *************前台 Blog 异常枚举值 **************/
+
+    EMAIL_ERROR(603, "请检查邮箱或稍后再试"),
     EMAIL_ISNULL(604, "邮箱不能为空"),
     PASSWORD_ISNULL(605, "密码不能为空"),
     CAPTCHA_ISNULL(606, "验证码不能为空"),
@@ -27,6 +31,7 @@ public enum AppHttpCodeEnum {
     NO_USER(607, "用户尚未注册，请先完成注册"),
     OVERLOCKING(609, "啊哦，一不小心超限制了，请明天再来吧！"),
     RSA_FAIL(610, "RSA解密失败"),
+
 
     /** *************后台 admin 异常枚举值 **************/
     ROLE_USED(701, "该角色正在使用"),

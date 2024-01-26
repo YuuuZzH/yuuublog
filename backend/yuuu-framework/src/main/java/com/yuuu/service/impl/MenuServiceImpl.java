@@ -2,6 +2,7 @@ package com.yuuu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yuuu.domain.entity.LoginUser;
 import com.yuuu.domain.entity.RoleMenu;
 import com.yuuu.domain.vo.MenuUpdateVo;
 import com.yuuu.domain.vo.TreeVo;
@@ -18,6 +19,7 @@ import com.yuuu.service.RoleMenuService;
 import com.yuuu.utils.BeanCopyUtils;
 import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -43,8 +45,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     @Override
     public List<String> selectPermsByUserId(Long id) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         //如果是管理员，返回所有的权限
-        if (SecurityUtils.isAdmin()){
+        if (principal instanceof LoginUser && SecurityUtils.isAdmin()){
             LambdaQueryWrapper<Menu> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.in(Menu::getMenuType, SystemConstants.MENU,SystemConstants.BUTTON);
             queryWrapper.eq(Menu::getStatus,SystemConstants.STATUS_NORMAL);

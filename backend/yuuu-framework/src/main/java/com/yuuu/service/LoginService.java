@@ -2,6 +2,8 @@ package com.yuuu.service;
 
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.entity.User;
+import com.yuuu.domain.vo.AdminUserInfoVo;
+import com.yuuu.domain.vo.RoutersVo;
 
 /**
  * @BelongsProject:YuuuBlog
@@ -16,4 +18,8 @@ public interface LoginService {
 
 
     ResponseResult logout();
+
+    AdminUserInfoVo getInfo();
+
+    RoutersVo getRouters();
 }

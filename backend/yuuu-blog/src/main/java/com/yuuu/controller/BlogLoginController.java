@@ -7,11 +7,14 @@ import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.exception.SystemException;
 import com.yuuu.service.BlogLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mobile.device.Device;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @BelongsProject:YuuuBlog
@@ -28,7 +31,7 @@ public class BlogLoginController {
     private BlogLoginService blogLoginService;
 
     @PostMapping("/login")
-    public ResponseResult login(@RequestBody UserLoginDto user) {
+    public ResponseResult login(@RequestBody UserLoginDto user, HttpServletRequest request, Device device) {
         if (!StringUtils.hasText(user.getUserName())) {
             //提示用户输入用户名
             throw new SystemException(AppHttpCodeEnum.REQUIRE_USERNAME);

@@ -54,11 +54,11 @@
       <h2 class="ui label">登录信息</h2>
       <br>
       <div v-if="IpInfo.ip" style="font-family: 楷体">
-        登录设备:<span>{{ IpInfo.dev }}</span> &nbsp;<i class="fa fa-ellipsis-v"></i> &nbsp;
+        登录设备:<span>{{ IpInfo.devName }}</span> &nbsp;<i class="fa fa-ellipsis-v"></i> &nbsp;
         IP:<span>{{ IpInfo.ip }}</span><br>
         位置:<span>{{ IpInfo.address }}</span> <br>
-        浏览器:<span>{{ IpInfo.browserInfo }}</span> <br>
-        操作系统:<span>{{ IpInfo.osInfo }}</span> <br>
+        浏览器:<span>{{ IpInfo.browser }}</span> <br>
+        操作系统:<span>{{ IpInfo.os }}</span> <br>
         <p id="showTime">时间：{{ formattedTime }}</p>
       </div>
       <div v-else>
@@ -104,6 +104,7 @@ export default {
       browseList: "", //热门文章 浏览量最多
       artCommentList: "", //最新评论
       formattedTime: "",
+      myClock: null,
       catchMeObj: {
         //个人信息
         git: "https://github.com/YuuuZzH?tab=repositories",
@@ -138,7 +139,7 @@ export default {
       }, 15);
     },
     getTime() {
-      let myClock = setInterval(() => {
+      this.myClock = setInterval(() => {
         let date = new Date();
         // 获取日期的各个部分
         let year = date.getFullYear();
@@ -198,6 +199,9 @@ export default {
     this.getIpList();
     this.getTime();
   },
+  destroyed() {
+    clearInterval(this.myClock);
+  }
 };
 </script>
 

@@ -75,6 +75,14 @@ export default new Router({
 			},
 			name: 'FriendsLink'
 		}, //友链
+		{
+			path: '/WordBoard',
+			component: resolve => require(['../pages/WordBoard.vue'], resolve),
+			meta: {
+				auth: true
+			},
+			name: 'WordBoard'
+		}, //留言板
 
 
 		{

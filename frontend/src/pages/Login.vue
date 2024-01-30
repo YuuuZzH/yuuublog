@@ -5,15 +5,15 @@
             <el-carousel height="100vh" indicator-position="none">
                 <el-carousel-item>
                     <img style="object-fit: cover; width: 100%; height: 100%; "
-                        src="https://pic3.zhimg.com/v2-3b83e03ec8352b504e7a3dab903a9c66_r.jpg" />
+                        src="../../static/img/login-bac0.png" />
                 </el-carousel-item>
                 <el-carousel-item>
                     <img style="object-fit: cover; width: 100%; height: 100%;"
-                        src="https://pic2.zhimg.com/v2-ed1f03a985265001cff73c27f0bb5a7d_r.jpg" />
+                        src="../../static/img/login-bac1.png" />
                 </el-carousel-item>
                 <el-carousel-item>
                     <img style="object-fit: cover; width: 100%; height: 100%;"
-                        src="https://pic2.zhimg.com/v2-5c87d13e5c78e6984058612571395141_r.jpg" />
+                        src="../../static/img/login-bac2.png" />
                 </el-carousel-item>
             </el-carousel>
         </div>

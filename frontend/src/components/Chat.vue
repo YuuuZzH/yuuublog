@@ -9,7 +9,7 @@
       <div v-for="message in messages" :key="message.chatTimeStamp" v-if="message">
         <div class="chat-message-me">
           <div class="message-me-asWhole-headPortrait">
-            <img :src="userInfo.avatar.startsWith('http://qiniu.yuuu.online') ? userInfo.avatar : 'https' + userInfo.avatar" class="examineeFace_logo_style">
+            <img :src="userInfo.avatar" class="examineeFace_logo_style">
           </div>
           <div class="message-me-asWhole-right">
             <div class="message-me-asWhole-top">

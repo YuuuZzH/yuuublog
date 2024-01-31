@@ -70,7 +70,7 @@
 			</div>
 			<div class="h-information">
 
-				<img :src="userInfoObj.avatar ? userInfoObj.avatar : 'static/img/tou.png'" alt="">
+				<img :src="userInfoObj.avatar ? userInfoObj.avatar.startsWith('http://qiniu.yuuu.online') ? userInfoObj.avatar : 'https' + userInfoObj.avatar : 'static/img/tou.png'" alt="">
 
 				<h2 class="h-description">
 

@@ -14,7 +14,7 @@
                     :speeds="Math.random() * 200 + 100" style="height: 100%; width:100%;position: relative;">
                     <template slot="dm" slot-scope="{ index, danmu }">
                         <div class="showContent">
-                            <img style="width: 30px;height: 30px;border-radius: 50%;" :src="danmu.avatar.startsWith('http://qiniu.yuuu.online') ? danmu.avatar : 'https:' + danmu.avatar">
+                            <img style="width: 30px;height: 30px;border-radius: 50%;" :src="danmu.avatar">
                             <div style="text-align: left;margin-left: 5px;">
                                 <span style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;color: black">{{ danmu.userName }}：{{ danmu.message }}</span>
                             </div>

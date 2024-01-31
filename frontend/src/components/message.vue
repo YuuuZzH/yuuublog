@@ -38,7 +38,7 @@
                     <li class="tmsg-c-item" v-for="(item, index) in commentList" :key="'common' + index">
                         <article class="">
                             <header>
-                                <img :src="item.avatar" :onerror="$store.state.errorImg">
+                                <img :src="item.avatar.startsWith('http://qiniu.yuuu.online') ? item.avatar : 'https' + item.avatar" :onerror="$store.state.errorImg">
                                 <div class="i-name">
                                     {{ item.username }}
                                 </div>

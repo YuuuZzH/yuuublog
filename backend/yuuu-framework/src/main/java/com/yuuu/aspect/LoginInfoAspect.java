@@ -13,6 +13,9 @@ import com.yuuu.utils.IPUtil;
 import com.yuuu.utils.IpToAddressUtil;
 import com.yuuu.utils.SecurityUtils;
 import com.yuuu.utils.UserAgentUtils;
+import eu.bitwalker.useragentutils.DeviceType;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.UserAgent;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -34,10 +37,10 @@ import java.util.Map;
  * @description: 获取用户登录信息的切面类
  * @author: yuuu
  **/
-@Aspect
+// @Aspect
 @Component
 @Slf4j
-@Order(Ordered.LOWEST_PRECEDENCE - 1)
+// @Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class LoginInfoAspect {
 
     @Autowired
@@ -54,7 +57,7 @@ public class LoginInfoAspect {
      * 因为 getAuthentication().getPrincipal() 是 anonymousUser
      * 解决：通过切 返回的结果，使用反射获取到响应对象，避免回表
      */
-    @AfterReturning(pointcut = "execution(* com.yuuu.controller.*Controller.*login(..))", returning = "result")
+    // @AfterReturning(pointcut = "execution(* com.yuuu.controller.*Controller.*login(..))", returning = "result")
     public void afterLogin(JoinPoint joinPoint, Object result) {
         // 通过反射获取 Response的data数据
         BlogUserLoginVo blogUserLoginVo;
@@ -88,20 +91,15 @@ public class LoginInfoAspect {
                 String osInfo = UserAgentUtils.getOperatingSystemInfo(request);
                 map.put("browserInfo", browserInfo);
                 map.put("osInfo", osInfo);
-            } else if (arg instanceof Device) {
-                Device device = (Device) arg;
-                if (device.isMobile()) {
-                    devName = "手机";
-                } else if (device.isTablet()) {
-                    devName = "平板";
-                } else if (device.isNormal()) {
-                    devName = "PC";
-                }
-
+                String userAgent = request.getHeader("User-Agent");
+                UserAgent parsedAgent = UserAgent.parseUserAgentString(userAgent);
+                OperatingSystem os = parsedAgent.getOperatingSystem();
+                DeviceType deviceType = os.getDeviceType();
+                devName = String.valueOf(deviceType);
             }
         }
         map.put("dev", devName);
-        saveOrUpdateLoginInfo(map);
+        // saveOrUpdateLoginInfo(map);
     }
 
     private void saveOrUpdateLoginInfo(Map<String, String> map) {

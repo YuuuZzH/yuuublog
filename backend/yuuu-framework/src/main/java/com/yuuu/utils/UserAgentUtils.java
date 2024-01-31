@@ -1,6 +1,8 @@
 package com.yuuu.utils;
 
 import cn.hutool.core.util.StrUtil;
+import eu.bitwalker.useragentutils.DeviceType;
+import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 
@@ -20,6 +22,23 @@ public class UserAgentUtils {
         // String browserVersionString = (browserVersion != null) ? browserVersion.getVersion() : "";
 
         return browserName;
+    }
+
+    public static String getDevName(HttpServletRequest request) {
+        String userAgentString = request.getHeader("User-Agent");
+        String devName = "其他";
+        if (StrUtil.isBlank(userAgentString)){
+            return devName;
+        }
+        UserAgent parsedAgent = UserAgent.parseUserAgentString(userAgentString);
+        OperatingSystem os = parsedAgent.getOperatingSystem();
+        DeviceType deviceType = os.getDeviceType();
+        devName = deviceType.getName();
+        return devName;
+    }
+    public static String getURIInfo(HttpServletRequest request){
+        String requestURI = request.getRequestURI();
+        return requestURI;
     }
 
     public static String getOperatingSystemInfo(HttpServletRequest request) {

@@ -1,17 +1,20 @@
 package com.yuuu.handler.visit;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yuuu.domain.entity.LoginConfig;
 import com.yuuu.domain.entity.LoginUser;
+import com.yuuu.domain.entity.User;
 import com.yuuu.service.LoginConfigService;
-import com.yuuu.utils.IPUtil;
-import com.yuuu.utils.IpToAddressUtil;
-import com.yuuu.utils.UserAgentUtils;
+import com.yuuu.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author: yuuu
@@ -28,8 +31,69 @@ public class VisitorInterceptor implements HandlerInterceptor {
         String cityInfo = IpToAddressUtil.getCityInfo(ipAddress);
         String browserInfo = UserAgentUtils.getBrowserInfo(request);
         String osInfo = UserAgentUtils.getOperatingSystemInfo(request);
-        String requestURI = request.getRequestURI();
-        System.out.println("执行拦截器："+requestURI);
+        String devName = UserAgentUtils.getDevName(request);
+        LoginConfig loginConfig = new LoginConfig();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof LoginUser) {
+            // 登录成功的
+            User user = SecurityUtils.getLoginUser().getUser();
+            Map<String, String> map = new HashMap<>();
+            map.put("userId", String.valueOf(user.getId()));
+            map.put("userName", user.getUserName());
+            map.put("nickName", user.getNickName());
+            map.put("email", user.getEmail());
+            map.put("ip", ipAddress);
+            map.put("browserInfo", browserInfo);
+            map.put("osInfo", osInfo);
+            map.put("address", cityInfo);
+            map.put("dev", devName);
+            saveOrUpdateLoginInfo(map);
+        } else {
+            LambdaQueryWrapper<LoginConfig> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(LoginConfig::getIp, ipAddress).eq(LoginConfig::getType, LoginConfig.VISITOR);
+            LoginConfig one = loginConfigService.getOne(queryWrapper);
+            if (one != null) {
+                if (principal instanceof LoginUser) {
+                    return true;
+                }
+                // 当前ip下已经有访客信息,更新
+                one.setDevName(devName);
+                one.setLoginTime(new Date());
+                one.setBrowser(browserInfo);
+                one.setOs(osInfo);
+                loginConfigService.updateById(one);
+            } else {
+                // 新增
+                loginConfig.setType(LoginConfig.VISITOR);
+                loginConfig.setNickName(VisitorUtil.generateGuestUsername());
+                loginConfig.setIp(ipAddress);
+                loginConfig.setDevName(devName);
+                loginConfig.setLoginTime(new Date());
+                loginConfig.setBrowser(browserInfo);
+                loginConfig.setOs(osInfo);
+                loginConfig.setAddress(cityInfo);
+                loginConfigService.save(loginConfig);
+            }
+        }
         return true;
+    }
+
+    private void saveOrUpdateLoginInfo(Map<String, String> map) {
+        Long userId = Long.valueOf(map.get("userId"));
+        LoginConfig loginConfig = new LoginConfig();
+        loginConfig.setUserId(userId);
+        loginConfig.setType(LoginConfig.LOGIN_USER);
+        loginConfig.setLoginTime(new Date());
+        loginConfig.setIp(map.get("ip"));
+        loginConfig.setOs(map.get("osInfo"));
+        loginConfig.setBrowser(map.get("browserInfo"));
+        loginConfig.setDevName(map.get("dev"));
+        loginConfig.setAddress(map.get("address"));
+        loginConfig.setUserName(map.get("userName"));
+        loginConfig.setNickName(map.get("nickName"));
+        loginConfig.setEmail(map.get("email"));
+        LambdaQueryWrapper<LoginConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LoginConfig::getUserId, userId);
+        loginConfigService.saveOrUpdate(loginConfig, queryWrapper);
     }
 }

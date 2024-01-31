@@ -66,6 +66,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private RedisCache redisCache;
 
+    @Autowired
+    private AvatarService avatarService;
+
     private String clientId;
     private String clientSecret;
 
@@ -140,6 +143,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 密码加密
         String password = passwordEncoder.encode(user.getPassword());
         user.setPassword(password);
+        user.setAvatar(avatarService.getRandomAvatar());
         save(user);
         return ResponseResult.okResult();
     }
@@ -198,11 +202,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         userAddDto.setPassword(password);
         User user = BeanCopyUtils.copyBean(userAddDto, User.class);
-        Long userId = SecurityUtils.getUserId();
-        user.setCreateBy(userId);
-        user.setCreateTime(new Date());
-        user.setUpdateBy(userId);
-        user.setUpdateTime(new Date());
+        user.setAvatar(avatarService.getRandomAvatar());
         save(user);
 
         List<UserRole> userRoles = userAddDto.getRoleIds().stream()

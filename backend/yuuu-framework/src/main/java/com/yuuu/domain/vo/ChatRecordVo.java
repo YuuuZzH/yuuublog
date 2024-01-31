@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 public class ChatRecordVo {
     private String query;
     private String answer;
+    private String avatar;
     private Long chatTimeStamp;
 }

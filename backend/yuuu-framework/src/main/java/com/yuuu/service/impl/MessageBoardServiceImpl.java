@@ -21,13 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.util.Map;
-import java.util.UUID;
+
+import static com.yuuu.utils.VisitorUtil.generateGuestUsername;
 
 
 /**
@@ -38,13 +34,8 @@ import java.util.UUID;
  */
 @Service("messageBoardService")
 public class MessageBoardServiceImpl extends ServiceImpl<MessageBoardMapper, MessageBoard> implements MessageBoardService {
-
-    private static final String API_URL = "https://img.xjh.me/random_img.php?return=json";
-    private final RestTemplate restTemplate;
-
-    public MessageBoardServiceImpl(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    @Autowired
+    private AvatarService avatarService;
 
     @Autowired
     private UserService userService;
@@ -60,12 +51,12 @@ public class MessageBoardServiceImpl extends ServiceImpl<MessageBoardMapper, Mes
         if (userId == null){
             messageBoard.setUserName(generateGuestUsername());
             messageBoard.setMessage(message);
-            messageBoard.setAvatar(this.getRandomAvatar());
+            messageBoard.setAvatar(avatarService.getRandomAvatar());
         }else{
             User user = userService.getById(userId);
             String avatar = "";
             if (StrUtil.isBlank(user.getAvatar())){
-                avatar = this.getRandomAvatar();
+                avatar = avatarService.getRandomAvatar();
             }else{
                 avatar = user.getAvatar();
             }
@@ -75,25 +66,6 @@ public class MessageBoardServiceImpl extends ServiceImpl<MessageBoardMapper, Mes
         }
         save(messageBoard);
         return ResponseResult.okResult(messageBoard);
-    }
-
-    private static String generateGuestUsername() {
-        UUID uuid = UUID.randomUUID();
-        String uuidStr = uuid.toString();
-        String uniqueIdentifier = uuidStr.substring(0, 8);
-        String username = "游客" + uniqueIdentifier;
-        return username;
-    }
-
-    private String getRandomAvatar() {
-        String avatar = "";
-        ResponseEntity<String> response = restTemplate.getForEntity(API_URL, String.class);
-        if (response.getStatusCodeValue() == 200){
-            String body = response.getBody();
-            Map map = JSON.parseObject(body, Map.class);
-            avatar = (String) map.get("img");
-        }
-        return avatar;
     }
 
 

@@ -5,11 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yuuu.constants.SystemConstants;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.dto.ChatDto;
+import com.yuuu.domain.entity.ChatRecords;
+import com.yuuu.domain.entity.LoginUser;
 import com.yuuu.domain.mongo.ChatRecord;
 import com.yuuu.domain.vo.ChatRecordVo;
 import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.exception.SystemException;
+import com.yuuu.service.ChatRecordsService;
 import com.yuuu.service.ChatService;
+import com.yuuu.service.UserService;
 import com.yuuu.utils.BeanCopyUtils;
 import com.yuuu.utils.RedisCache;
 import com.yuuu.utils.SecurityUtils;
@@ -60,7 +64,8 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ResponseResult chatMessage(ChatDto dto) {
-        String userId = SecurityUtils.getUserId().toString();
+        Long userId = SecurityUtils.getUserId();
+        String avatar = SecurityUtils.getLoginUser().getUser().getAvatar();
         // 计算距离明天零点的秒数
         long secondsUntilMidnight = Duration.between(
                 Instant.now(),
@@ -73,7 +78,7 @@ public class ChatServiceImpl implements ChatService {
             chatRecordVo.setAnswer("啊哦，今天聊天太多了，请明天再来吧！");
             return ResponseResult.okResult(chatRecordVo);
         }
-        List<ChatRecord> chatRecords = queryRecords(SystemConstants.BLOG_CHAT_KEY + userId);
+        List<ChatRecords> chatRecords = queryRecords(userId);
         String conversationId = "";
         if (chatRecords != null && chatRecords.size() > 0) {
             conversationId = chatRecords.get(0).getConversationId();
@@ -94,10 +99,11 @@ public class ChatServiceImpl implements ChatService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String body = responseEntity.getBody();
             Map map = JSON.parseObject(body, Map.class);
-            saveRecord(SystemConstants.BLOG_CHAT_KEY + userId, map.get("conversation_id").toString(), dto.getQuestion(), map.get("answer").toString());
+            saveRecord(userId, map.get("conversation_id").toString(), dto.getQuestion(), map.get("answer").toString());
             ChatRecordVo chatRecordVo = new ChatRecordVo();
             chatRecordVo.setAnswer(map.get("answer").toString());
             chatRecordVo.setQuery(dto.getQuestion());
+            chatRecordVo.setAvatar(avatar);
             chatRecordVo.setChatTimeStamp(new Date().getTime());
             return ResponseResult.okResult(chatRecordVo);
         } else {
@@ -107,25 +113,50 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ResponseResult getAllMessages() {
-        String userId = SecurityUtils.getUserId().toString();
-        List<ChatRecord> chatRecords = queryRecords(SystemConstants.BLOG_CHAT_KEY + userId);
+        Long userId = SecurityUtils.getUserId();
+        String avatar = SecurityUtils.getLoginUser().getUser().getAvatar();
+        List<ChatRecords> chatRecords = queryRecords(userId);
         List<ChatRecordVo> result = new ArrayList<>();
-        for (ChatRecord chatRecord : chatRecords) {
+        for (ChatRecords chatRecord : chatRecords) {
             ChatRecordVo chatRecordVo = BeanCopyUtils.copyBean(chatRecord, ChatRecordVo.class);
+            chatRecordVo.setAvatar(avatar);
             result.add(chatRecordVo);
         }
         return ResponseResult.okResult(result);
     }
 
     @Autowired
+    private ChatRecordsService chatRecordsService;
+
+    private void saveRecord(Long userId,
+                            String conversationId,
+                            String query,
+                            String answer) {
+        ChatRecords chatRecord = new ChatRecords();
+        chatRecord.setUserId(userId);
+        chatRecord.setConversationId(conversationId);
+        chatRecord.setQuery(query);
+        chatRecord.setAnswer(answer);
+        chatRecord.setTimeStamp(System.currentTimeMillis());
+        chatRecordsService.save(chatRecord);
+    }
+
+    private List<ChatRecords> queryRecords(Long userId) {
+        LambdaQueryWrapper<ChatRecords> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ChatRecords::getUserId,userId).orderByAsc(ChatRecords::getTimeStamp);
+        return chatRecordsService.list(queryWrapper);
+    }
+
+    /*@Autowired
     private MongoTemplate mongoTemplate;
 
-    /**
+
+    *//**
      * @description: 保存聊天记录到mongo中
      * @author: yuuu
      * @param: [userId, conversationId, query, answer]
      * @return: void
-     **/
+     **//*
     private void saveRecord(String userId,
                             String conversationId,
                             String query,
@@ -139,14 +170,14 @@ public class ChatServiceImpl implements ChatService {
         mongoTemplate.save(chatRecord);
     }
 
-    /**
+    *//**
      * @description: 根据userId获取聊天记录
      * @author: yuuu
      * @param: [userId]
      * @return: java.util.List<com.yuuu.domain.mongo.ChatRecord>
-     **/
+     **//*
     private List<ChatRecord> queryRecords(String userId) {
         Query query = new Query(Criteria.where("userId").is(userId)).with(Sort.by(Sort.Order.asc("chatTimeStamp")));
         return mongoTemplate.find(query, ChatRecord.class);
-    }
+    }*/
 }

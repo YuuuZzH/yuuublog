@@ -14,7 +14,7 @@ import router from './router'
 import plugins from './plugins' // plugins
 import './assets/icons' // icon
 import '@/permission' // permission control
-import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, handleTree } from '@/utils/sg'
+import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, handleTree } from '@/utils/format'
 
 import mavonEditor from 'mavon-editor'
 import hasPermission from '@/utils/hasPermission';

@@ -136,7 +136,37 @@ export const constantRoutes = [
       component: () => import('@/views/content/tag/index'),
       hidden: true
     }]
-  }
+  },
+  {
+    path: '/log/login',
+    component: Layout,
+    children: [{
+      path: '/',
+      name: 'LoginLog',
+      component: () => import('@/views/log/login/index'),
+      hidden: true
+    }]
+  },
+  {
+    path: '/log/visitor',
+    component: Layout,
+    children: [{
+      path: '/',
+      name: 'VisitorLog',
+      component: () => import('@/views/log/visitor/index'),
+      hidden: true
+    }]
+  },
+  {
+    path: '/log/operation',
+    component: Layout,
+    children: [{
+      path: '/',
+      name: 'OperationLog',
+      component: () => import('@/views/log/operation/index'),
+      hidden: true
+    }]
+  },
 ]
 
 const createRouter = () => new Router({

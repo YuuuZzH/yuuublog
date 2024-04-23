@@ -39,7 +39,7 @@ public class LoginController {
     private LoginService loginService;
 
     @PostMapping("/user/login")
-    public ResponseResult login(@RequestBody User user, HttpServletRequest request){
+    public ResponseResult login(@RequestBody User user){
         if (!StringUtils.hasText(user.getUserName())){
             //提示用户输入用户名
             throw new SystemException(AppHttpCodeEnum.REQUIRE_USERNAME);

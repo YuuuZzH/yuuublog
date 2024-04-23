@@ -6,6 +6,8 @@ import com.yuuu.domain.dto.TagDto;
 import com.yuuu.domain.dto.TagListDto;
 import com.yuuu.domain.entity.Tag;
 
+import java.util.List;
+
 
 /**
  * 标签(Tag)表服务接口
@@ -20,7 +22,7 @@ public interface TagService extends IService<Tag> {
 
     ResponseResult addTag(TagListDto tagListDto);
 
-    ResponseResult deleteTag(Long id);
+    ResponseResult deleteTag(List<Long> ids);
 
     ResponseResult getTagById(Long id);
 

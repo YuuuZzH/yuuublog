@@ -1,3 +1,4 @@
+/*
 package com.yuuu.aspect;
 
 import cn.hutool.core.util.StrUtil;
@@ -33,10 +34,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+*/
 /**
  * @description: 获取用户登录信息的切面类
  * @author: yuuu
- **/
+ **//*
+
 // @Aspect
 @Component
 @Slf4j
@@ -49,14 +52,16 @@ public class LoginInfoAspect {
     @Autowired
     private LoginConfigService loginConfigService;
 
-    /**
+    */
+/**
      * @author yuuu
      * @description 在切面类中，第一次 记录用户登录信息时，用户还未登录成功，或者说 请求还未携带 token ，因此 SpringSecurity 还不能获取到LoginUser
      * 此时，通过  SecurityUtils.getLoginUser().getUser(); 会报错
      * 【java.lang.ClassCastException: java.lang.String cannot be cast to com.yuuu.domain.entity.LoginUser】
      * 因为 getAuthentication().getPrincipal() 是 anonymousUser
      * 解决：通过切 返回的结果，使用反射获取到响应对象，避免回表
-     */
+     *//*
+
     // @AfterReturning(pointcut = "execution(* com.yuuu.controller.*Controller.*login(..))", returning = "result")
     public void afterLogin(JoinPoint joinPoint, Object result) {
         // 通过反射获取 Response的data数据
@@ -121,3 +126,4 @@ public class LoginInfoAspect {
         loginConfigService.saveOrUpdate(loginConfig, queryWrapper);
     }
 }
+*/

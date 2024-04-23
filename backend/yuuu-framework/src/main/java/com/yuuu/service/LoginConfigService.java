@@ -1,7 +1,11 @@
 package com.yuuu.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yuuu.domain.ResponseResult;
+import com.yuuu.domain.dto.QueryLogDto;
 import com.yuuu.domain.entity.LoginConfig;
+
+import java.util.List;
 
 
 /**
@@ -12,4 +16,7 @@ import com.yuuu.domain.entity.LoginConfig;
  */
 public interface LoginConfigService extends IService<LoginConfig> {
 
+    ResponseResult queryLogByLogin(QueryLogDto dto);
+
+    ResponseResult deleteLoginLog(List<Long> ids);
 }

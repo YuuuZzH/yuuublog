@@ -52,7 +52,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         if (StringUtils.hasText(linkListDto.getStatus())) {
             queryWrapper.like(Link::getStatus,linkListDto.getStatus());
         }
-        Page<Link> page = new Page<>();
+        Page<Link> page = new Page<>(pageNum,pageSize);
         page(page,queryWrapper);
         List<Link> records = page.getRecords();
         List<LinkVo> linkVos = BeanCopyUtils.copyBeanList(records, LinkVo.class);

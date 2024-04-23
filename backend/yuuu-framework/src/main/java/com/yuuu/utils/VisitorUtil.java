@@ -17,5 +17,8 @@ public class VisitorUtil {
         return username;
     }
 
-
+    public static String emailDesensitization(String s){
+        String maskedEmail = s.replaceAll("^(.{3}).*(.{1}@.*)$", "$1****$2");
+        return maskedEmail;
+    }
 }

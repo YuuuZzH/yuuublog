@@ -16,10 +16,7 @@ import org.springframework.mobile.device.Device;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author: yuuu
@@ -38,14 +35,15 @@ public class IPController {
         Long userId = SecurityUtils.getUserId();
         LambdaQueryWrapper<LoginConfig> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(LoginConfig::getUserId,userId);
-        LoginConfig one = loginConfigService.getOne(queryWrapper);
+        queryWrapper.orderByDesc(LoginConfig::getId);
+        LoginConfig one = loginConfigService.list(queryWrapper).get(0);
         HashMap<String,String> map = new HashMap<>();
         map.put("devName",one.getDevName());
         map.put("ip",one.getIp());
         map.put("address",one.getAddress());
         map.put("browser",one.getBrowser());
         map.put("os",one.getOs());
-        return new ResponseResult().ok(one);
+        return ResponseResult.okResult(one);
     }
 
 }

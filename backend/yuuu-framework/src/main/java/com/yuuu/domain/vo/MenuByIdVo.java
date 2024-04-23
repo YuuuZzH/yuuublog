@@ -33,7 +33,8 @@ public class MenuByIdVo {
     private String visible;
     //菜单状态（0正常 1停用）
     private String status;
-
+    //组件路径
+    private String component;
     //菜单图标
     private String icon;
     //备注

@@ -31,7 +31,7 @@ public class BlogLoginController {
     private BlogLoginService blogLoginService;
 
     @PostMapping("/login")
-    public ResponseResult login(@RequestBody UserLoginDto user, HttpServletRequest request) {
+    public ResponseResult login(@RequestBody UserLoginDto user) {
         if (!StringUtils.hasText(user.getUserName())) {
             //提示用户输入用户名
             throw new SystemException(AppHttpCodeEnum.REQUIRE_USERNAME);

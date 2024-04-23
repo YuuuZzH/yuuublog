@@ -61,13 +61,9 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     }
 
     @Override
-    public ResponseResult deleteTag(Long id) {
-        boolean b = removeById(id);
-        if (b){
-            return ResponseResult.okResult();
-        }else{
-            return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);
-        }
+    public ResponseResult deleteTag(List<Long> ids) {
+        removeByIds(ids);
+        return ResponseResult.okResult();
     }
 
     @Override

@@ -12,9 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: yuuu
@@ -51,7 +49,12 @@ public class VisitorInterceptor implements HandlerInterceptor {
         } else {
             LambdaQueryWrapper<LoginConfig> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(LoginConfig::getIp, ipAddress).eq(LoginConfig::getType, LoginConfig.VISITOR);
-            LoginConfig one = loginConfigService.getOne(queryWrapper);
+            queryWrapper.orderByDesc(LoginConfig::getId);
+            List<LoginConfig> list = loginConfigService.list(queryWrapper);
+            LoginConfig one = null;
+            if (list != null && list.size() > 0){
+                one = list.get(0);
+            }
             if (one != null) {
                 if (principal instanceof LoginUser) {
                     return true;

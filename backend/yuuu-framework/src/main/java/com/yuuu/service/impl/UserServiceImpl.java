@@ -408,7 +408,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     private GithubUser getUserInfoWithGithub(String oauthToken) throws IOException {
-        String url = "https://yuuu.store/user";
+        String url = "https://yuuu.work/user";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + oauthToken);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -427,7 +427,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     private String getOauthToken(String code) throws IOException {
-        String url = "https://yuuu.store/login/oauth/access_token";
+        String url = "https://yuuu.work/login/oauth/access_token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

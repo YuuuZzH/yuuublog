@@ -25,7 +25,7 @@ public class OpenAIAPI {
     /**
      * 聊天端点
      */
-    String chatEndpoint = "https://yuuu.store/v1/chat/completions";
+    String chatEndpoint = "https://yuuu.work/v1/chat/completions";
     /**
      * api密匙
      */

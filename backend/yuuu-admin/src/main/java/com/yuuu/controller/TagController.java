@@ -11,6 +11,8 @@ import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @BelongsProject:YuuuBlog
  * @BelongsPackage:com.yuuu.controller
@@ -39,11 +41,11 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseResult deleteTag(@PathVariable("id") Long id){
+    public ResponseResult deleteTag(@PathVariable("id") List<Long> ids){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
         }
-        return tagService.deleteTag(id);
+        return tagService.deleteTag(ids);
     }
 
     @GetMapping("/{id}")

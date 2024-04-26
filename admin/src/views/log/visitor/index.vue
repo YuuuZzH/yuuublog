@@ -1,40 +1,45 @@
 <template>
-    <div>
-        <h1>游客访问信息</h1>
-        <el-table :data="tableData" stripe style="width: 100%">
-            <el-table-column prop="date" label="日期" width="180">
-            </el-table-column>
-            <el-table-column prop="name" label="姓名" width="180">
-            </el-table-column>
-            <el-table-column prop="address" label="地址">
-            </el-table-column>
-        </el-table>
+    <div class="app-container">
+        <el-form :inline="true" label-width="80">
+            <el-form-item label="时间选择">
+                <el-switch style="display: block ;top: 9px;" v-model="nearly" active-color="rgb(107, 179, 41)" inactive-color="#13ce66"
+                    @change="queryLoginLog" active-text="近三十天" inactive-text="近七天">
+                </el-switch>
+            </el-form-item>
+        </el-form>
+
+        
     </div>
 </template>
-  
+
 <script>
+import request from '@/utils/request'
+
 export default {
-    name: 'VisitorLog',
+    name: 'VisitLog',
     data() {
         return {
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1517 弄'
-            }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1519 弄'
-            }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1516 弄'
-            }]
+            tableData: [],
+            pageNo: 1,
+            pageSize: 10,
+            total: 0,
+            nearly: 0, // 近一周
         }
-    }
+    },
+    methods: {
+        queryLoginLog() {
+            request.post('/log/visitorLog', {
+                pageNo: this.pageNo,
+                pageSize: this.pageSize,
+                nearly: this.nearly,
+            }).then(res => {
+                this.tableData = res.rows
+                this.total = res.total
+            })
+        },
+    },
+    mounted() {
+        this.queryLoginLog()
+    },
 }
 </script>

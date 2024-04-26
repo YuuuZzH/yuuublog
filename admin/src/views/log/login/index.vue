@@ -2,12 +2,17 @@
     <div class="app-container">
         <el-form :inline="true" label-width="80">
             <el-form-item label="地址">
-                <el-input v-model="address" placeholder="请输入地址" clearable size="small" @keyup.enter.native="queryLoginLog"
-                    @clear="queryLoginLog" />
+                <el-input v-model="address" placeholder="请输入地址" clearable size="small"
+                    @keyup.enter.native="queryLoginLog" @clear="queryLoginLog" />
             </el-form-item>
             <el-form-item label="用户昵称">
-                <el-input v-model="nickname" placeholder="请输入昵称" clearable size="small" @keyup.enter.native="queryLoginLog"
-                    @clear="queryLoginLog" />
+                <el-input v-model="nickname" placeholder="请输入昵称" clearable size="small"
+                    @keyup.enter.native="queryLoginLog" @clear="queryLoginLog" />
+            </el-form-item>
+            <el-form-item label="时间选择">
+                <el-switch style="display: block ;top: 9px;" v-model="nearly" active-color="rgb(107, 179, 41)" inactive-color="#13ce66"
+                    @change="queryLoginLog" active-text="近三十天" inactive-text="近七天">
+                </el-switch>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="queryLoginLog">搜索</el-button>
@@ -41,7 +46,8 @@
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-delete"
-                        :disabled="!$hasPermission('content:tag:remove')" @click="handleDelete(scope.row)">删除</el-button>
+                        :disabled="!$hasPermission('content:tag:remove')"
+                        @click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -50,10 +56,10 @@
             @size-change="queryLoginLog" />
     </div>
 </template>
-  
+
 <script>
 import request from '@/utils/request'
-import { delLoginLog} from '@/api/log/loginlog'
+import { delLoginLog } from '@/api/log/loginlog'
 import { praseStrEmpty } from '@/utils/format'
 export default {
     name: 'LoginLog',
@@ -64,7 +70,7 @@ export default {
             pageSize: 10,
             total: 0,
             ids: [],
-            nearly: 1, // 近一周
+            nearly: 0, // 近一周
             address: '',
             nickname: '',
         }
@@ -106,3 +112,9 @@ export default {
     },
 }
 </script>
+<style>
+#app-container {
+    color: rgb(107, 179, 41);
+    color: coral;
+}
+</style>

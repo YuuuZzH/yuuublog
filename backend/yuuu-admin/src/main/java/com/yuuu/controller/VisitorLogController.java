@@ -27,6 +27,11 @@ public class VisitorLogController {
         return service.queryLogByLogin(dto);
     }
 
+    @PostMapping("/visitorLog")
+    public ResponseResult visitorLog(@RequestBody QueryLogDto dto){
+        return service.queryLogByVisitor(dto);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseResult deleteLoginLog(@PathVariable("id") List<Long> ids){
         if (!SecurityUtils.isAdmin()){

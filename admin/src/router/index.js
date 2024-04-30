@@ -88,6 +88,16 @@ export const constantRoutes = [
     }]
   },
   {
+    path: '/system/sensitive',
+    component: Layout,
+    children: [{
+      path: '/',
+      name: 'sensitive',
+      component: () => import('@/views/system/sensitive'),
+      hidden: true
+    }]
+  },
+  {
     path: '/system/role',
     component: Layout,
     children: [{

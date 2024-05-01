@@ -7,7 +7,7 @@
           placeholder="请输入角色名称"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 200px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -18,7 +18,7 @@
           placeholder="角色状态"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 100px"
         >
           <el-option :key="0" label="正常" :value="0" />
           <el-option :key="1" label="停用" :value="1" />
@@ -33,6 +33,7 @@
           :disabled="!$hasPermission('system:role:query')"
           @click="handleQuery"
         >搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
     <el-row :gutter="10" class="mb8">
@@ -298,6 +299,10 @@ export default {
       const halfCheckedKeys = this.$refs.menu.getHalfCheckedKeys()
       checkedKeys.unshift.apply(checkedKeys, halfCheckedKeys)
       return checkedKeys
+    },
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
     },
     /** 根据角色ID查询菜单树结构 */
     getRoleMenuTreeselect(id) {

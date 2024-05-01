@@ -1,20 +1,9 @@
 <template>
   <div class="app-container">
-    <el-form
-      v-show="showSearch"
-      ref="queryForm"
-      :model="queryParams"
-      :inline="true"
-      label-width="68px"
-    >
+    <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="名称" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.name" placeholder="请输入名称" clearable size="small"
+          @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="审核状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择" clearable>
@@ -24,54 +13,30 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button
-          type="primary"
-          icon="el-icon-search"
-          size="mini"
-          @click="handleQuery"
-        >搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-        >新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
       </el-col>
 
       <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="!$hasPermission('content:link:remove') || multiple"
-          @click="handleDelete"
-        >删除</el-button>
+        <el-button type="danger" plain icon="el-icon-delete" size="mini"
+          :disabled="!$hasPermission('content:link:remove') || multiple" @click="handleDelete">删除</el-button>
       </el-col>
     </el-row>
 
-    <el-table
-      v-loading="loading"
-      :data="linkList"
-      @selection-change="handleSelectionChange"
-    >
+    <el-table v-loading="loading" :data="linkList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="友链编号" align="center" type="index" width="150" />
       <el-table-column label="名称" align="center" prop="name" />
       <el-table-column label="描述" align="center" prop="description" />
       <el-table-column label="logo" align="center" prop="logo" type="img">
         <template slot-scope="scope">
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="scope.row.logo"
-            fit="fill"
-          />
+          <el-image style="width: 100px; height: 100px" :src="scope.row.logo" fit="fill" />
         </template>
       </el-table-column>
       <el-table-column prop="address" label="地址" align="center" />
@@ -82,54 +47,23 @@
           <el-tag v-if="scope.row.status == 2" type="danger">未审核</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        label="操作"
-        align="center"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            v-hasPermission="['content:link:edit']"
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-          >修改</el-button>
-          <el-button
-            v-hasPermission="['content:link:remove']"
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            :disabled="!$hasPermission('content:link:remove')"
-            @click="handleDelete(scope.row)"
-          >删除</el-button>
-          <el-button
-            v-if="scope.row.status == 2"
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleChangeStatus(scope.row, '0')"
-          >审核通过</el-button>
-          <el-button
-            v-if="scope.row.status == 2"
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleChangeStatus(scope.row, '1')"
-          >审核不通过</el-button>
+          <el-button v-hasPermission="['content:link:edit']" size="mini" type="text" icon="el-icon-edit"
+            @click="handleUpdate(scope.row)">修改</el-button>
+          <el-button  size="mini" type="text" icon="el-icon-delete"
+            :disabled="!$hasPermission('content:link:remove')" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button v-if="scope.row.status == 2" size="mini" type="text" icon="el-icon-delete"
+            @click="handleChangeStatus(scope.row, '0')">审核通过</el-button>
+          <el-button v-if="scope.row.status == 2" size="mini" type="text" icon="el-icon-delete"
+            @click="handleChangeStatus(scope.row, '1')">审核不通过</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-pagination
-      :page-size.sync="queryParams.pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      :page-sizes="[10, 20, 30, 40]"
-      :current-page.sync="queryParams.pageNum"
-      @current-change="getList"
-      @size-change="getList"
-    />
+    <el-pagination :page-size.sync="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper"
+      :total="total" :page-sizes="[10, 20, 30, 40]" :current-page.sync="queryParams.pageNum" @current-change="getList"
+      @size-change="getList" />
 
     <!-- 添加或修改友链对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -138,11 +72,7 @@
           <el-input v-model="form.name" placeholder="请输入名称" />
         </el-form-item>
         <el-form-item label="描述" prop="description">
-          <el-input
-            v-model="form.description"
-            type="textarea"
-            placeholder="请输入描述"
-          />
+          <el-input v-model="form.description" type="textarea" placeholder="请输入描述" />
         </el-form-item>
         <el-form-item label="logo" prop="logo">
           <el-input v-model="form.logo" placeholder="请输入logo地址" />
@@ -229,6 +159,10 @@ export default {
         this.loading = false
       })
     },
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
     handleChangeStatus(link, newStatus) {
       this.loading = true
       changeLinkStatus(link.id, newStatus).then((response) => {
@@ -311,14 +245,14 @@ export default {
       const ids = row.id || this.ids
       this.$modal
         .confirm('是否确认删除友链编号为"' + ids + '"的数据项？')
-        .then(function() {
+        .then(function () {
           return delLink(ids)
         })
         .then(() => {
           this.getList()
           this.$modal.msgSuccess('删除成功')
         })
-        .catch(() => {})
+        .catch(() => { })
     }
   }
 }

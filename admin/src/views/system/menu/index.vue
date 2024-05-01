@@ -18,6 +18,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" :disabled="!$hasPermission('system:menu:query')" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -274,6 +275,10 @@ export default {
         return i.match(re)[1]
       })
       return arr
+    },
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
     },
     // 选择图标
     selected(name) {

@@ -15,17 +15,17 @@
               placeholder="请输入用户名称"
               clearable
               size="small"
-              style="width: 240px"
+              style="width: 200px"
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="手机号码" prop="phonenumber">
+          <el-form-item label="手机号码" prop="phoneNumber">
             <el-input
-              v-model="queryParams.phonenumber"
+              v-model="queryParams.phoneNumber"
               placeholder="请输入手机号码"
               clearable
               size="small"
-              style="width: 240px"
+              style="width: 200px"
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
@@ -35,7 +35,7 @@
               placeholder="用户状态"
               clearable
               size="small"
-              style="width: 240px"
+              style="width: 100px"
             >
               <el-option :key="0" label="正常" :value="0" />
               <el-option :key="1" label="停用" :value="1" />
@@ -49,6 +49,7 @@
               :disabled="!$hasPermission('system:user:query')"
               @click="handleQuery"
             >搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
 
@@ -154,7 +155,7 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="手机号码" prop="phonenumber">
+            <el-form-item label="手机号码" prop="phoneNumber">
               <el-input
                 v-model="form.phoneNumber"
                 placeholder="请输入手机号码"
@@ -269,7 +270,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         userName: undefined,
-        phonenumber: undefined,
+        phoneNumber: undefined,
         status: undefined
       },
       title: '',
@@ -305,7 +306,7 @@ export default {
             trigger: ['blur', 'change']
           }
         ],
-        phonenumber: [
+        phoneNumber: [
           {
             pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
             message: '请输入正确的手机号码',
@@ -399,6 +400,10 @@ export default {
 
       })
     },
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
     // 表单重置
     reset() {
       this.form = {
@@ -406,7 +411,7 @@ export default {
         userName: undefined,
         nickName: undefined,
         password: undefined,
-        phonenumber: undefined,
+        phoneNumber: undefined,
         email: undefined,
         sex: undefined,
         status: '0',

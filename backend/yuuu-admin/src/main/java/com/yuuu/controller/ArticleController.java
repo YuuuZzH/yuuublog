@@ -9,6 +9,7 @@ import com.yuuu.exception.SystemException;
 import com.yuuu.service.ArticleService;
 import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,6 +28,7 @@ public class ArticleController {
 
 
     @PostMapping
+    @PreAuthorize("@ps.hasPermission('content:article:publish')")
     public ResponseResult add(@RequestBody ArticleDto articleDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -35,15 +37,19 @@ public class ArticleController {
     }
 
     @GetMapping("/list")
+    @PreAuthorize("@ps.hasPermission('content:article:list')")
     public ResponseResult articleList(Integer pageNum, Integer pageSize, ArticleListDto articleListDto){
         return articleService.articleListAdmin(pageNum,pageSize,articleListDto);
     }
+
     @GetMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:article:query')")
     public ResponseResult getArticleById(@PathVariable("id") Long id){
         return articleService.getArticleById(id);
     }
 
     @PutMapping
+    @PreAuthorize("@ps.hasPermission('content:article:writer')")
     public ResponseResult updateArticle(@RequestBody ArticleByIdVo article){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -52,6 +58,7 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:article:remove')")
     public ResponseResult deleteArticle(@PathVariable("id") Long id){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);

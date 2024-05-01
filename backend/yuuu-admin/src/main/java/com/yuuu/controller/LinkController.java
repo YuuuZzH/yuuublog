@@ -9,6 +9,7 @@ import com.yuuu.exception.SystemException;
 import com.yuuu.service.LinkService;
 import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,11 +28,13 @@ public class LinkController {
     private LinkService linkService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ps.hasPermission('content:link:list')")
     public ResponseResult linkList(Integer pageNum, Integer pageSize, LinkListDto linkListDto){
         return linkService.linkList(pageNum,pageSize,linkListDto);
     }
 
     @PostMapping
+    @PreAuthorize("@ps.hasPermission('content:link:add')")
     public ResponseResult addLink(@RequestBody AddLinkDto addLinkDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -40,11 +43,13 @@ public class LinkController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:link:query')")
     public ResponseResult getLinkById(@PathVariable("id") Long id){
         return linkService.getLinkById(id);
     }
 
     @PutMapping
+    @PreAuthorize("@ps.hasPermission('content:link:edit')")
     public ResponseResult updateLink(@RequestBody UpdateLinkDto updateLinkDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -54,6 +59,7 @@ public class LinkController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:link:remove')")
     public ResponseResult deleteLinkById(@PathVariable("id") Long id){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);

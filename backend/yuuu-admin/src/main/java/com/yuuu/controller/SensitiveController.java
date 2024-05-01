@@ -1,12 +1,16 @@
 package com.yuuu.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.dto.SensitiveDto;
 import com.yuuu.domain.entity.Sensitive;
+import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.service.SensitiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 /**
  * 敏感词信息Controller
@@ -44,6 +48,11 @@ public class SensitiveController {
     @PreAuthorize("@ps.hasPermission('system:sensitive:add')")
     @PostMapping
     public ResponseResult add(@RequestBody Sensitive sensitive) {
+        int count = sensitiveService.count(new LambdaQueryWrapper<Sensitive>()
+                .eq(Sensitive::getSensitives, sensitive.getSensitives()));
+        if (count > 0) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.NOT_UNIQUE);
+        }
         return ResponseResult.okResult(sensitiveService.save(sensitive));
     }
 

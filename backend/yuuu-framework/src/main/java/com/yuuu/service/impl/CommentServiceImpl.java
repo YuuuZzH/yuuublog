@@ -3,6 +3,7 @@ package com.yuuu.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yuuu.domain.entity.Sensitive;
 import com.yuuu.domain.entity.User;
 import com.yuuu.service.CommentService;
 import com.yuuu.constants.SystemConstants;
@@ -13,14 +14,17 @@ import com.yuuu.domain.vo.PageVo;
 import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.exception.SystemException;
 import com.yuuu.mapper.CommentMapper;
+import com.yuuu.service.SensitiveService;
 import com.yuuu.service.UserService;
 import com.yuuu.utils.BeanCopyUtils;
+import com.yuuu.utils.SensitiveWordUtil;
 import io.jsonwebtoken.lang.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +38,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SensitiveService sensitiveService;
 
     @Override
     public ResponseResult getCommentList(String commentType, Long articleId, Integer pageNum, Integer pageSize) {
@@ -67,6 +74,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (!StringUtils.hasText(comment.getContent())) {
             throw new SystemException(AppHttpCodeEnum.CONTENT_IS_NULL);
         }
+        List<String> sensitives = sensitiveService.list().stream().map(Sensitive::getSensitives).collect(Collectors.toList());
+        SensitiveWordUtil.initMap(sensitives);
+        String filteredContent = SensitiveWordUtil.filterSensitiveWords(comment.getContent());
+        comment.setContent(filteredContent);
         save(comment);
         return ResponseResult.okResult();
     }

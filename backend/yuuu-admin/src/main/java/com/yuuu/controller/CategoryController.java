@@ -36,6 +36,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping("listAllCategory")
+    @PreAuthorize("@ps.hasPermission('content:category:list')")
     public ResponseResult listAllCategory() {
         return categoryService.listAllCategory();
     }
@@ -62,11 +63,13 @@ public class CategoryController {
     }
 
     @GetMapping("/list")
+    @PreAuthorize("@ps.hasPermission('content:category:list')")
     public ResponseResult getList(Integer pageNum,Integer pageSize,String name,String status){
         return categoryService.getList(pageNum,pageSize,name,status);
     }
 
     @PostMapping
+    @PreAuthorize("@ps.hasPermission('content:category:add')")
     public ResponseResult addCategory(@RequestBody CategoryDto categoryDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -75,11 +78,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:category:query')")
     public ResponseResult getCategoryById(@PathVariable("id") Long id){
         return categoryService.getCategoryById(id);
     }
 
     @PutMapping
+    @PreAuthorize("@ps.hasPermission('content:category:edit')")
     public ResponseResult updateCategory(@RequestBody CategoryByIdVo category){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -88,6 +93,7 @@ public class CategoryController {
     }
 
     @PutMapping("/changeStatus")
+    @PreAuthorize("@ps.hasPermission('content:category:edit')")
     public ResponseResult changeStatus(@RequestBody CategoryByIdVo categoryByIdVo){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -96,6 +102,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:category:remove')")
     public ResponseResult deleteCategory(@PathVariable Long id){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);

@@ -10,6 +10,7 @@ import com.yuuu.domain.dto.RoleListDto;
 import com.yuuu.domain.dto.RoleUpdateDto;
 import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,11 +28,13 @@ public class RoleController {
     private RoleService roleService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ps.hasPermission('system:role:list')")
     public ResponseResult roleList(Integer pageNum, Integer pageSize, RoleListDto roleListDto){
         return roleService.roleList(pageNum,pageSize,roleListDto);
     }
 
     @PutMapping("/changeStatus")
+    @PreAuthorize("@ps.hasPermission('system:role:edit')")
     public ResponseResult changeStatus(@RequestBody RoleChangeDto roleChangeDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -40,6 +43,7 @@ public class RoleController {
     }
 
     @PostMapping
+    @PreAuthorize("@ps.hasPermission('system:role:add')")
     public ResponseResult addRole(@RequestBody AddRoleDto addRoleDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -48,11 +52,13 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('system:role:query')")
     public ResponseResult getRoleById(@PathVariable("id") Long id){
         return roleService.getRoleById(id);
     }
 
     @PutMapping
+    @PreAuthorize("@ps.hasPermission('system:role:edit')")
     public ResponseResult updateRole(@RequestBody RoleUpdateDto roleUpdateDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -61,6 +67,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('system:role:remove')")
     public ResponseResult deleteById(@PathVariable("id") Long id){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -69,6 +76,7 @@ public class RoleController {
     }
 
     @GetMapping("/listAllRole")
+    @PreAuthorize("@ps.hasPermission('system:role:list')")
     public ResponseResult listAllRole(){
         return roleService.listAllRole();
     }

@@ -32,8 +32,8 @@ public class VisitorLogController {
         return service.queryLogByVisitor(dto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseResult deleteLoginLog(@PathVariable("id") List<Long> ids){
+    @DeleteMapping("/{ids}")
+    public ResponseResult deleteLoginLog(@PathVariable Long[] ids){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
         }

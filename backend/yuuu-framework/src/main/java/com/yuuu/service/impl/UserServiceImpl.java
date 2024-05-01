@@ -21,10 +21,7 @@ import com.yuuu.mapper.UserMapper;
 import com.yuuu.service.RoleService;
 import com.yuuu.service.UserRoleService;
 import com.yuuu.service.UserService;
-import com.yuuu.utils.BeanCopyUtils;
-import com.yuuu.utils.JwtUtil;
-import com.yuuu.utils.RedisCache;
-import com.yuuu.utils.SecurityUtils;
+import com.yuuu.utils.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -38,6 +35,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.yuuu.utils.VisitorUtil.emailDesensitization;
 
 
 /**
@@ -155,7 +154,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             queryWrapper.like(User::getUserName, userListDto.getUserName());
         }
         if (!StrUtil.isBlank(userListDto.getPhoneNumber())) {
-            queryWrapper.eq(User::getPhoneNumber, userListDto.getPhoneNumber());
+            queryWrapper.like(User::getPhoneNumber, userListDto.getPhoneNumber());
         }
         if (!StrUtil.isBlank(userListDto.getStatus())) {
             queryWrapper.eq(User::getStatus, userListDto.getStatus());
@@ -165,6 +164,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Page<User> page = new Page<>(pageNum, pageSize);
         page(page, queryWrapper);
         List<UserListVo> userListVos = BeanCopyUtils.copyBeanList(page.getRecords(), UserListVo.class);
+        userListVos.stream()
+                .filter(item -> StrUtil.isNotBlank(item.getPhoneNumber()))
+                .forEach(item -> item.setPhoneNumber(PhoneNumberEncryptionUtil.encryptPhoneNumber(item.getPhoneNumber())));
         return ResponseResult.okResult(new PageVo(userListVos, page.getTotal()));
 
     }
@@ -199,7 +201,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 密码加密
         String password = passwordEncoder.encode(userAddDto.getPassword());
-
+        if (StrUtil.isNotBlank(userAddDto.getPhoneNumber())){
+            String encryptPhoneNumber = PhoneNumberEncryptionUtil.encryptPhoneNumber(userAddDto.getPhoneNumber());
+            userAddDto.setPhoneNumber(encryptPhoneNumber);
+        }
         userAddDto.setPassword(password);
         User user = BeanCopyUtils.copyBean(userAddDto, User.class);
         user.setAvatar(avatarService.getRandomAvatar());
@@ -235,6 +240,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 用户信息
         User user = getById(id);
         UserUpdateVo userUpdateVo = BeanCopyUtils.copyBean(user, UserUpdateVo.class);
+        userUpdateVo.setEmail(emailDesensitization(userUpdateVo.getEmail()));
         // 所有角色的列表
         LambdaQueryWrapper<Role> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Role::getStatus, SystemConstants.STATUS_NORMAL);

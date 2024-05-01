@@ -27,8 +27,6 @@ public class UserListVo {
 
     //账号状态（0正常 1停用）
     private String status;
-    //邮箱
-    private String email;
     //手机号
     private String phoneNumber;
     //用户性别（0男，1女，2未知）

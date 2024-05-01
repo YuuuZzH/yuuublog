@@ -13,6 +13,7 @@ import java.util.List;
  */
 @Data
 public class QueryLogVo {
+    private Long id;
     //用户昵称
     private String nickName;
     //登录ip

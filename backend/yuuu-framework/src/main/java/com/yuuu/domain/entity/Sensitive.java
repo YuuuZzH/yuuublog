@@ -22,7 +22,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class Sensitive extends Model<Sensitive> {
     //主键
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
     //敏感词
     private String sensitives;

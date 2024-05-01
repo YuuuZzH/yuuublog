@@ -9,6 +9,7 @@ import com.yuuu.exception.SystemException;
 import com.yuuu.service.TagService;
 import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,10 +30,13 @@ public class TagController {
     private TagService tagService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ps.hasPermission('content:tag:index')")
     public ResponseResult<PageVo> list(Integer pageSize, Integer pageNum, TagListDto tagListDto){
         return tagService.pageTagList(pageNum,pageSize,tagListDto);
     }
+
     @PostMapping
+    @PreAuthorize("@ps.hasPermission('content:tag:add')")
     public ResponseResult addTag(@RequestBody TagListDto tagListDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -41,6 +45,7 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:tag:remove')")
     public ResponseResult deleteTag(@PathVariable("id") List<Long> ids){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -49,11 +54,13 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ps.hasPermission('content:tag:query')")
     public ResponseResult getTagById(@PathVariable("id") Long id){
         return tagService.getTagById(id);
     }
 
     @PutMapping
+    @PreAuthorize("@ps.hasPermission('content:tag:edit')")
     public ResponseResult updateTag(@RequestBody TagDto tagDto){
         if (!SecurityUtils.isAdmin()){
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -63,6 +70,7 @@ public class TagController {
     }
 
     @GetMapping("/listAllTag")
+    @PreAuthorize("@ps.hasPermission('content:tag:query')")
     public ResponseResult listAllTag(){
         return tagService.listAllTag();
     }

@@ -17,9 +17,7 @@ import com.yuuu.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.yuuu.utils.VisitorUtil.emailDesensitization;
 
@@ -38,51 +36,51 @@ public class LoginConfigServiceImpl extends ServiceImpl<LoginConfigMapper, Login
         LambdaQueryWrapper<LoginConfig> queryWrapper = new LambdaQueryWrapper<>();
         // 查询登录用户信息
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        queryWrapper.eq(LoginConfig::getType,LoginConfig.LOGIN_USER)
-                .ne(LoginConfig::getUserName,loginUser.getUser().getUserName());
-        queryWrapper.like(StrUtil.isNotBlank(dto.getAddress()),LoginConfig::getAddress,dto.getAddress());
-        queryWrapper.like(StrUtil.isNotBlank(dto.getNickName()),LoginConfig::getNickName,dto.getNickName());
+        queryWrapper.eq(LoginConfig::getType, LoginConfig.LOGIN_USER)
+                .ne(LoginConfig::getUserName, loginUser.getUser().getUserName());
+        queryWrapper.like(StrUtil.isNotBlank(dto.getAddress()), LoginConfig::getAddress, dto.getAddress());
+        queryWrapper.like(StrUtil.isNotBlank(dto.getNickName()), LoginConfig::getNickName, dto.getNickName());
         Calendar calendar = Calendar.getInstance();
-        if (dto.getNearly() == 0){
+        if (dto.getNearly() == 0) {
             calendar.add(Calendar.DATE, -7);
-        }else {
+        } else {
             calendar.add(Calendar.DATE, -30);
         }
         Date time = calendar.getTime();
-        queryWrapper.le(LoginConfig::getLoginTime,new Date());
-        queryWrapper.ge(LoginConfig::getLoginTime,time);
-        Page<LoginConfig> page = new Page(dto.getPageNo(),dto.getPageSize());
-        page(page,queryWrapper);
+        queryWrapper.le(LoginConfig::getLoginTime, new Date());
+        queryWrapper.ge(LoginConfig::getLoginTime, time);
+        Page<LoginConfig> page = new Page(dto.getPageNo(), dto.getPageSize());
+        page(page, queryWrapper);
         List<LoginConfig> records = page.getRecords();
         List<QueryLogVo> vos = BeanCopyUtils.copyBeanList(records, QueryLogVo.class);
         vos.stream().forEach(vo -> vo.setEmail(emailDesensitization(vo.getEmail())));
-        PageVo pageVo = new PageVo(vos,page.getTotal());
+        PageVo pageVo = new PageVo(vos, page.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 
     @Override
-    public ResponseResult deleteLoginLog(List<Long> ids) {
-        return ResponseResult.okResult(removeByIds(ids));
+    public ResponseResult deleteLoginLog(Long[] ids) {
+        return ResponseResult.okResult(removeByIds(Arrays.asList(ids)));
     }
 
     @Override
     public ResponseResult queryLogByVisitor(QueryLogDto dto) {
         LambdaQueryWrapper<LoginConfig> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(LoginConfig::getType,LoginConfig.VISITOR);
+        queryWrapper.eq(LoginConfig::getType, LoginConfig.VISITOR);
         Calendar calendar = Calendar.getInstance();
-        if (dto.getNearly() == 0){
+        if (dto.getNearly() == 0) {
             calendar.add(Calendar.DATE, -7);
-        }else {
+        } else {
             calendar.add(Calendar.DATE, -30);
         }
         Date time = calendar.getTime();
-        queryWrapper.le(LoginConfig::getLoginTime,new Date());
-        queryWrapper.ge(LoginConfig::getLoginTime,time);
-        Page<LoginConfig> page = new Page(dto.getPageNo(),dto.getPageSize());
-        page(page,queryWrapper);
+        queryWrapper.le(LoginConfig::getLoginTime, new Date());
+        queryWrapper.ge(LoginConfig::getLoginTime, time);
+        Page<LoginConfig> page = new Page(dto.getPageNo(), dto.getPageSize());
+        page(page, queryWrapper);
         List<LoginConfig> records = page.getRecords();
         List<QueryLogVo> vos = BeanCopyUtils.copyBeanList(records, QueryLogVo.class);
-        PageVo pageVo = new PageVo(vos,page.getTotal());
+        PageVo pageVo = new PageVo(vos, page.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 }

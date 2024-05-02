@@ -64,11 +64,11 @@ public class LoginConfigServiceImpl extends ServiceImpl<LoginConfigMapper, Login
     }
 
     @Override
-    public ResponseResult queryLogByVisitor(QueryLogDto dto) {
+    public ResponseResult queryLogByVisitor(boolean nearly) {
         LambdaQueryWrapper<LoginConfig> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(LoginConfig::getType, LoginConfig.VISITOR);
         Calendar calendar = Calendar.getInstance();
-        if (dto.getNearly() == 0) {
+        if (!nearly) {
             calendar.add(Calendar.DATE, -7);
         } else {
             calendar.add(Calendar.DATE, -30);
@@ -76,11 +76,7 @@ public class LoginConfigServiceImpl extends ServiceImpl<LoginConfigMapper, Login
         Date time = calendar.getTime();
         queryWrapper.le(LoginConfig::getLoginTime, new Date());
         queryWrapper.ge(LoginConfig::getLoginTime, time);
-        Page<LoginConfig> page = new Page(dto.getPageNo(), dto.getPageSize());
-        page(page, queryWrapper);
-        List<LoginConfig> records = page.getRecords();
-        List<QueryLogVo> vos = BeanCopyUtils.copyBeanList(records, QueryLogVo.class);
-        PageVo pageVo = new PageVo(vos, page.getTotal());
-        return ResponseResult.okResult(pageVo);
+        List<LoginConfig> list = list(queryWrapper);
+        return ResponseResult.okResult(list);
     }
 }

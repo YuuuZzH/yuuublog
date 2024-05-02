@@ -27,9 +27,9 @@ public class VisitorLogController {
         return service.queryLogByLogin(dto);
     }
 
-    @PostMapping("/visitorLog")
-    public ResponseResult visitorLog(@RequestBody QueryLogDto dto){
-        return service.queryLogByVisitor(dto);
+    @GetMapping("/visitorLog/{nearly}")
+    public ResponseResult visitorLog(@PathVariable("nearly") boolean nearly){
+        return service.queryLogByVisitor(nearly);
     }
 
     @DeleteMapping("/{ids}")

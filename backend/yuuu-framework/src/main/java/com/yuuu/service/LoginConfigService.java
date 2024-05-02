@@ -20,5 +20,5 @@ public interface LoginConfigService extends IService<LoginConfig> {
 
     ResponseResult deleteLoginLog(Long[] ids);
 
-    ResponseResult queryLogByVisitor(QueryLogDto dto);
+    ResponseResult queryLogByVisitor(boolean nearly);
 }

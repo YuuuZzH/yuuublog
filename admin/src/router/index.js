@@ -177,6 +177,16 @@ export const constantRoutes = [
       hidden: true
     }]
   },
+  {
+    path: '/monitor/server',
+    component: Layout,
+    children: [{
+      path: '/',
+      name: 'server',
+      component: () => import('@/views/monitor/server/index'),
+      hidden: true
+    }]
+  },
 ]
 
 const createRouter = () => new Router({

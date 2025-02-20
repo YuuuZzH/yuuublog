@@ -1,24 +1,27 @@
 # yuuublog
 
 #### 介绍
-该项目以上线，可以通过访问www.yuuu.online进行查看
+可以通过访问www.yuuu.online进行查看
+
 基于SpringBoot + vue实现的个人博客
+
 完成登录注册、文章详情、评论发表等功能
-#### 软件架构
-后端采用vue-admin后台管理开源项目
 
 #### 安装教程
-本项目使用mysql8 redis6 
+本项目使用jdk8 SpringBoot2 mysql8 redis6 
 1.  导入项目
 2.  将application中的配置信息修改为个人开发的环境
 3.  启动项目
 
+注意：
+各服务密钥需要自行获取，如github、dify等；有需要可以联系我
+
 #### 使用说明
+前端使用vue2 + element-ui实现，基于开源的vue-admin-template完成管理端页面
 
-由于前端项目在一开始没有使用gitee进行项目管理，所以前端项目需要找我本人免费领取，博客中有相关信息。
-在这里也贴上个人的QQ。
-QQ:864326354
+前端前台项目（展示页）： https://gitee.com/yuuu-zehua/blogvue
 
+前端后台项目（管理端）： https://gitee.com/yuuu-zehua/adminvue
 
 #### 参与贡献
 

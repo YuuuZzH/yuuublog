@@ -38,6 +38,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.yuuu.constants.ApiUrlConstants.DIFY;
+import static com.yuuu.constants.ApiUrlConstants.DIFY_CHAT;
+
 /**
  * @author: yuuu
  * Description:
@@ -48,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 public class ChatServiceImpl implements ChatService {
 
     private String apiKey;
-    private static final String API_URL = "https://api.dify.ai/v1/";
+    private static final String API_URL = DIFY.getUrl();
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -95,7 +98,8 @@ public class ChatServiceImpl implements ChatService {
                 "    \"conversation_id\": \"" + conversationId + "\",\n" +
                 "    \"user\": \"" + SystemConstants.BLOG_CHAT_KEY + userId + "\"\n" +
                 "}", headers);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(API_URL + "chat-messages", HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(API_URL + DIFY_CHAT.getUrl(),
+                DIFY_CHAT.getMethod(), requestEntity, String.class);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String body = responseEntity.getBody();
             Map map = JSON.parseObject(body, Map.class);

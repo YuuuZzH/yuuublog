@@ -98,5 +98,6 @@ public class SystemConstants {
          */
         public static final String CAPTCHA_KEY="captcha:";
 
-        public static final String MAIL_KEY = "mail:";
+        public static final String MAIL_KEY_0 = "mail:register:";
+        public static final String MAIL_KEY_1 = "mail:upwd:";
 }

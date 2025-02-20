@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.yuuu.constants.ApiUrlConstants.*;
 import static com.yuuu.utils.VisitorUtil.emailDesensitization;
 
 
@@ -77,6 +78,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         this.restTemplate = restTemplate;
     }
 
+    private static final String GITHUB_BASE_URL = GITHUB.getUrl();
 
     @Override
     public ResponseResult userInfo() {
@@ -132,7 +134,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new SystemException(AppHttpCodeEnum.NOT_UNIQUE);
         }
 
-        String cacheObject = redisCache.getCacheObject(SystemConstants.MAIL_KEY + emailCaptcha);
+        String cacheObject = redisCache.getCacheObject(SystemConstants.MAIL_KEY_0 + emailCaptcha);
         if (!emailCaptcha.equals(cacheObject)) {
             return ResponseResult.errorResult(601, "验证码不对诶~");
         } else {
@@ -307,11 +309,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (list.size() != 1) {
             throw new SystemException(AppHttpCodeEnum.NO_USER);
         }
-        String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY + captcha);
+        String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY_1 + captcha);
         if (!captcha.equals(cacheCaptcha)) {
             return ResponseResult.errorResult(601, "请再检查一下验证码~");
         } else {
-            redisCache.deleteObject(SystemConstants.MAIL_KEY + captcha);
+            redisCache.deleteObject(SystemConstants.MAIL_KEY_1 + captcha);
         }
         // 密码加密
         password = passwordEncoder.encode(password);
@@ -365,11 +367,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getEmail, email);
-        String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY + captcha);
+        String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY_0 + captcha);
         if (!captcha.equals(cacheCaptcha)) {
             return ResponseResult.errorResult(601, "请再检查一下验证码~");
         } else {
-            redisCache.deleteObject(SystemConstants.MAIL_KEY + captcha);
+            redisCache.deleteObject(SystemConstants.MAIL_KEY_0 + captcha);
         }
         User existingUser = getOne(queryWrapper);
         BlogUserLoginVo blogUserLoginVo;
@@ -408,24 +410,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 把token和userInfo封装返回
         // 把user转换为userInfo
         UserInfoVo userInfoVo = BeanCopyUtils.copyBean(user, UserInfoVo.class);
-        BlogUserLoginVo blogUserLoginVo = new BlogUserLoginVo(jwt, userInfoVo);
-        return blogUserLoginVo;
+        return new BlogUserLoginVo(jwt, userInfoVo);
     }
 
 
     private GithubUser getUserInfoWithGithub(String oauthToken) throws IOException {
-        String url = "https://yuuu.work/user";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + oauthToken);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-        // RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(GITHUB_BASE_URL + GITHUB_USER.getUrl(),
+                GITHUB_USER.getMethod(), requestEntity, String.class);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String body = responseEntity.getBody();
             cn.hutool.json.JSONObject jsonObject = JSONUtil.parseObj(body);
-            GithubUser githubUser = jsonObject.toBean(GithubUser.class);
-            return githubUser;
+            return jsonObject.toBean(GithubUser.class);
         } else {
             throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
         }
@@ -433,20 +432,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     private String getOauthToken(String code) throws IOException {
-        String url = "https://yuuu.work/login/oauth/access_token";
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         String requestBody = String.format("{\"client_id\":\"%s\",\"client_secret\":\"%s\",\"code\":\"%s\"}",
                 clientId, clientSecret, code);
-
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
-
-        // RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
-
+        ResponseEntity<String> response = restTemplate.exchange(GITHUB_BASE_URL + GITHUB_ACCESS_TOKEN.getUrl(),
+                GITHUB_ACCESS_TOKEN.getMethod(), request, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
             // 解析JSON响应，获取access_token字段
             String jsonString = JSON.toJSONString(response);

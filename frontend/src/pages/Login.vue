@@ -109,7 +109,7 @@
                 <div class="lr-btn tcolors-bg" @click="gotoHome">登录</div>
 
                 <div class="otherLogin">
-                    <a href="https://yuuu.store/login/oauth/authorize?client_id=cdf2d217f805b03b6e63&state=github">
+                    <a href="https://yuuuzzh.us.kg/login/oauth/authorize?client_id=cdf2d217f805b03b6e63&state=github">
                         <i class="fa fa-fw fa-github" style="background-color: black;"></i>
                     </a>
                     <a href="javascript:void(0)" @click="showAlert">

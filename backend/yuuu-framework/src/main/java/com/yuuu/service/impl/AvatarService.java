@@ -18,11 +18,15 @@ public class AvatarService {
 
     public String getRandomAvatar() {
         String avatar = "";
-        ResponseEntity<String> response = restTemplate.getForEntity(API_URL, String.class);
-        if (response.getStatusCodeValue() == 200){
-            String body = response.getBody();
-            Map map = JSON.parseObject(body, Map.class);
-            avatar = (String) map.get("img");
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(API_URL, String.class);
+            if (response.getStatusCodeValue() == 200){
+                String body = response.getBody();
+                Map map = JSON.parseObject(body, Map.class);
+                avatar = (String) map.get("img");
+            }
+        }catch (Exception ignore){
+            avatar = "http://qiniu.yuuu.online/2023/08/11/8dbfd3b51126440ca7a2b239cc628b5c.jpg";
         }
         return avatar;
     }

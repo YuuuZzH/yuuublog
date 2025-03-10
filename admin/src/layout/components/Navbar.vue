@@ -19,7 +19,7 @@
             <el-dropdown-item style="color:black;"> 首页 </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
-            <a href="http://www.yuuu.online">返回前台</a>
+            <a href="https://www.yuuu.online">返回前台</a>
           </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display: block">退出登录</span>

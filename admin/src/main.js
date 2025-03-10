@@ -15,7 +15,6 @@ import plugins from './plugins' // plugins
 import './assets/icons' // icon
 import '@/permission' // permission control
 import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, handleTree } from '@/utils/format'
-
 import mavonEditor from 'mavon-editor'
 import hasPermission from '@/utils/hasPermission';
 import 'mavon-editor/dist/css/index.css'

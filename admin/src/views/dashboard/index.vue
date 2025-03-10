@@ -13,7 +13,7 @@
         </div>
         <br>
         项目地址：<a href="https://gitee.com/yuuu-zehua">https://gitee.com/yuuu-zehua</a><br>
-        前台地址：<a href="http://www.yuuu.online">www.yuuu.online</a>
+        前台地址：<a href="https://www.yuuu.online">www.yuuu.online</a>
         <br>
         <br>
         <div>

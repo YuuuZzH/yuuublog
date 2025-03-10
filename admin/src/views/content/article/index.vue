@@ -36,6 +36,7 @@
               size="mini"
               @click="handleQuery"
             >搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
 
@@ -150,6 +151,10 @@ export default {
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
+    },
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
     },
     // 多选框选中数据
     handleSelectionChange(selection) {

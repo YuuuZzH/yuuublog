@@ -10,12 +10,13 @@
                     @keyup.enter.native="queryLoginLog" @clear="queryLoginLog" />
             </el-form-item>
             <el-form-item label="时间选择">
-                <el-switch style="display: block ;top: 9px;" v-model="nearly" active-color="rgb(107, 179, 41)" inactive-color="#13ce66"
-                    @change="queryLoginLog" active-text="近三十天" inactive-text="近七天">
+                <el-switch style="display: block ;top: 9px;" v-model="nearly" active-color="rgb(107, 179, 41)"
+                    inactive-color="#13ce66" @change="queryLoginLog" active-text="近三十天" inactive-text="近七天">
                 </el-switch>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="queryLoginLog">搜索</el-button>
+                <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
             </el-form-item>
             <el-form-item>
                 <el-button type="danger" plain icon="el-icon-delete" size="mini"
@@ -88,6 +89,14 @@ export default {
                 this.total = res.total
             })
         },
+        resetQuery() {
+            this.pageNo = 1
+            this.pageSize = 10
+            this.address = ''
+            this.nickname = ''
+            this.nearly = 0;
+            this.queryLoginLog();
+        },
         handleSelectionChange(selection) {
             this.ids = selection.map((item) => item.id)
             this.single = selection.length !== 1
@@ -101,7 +110,7 @@ export default {
                     return delLoginLog(ids)
                 })
                 .then(() => {
-                    this.getList()
+                    this.queryLoginLog()
                     this.$modal.msgSuccess('删除成功')
                 })
                 .catch(() => { })

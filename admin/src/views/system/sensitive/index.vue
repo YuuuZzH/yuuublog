@@ -32,7 +32,6 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -43,7 +42,6 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -52,11 +50,11 @@
           plain
           icon="el-icon-delete"
           size="mini"
-          :disabled="multiple"
+          :disabled="multiple || !$hasPermission('system:sensitive:remove')"
           @click="handleDelete"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="warning"
           plain
@@ -64,12 +62,12 @@
           size="mini"
           @click="handleExport"
         >导出</el-button>
-      </el-col>
+      </el-col> -->
     </el-row>
 
     <el-table v-loading="loading" :data="sensitiveList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键" align="center" prop="id" />
+      <el-table-column label="编号" align="center" type="index" />
       <el-table-column label="敏感词" align="center" prop="sensitives" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createdTime" width="180">
@@ -89,6 +87,7 @@
             size="mini"
             type="text"
             icon="el-icon-delete"
+            :disabled="!$hasPermission('system:sensitive:remove')"
             @click="handleDelete(scope.row)"
           >删除</el-button>
         </template>
@@ -124,7 +123,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm" :disabled="!$hasPermission('system:sensitive:add')">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>

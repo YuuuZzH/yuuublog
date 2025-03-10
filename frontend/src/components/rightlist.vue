@@ -68,7 +68,7 @@
     </section>
     <hr>
     <section class="rs4">
-      <a href="http://beian.miit.gov.cn/">
+      <a href="https://beian.miit.gov.cn/">
         豫ICP备2023004704号</a>
     </section>
     <!-- 右侧上滑小图片 -->

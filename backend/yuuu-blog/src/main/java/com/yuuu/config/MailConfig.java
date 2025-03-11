@@ -1,5 +1,7 @@
 package com.yuuu.config;
 
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,16 +18,19 @@ import java.util.Properties;
 
 
 @Configuration
+@ConfigurationProperties(prefix = "mail")
+@Data
 public class MailConfig {
+
+    private String password;
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-
         // 配置邮件服务器
         mailSender.setHost("smtp.qq.com");
         mailSender.setPort(587);
         mailSender.setUsername("***REMOVED***");
-        mailSender.setPassword("***REMOVED***");
+        mailSender.setPassword(password);
 
 
         // 配置属性

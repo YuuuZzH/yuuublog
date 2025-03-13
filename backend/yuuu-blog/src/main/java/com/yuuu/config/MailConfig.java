@@ -23,13 +23,15 @@ import java.util.Properties;
 public class MailConfig {
 
     private String password;
+
+    private String username;
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         // 配置邮件服务器
         mailSender.setHost("smtp.qq.com");
         mailSender.setPort(587);
-        mailSender.setUsername("***REMOVED***");
+        mailSender.setUsername(username);
         mailSender.setPassword(password);
 
 

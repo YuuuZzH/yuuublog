@@ -29,3 +29,7 @@ oss:
   accessKey: ***REMOVED***
   secretKey: ***REMOVED***
   bucket: yuuz
+mail:
+  smsTemplateDir: "templates/mail/sms"
+  replyTemplateDir: "templates/mail/reply"
+  username: ***REMOVED***

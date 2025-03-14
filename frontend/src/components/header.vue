@@ -39,7 +39,7 @@
 								<div v-show="!haslogin" class="nologin">
 									<a href="javascript:void(0);" @click="logoinFun(1)">登录&nbsp;</a>|<a
 										href="javascript:void(0);" @click="logoinFun(0)">&nbsp;注册&nbsp;</a>|
-										<a href="https://www.yuuu.online/admin/">进入后台</a>
+										<a href="https://www.yuuu.online:8094">进入后台</a>
 								</div>
 								
 								<div v-show="haslogin" class="haslogin">
@@ -49,7 +49,7 @@
 											<a href="#/UserInfo">个人中心</a>
 										</li>
 										<li>
-											<a href="https://www.yuuu.online/admin/">进入后台</a>
+											<a href="https://www.yuuu.online:8094">进入后台</a>
 										</li>
 										<li>
 											<a href="javascript:void(0);" @click="userlogout">退出登录</a>

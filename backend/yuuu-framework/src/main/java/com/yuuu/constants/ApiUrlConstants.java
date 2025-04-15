@@ -12,9 +12,8 @@ import org.springframework.http.HttpMethod;
 @Getter
 public enum ApiUrlConstants {
 
-    GITHUB("https://yuuuzzh.us.kg/", "github根域名", null),
-    GITHUB_ACCESS_TOKEN("login/oauth/access_token", "github获取token", HttpMethod.POST),
-    GITHUB_USER("user", "github获取用户信息", HttpMethod.GET),
+    GITHUB_ACCESS_TOKEN("https://github.com/login/oauth/access_token", "github获取token", HttpMethod.POST),
+    GITHUB_USER("https://api.github.com/user", "github获取用户信息", HttpMethod.GET),
     DIFY("https://api.dify.ai/v1/", "dify根域名", null),
     DIFY_CHAT("chat-messages", "聊天接口", HttpMethod.POST),
     ;

@@ -78,8 +78,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         this.restTemplate = restTemplate;
     }
 
-    private static final String GITHUB_BASE_URL = GITHUB.getUrl();
-
     @Override
     public ResponseResult userInfo() {
         // 获取当前用户id
@@ -138,7 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!emailCaptcha.equals(cacheObject)) {
             return ResponseResult.errorResult(601, "验证码不对诶~");
         } else {
-            redisCache.deleteObject(SystemConstants.CAPTCHA_KEY + cacheObject);
+            redisCache.deleteObject(SystemConstants.MAIL_KEY_0 + cacheObject);
         }
 
         // 密码加密
@@ -367,11 +365,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getEmail, email);
-        String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY_0 + captcha);
+        String cacheCaptcha = redisCache.getCacheObject(SystemConstants.MAIL_KEY_1 + captcha);
         if (!captcha.equals(cacheCaptcha)) {
             return ResponseResult.errorResult(601, "请再检查一下验证码~");
         } else {
-            redisCache.deleteObject(SystemConstants.MAIL_KEY_0 + captcha);
+            redisCache.deleteObject(SystemConstants.MAIL_KEY_1 + captcha);
         }
         User existingUser = getOne(queryWrapper);
         BlogUserLoginVo blogUserLoginVo;
@@ -419,7 +417,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         headers.set("Authorization", "Bearer " + oauthToken);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(GITHUB_BASE_URL + GITHUB_USER.getUrl(),
+        ResponseEntity<String> responseEntity = restTemplate.exchange(GITHUB_USER.getUrl(),
                 GITHUB_USER.getMethod(), requestEntity, String.class);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String body = responseEntity.getBody();
@@ -438,7 +436,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String requestBody = String.format("{\"client_id\":\"%s\",\"client_secret\":\"%s\",\"code\":\"%s\"}",
                 clientId, clientSecret, code);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.exchange(GITHUB_BASE_URL + GITHUB_ACCESS_TOKEN.getUrl(),
+        ResponseEntity<String> response = restTemplate.exchange(GITHUB_ACCESS_TOKEN.getUrl(),
                 GITHUB_ACCESS_TOKEN.getMethod(), request, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
             // 解析JSON响应，获取access_token字段

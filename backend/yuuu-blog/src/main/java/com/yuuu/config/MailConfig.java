@@ -12,7 +12,7 @@ import java.util.Properties;
 /**
  * @author: yuuu
  * Description: 邮件配置类
- * Email: ***REMOVED***
+ * Email: 864326354@qq.com
  * CreatedTime: 2023-06-02 09:27:9:27
  */
 

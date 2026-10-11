@@ -21,7 +21,7 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-        Contact contact = new Contact("yuuu", "http://www.yuuu.com", "***REMOVED***");
+        Contact contact = new Contact("yuuu", "http://www.yuuu.com", "864326354@qq.com");
         return new ApiInfoBuilder()
                 .title("个人博客")
                 .description("博客详情")

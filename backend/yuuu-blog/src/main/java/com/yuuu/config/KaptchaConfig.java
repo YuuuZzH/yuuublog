@@ -10,7 +10,7 @@ import java.util.Properties;
 /**
  * @author: yuuu
  * Description: 验证码配置文件
- * Email: ***REMOVED***
+ * Email: 864326354@qq.com
  * CreatedTime: 2023-06-01 14:32:14:32
  */
 @Configuration

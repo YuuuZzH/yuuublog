@@ -3,7 +3,7 @@ package com.yuuu.utils;
 /**
  * @author: yuuu
  * Description:
- * Email: ***REMOVED***
+ * Email: 864326354@qq.com
  * CreatedTime: 2023-08-22 11:46:11:46
  */
 import lombok.extern.slf4j.Slf4j;

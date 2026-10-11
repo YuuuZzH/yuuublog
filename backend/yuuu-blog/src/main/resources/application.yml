@@ -26,10 +26,10 @@ mybatis-plus:
       logic-not-delete-value: 0
       id-type: auto
 oss:
-  accessKey: ***REMOVED***
-  secretKey: ***REMOVED***
-  bucket: yuuz
+  accessKey: YOUR_OSS_ACCESS_KEY
+  secretKey: YOUR_OSS_SECRET_KEY
+  bucket: YOUR_OSS_BUCKET
 mail:
   smsTemplateDir: "templates/mail/sms"
   replyTemplateDir: "templates/mail/reply"
-  username: ***REMOVED***
+  username: YOUR_MAIL_USERNAME

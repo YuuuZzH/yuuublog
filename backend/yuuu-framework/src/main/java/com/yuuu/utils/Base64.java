@@ -3,7 +3,7 @@ package com.yuuu.utils;
 /**
  * @author: yuuu
  * Description:
- * Email: ***REMOVED***
+ * Email: 864326354@qq.com
  * CreatedTime: 2023-05-19 16:16:16:16
  */
 public final class Base64

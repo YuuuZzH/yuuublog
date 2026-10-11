@@ -1,45 +1,20 @@
-# yuuublog
+# backend
 
-#### 介绍
-可以通过访问www.yuuu.online进行查看
+Spring Boot 多模块后端，属于 [yuuublog](../README.md) 单体仓库的一部分。
 
-基于SpringBoot + vue实现的个人博客
+## 模块
 
-完成登录注册、文章详情、评论发表等功能
+- `yuuu-framework`：公共领域模型、服务与工具
+- `yuuu-blog`：前台 API（默认端口 `7777`）
+- `yuuu-admin`：管理端 API（默认端口 `8989`）
 
-#### 安装教程
-本项目使用jdk8 SpringBoot2 mysql8 redis6 
-1.  导入项目
-2.  将application中的配置信息修改为个人开发的环境
-3.  启动项目
+## 配置
 
-注意：
-各服务密钥需要自行获取，如github、dify等；有需要可以联系我
+启动前请修改：
 
-#### 使用说明
-前端使用vue2 + element-ui实现，基于开源的vue-admin-template完成管理端页面
+- `yuuu-blog/src/main/resources/application.yml`
+- `yuuu-admin/src/main/resources/application.yaml`
 
-前端前台项目（展示页）： https://gitee.com/yuuu-zehua/blogvue
+并导入根目录下的 `yuuu_blog.sql`。
 
-前端后台项目（管理端）： https://gitee.com/yuuu-zehua/adminvue
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-#### TODO
-- [ ] 邮箱-验证码、邮箱-密码登录
-- [ ] 邮件回复功能
-- [ ] 定时清除login_config表功能
-- [ ] 文章置顶功能
-- [ ] 文章按需排序功能
-- [ ] 支持标签云、词云
-- [ ] 文章阅读进度保存
-- [ ] 支持暗黑模式
-- [ ] 支持多语言切换
-
-
-
+OSS / 邮箱 / OAuth 等密钥请使用本地配置，不要提交真实密钥。

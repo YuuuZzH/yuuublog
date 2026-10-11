@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuuu.mapper.RoleMapper">
+    <insert id="insertRoleMenu">
+        insert into sys_role_menu
+        values
+        <foreach collection="menuIds" item="menuId" separator=",">
+            (#{roleId}, #{menuId})
+        </foreach>
+    </insert>
+    <delete id="deleteRoleMenuByRoleId">
+        delete from sys_role_menu where role_id = #{roleId}
+    </delete>
+    <select id="selectRoleKeyByUserId" resultType="java.lang.String">
+        SELECT
+            r.`role_key`
+        FROM
+            `sys_user_role` ur
+                LEFT JOIN `sys_role` r ON ur.`role_id` = r.`id`
+        WHERE
+            ur.`user_id` = #{userId} AND
+            r.`status` = 0 AND
+            r.`del_flag` = 0
+    </select>
+</mapper>

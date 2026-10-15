@@ -439,6 +439,33 @@ const Typeit = (isAimee,emId) =>{
         }
 }
 
+/**
+ * 单行打字机：一次性逐字打出，不循环、不擦除（供签名等静态文案使用）
+ * @param {string} text 要打出的文本
+ * @param {string} emId 目标元素选择器
+ * @param {number} delay 延迟多少毫秒开始
+ */
+const TypeitLine = (text, emId, delay) => {
+    var el = document.querySelector(emId);
+    // 元素可能随页面切换被重建，这里做一次防重，避免同一行叠加多个打字循环
+    if (!el || el.getAttribute("data-typed") === "1") return;
+    el.setAttribute("data-typed", "1");
+
+    var theater = new TheaterJS();
+    theater.describe("Line", .9, emId);
+    theater.on("say:start, erase:start", function () {
+        this.utils.addClass(this.current.voice, "saying");
+    }).on("say:end, erase:end", function () {
+        this.utils.removeClass(this.current.voice, "saying");
+    });
+
+    setTimeout(function () {
+        el.innerHTML = "";
+        theater.write("Line:" + (text || ""));
+    }, delay || 0);
+}
+
 export {
-    Typeit//打字效果
+    Typeit,//打字效果
+    TypeitLine//单行打字效果
 }

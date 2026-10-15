@@ -78,7 +78,7 @@
 
 				<h2 class="h-description">
 
-					{{ this.$store.state.themeObj.autograph ? this.$store.state.themeObj.autograph : "且将新火试新茶，诗酒趁年华" }}
+					<span id="signature"></span>
 
 				</h2>
 			</div>
@@ -97,7 +97,8 @@ import { getCategoryList } from '../api/category'
 import { getUserInfo } from '../api/user.js'//获取用户信息，保存用户信息
 import request from "@/utils/request.js"
 import {
-	Typeit
+	Typeit,
+	TypeitLine
 } from '../utils/plug.js'
 export default {
 	data() { //选项 / 数据
@@ -280,6 +281,10 @@ export default {
 	components: { //定义组件
 	},
 	computed: {
+		signatureText() {
+			var themeObj = this.$store.state.themeObj;
+			return (themeObj && themeObj.autograph) ? themeObj.autograph : '且将新火试新茶，诗酒趁年华';
+		},
 		heroBgStyle() {
 			var bg = this.$store.state.themeObj.top_image
 				? 'url(' + this.$store.state.themeObj.top_image + ')'
@@ -323,6 +328,7 @@ export default {
 		var that = this;
 		var timer = setTimeout(function () {
 			Typeit(that.$store.state.themeObj.user_start, "#luke"); //打字机效果
+			TypeitLine(that.signatureText, "#signature", 700); //签名打字机效果
 			clearTimeout(timer);
 		}, 500);
 		this.onScroll();
@@ -796,71 +802,70 @@ export default {
 	pointer-events: none;
 }
 
-/* 场景文字与信息卡需要在遮罩之上 */
+/* 场景文字与信息卡需要在遮罩之上；信息卡取 4，盖住底部波浪（波浪为 3） */
 .scene,
 .h-information {
-	z-index: 2;
+	z-index: 4;
 }
 
-/* 信息卡：接近原版的浅蓝半透明玻璃，锚定首屏底部 */
+/* 信息卡：通栏玻璃底条，固定 300px 高，贴住首屏底部，内容垂直居中 */
 .h-information {
 	position: absolute;
 	left: 0;
 	right: 0;
 	top: auto;
-	bottom: 100px;
-	width: min(70%, 620px);
-	margin: auto;
-	padding: 20px 30px 16px;
-	border-radius: var(--radius, 16px);
-	background: rgba(234, 244, 250, .5);
-	-webkit-backdrop-filter: saturate(160%) blur(14px);
-	backdrop-filter: saturate(160%) blur(14px);
-	border: 1px solid rgba(255, 255, 255, .45);
-	box-shadow: var(--shadow-2, 0 18px 50px rgba(20, 30, 60, .28));
-	transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+	bottom: 0;
+	width: 100%;
+	margin: 0;
+	height: 300px;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+	padding: 0;
+	border-radius: 0;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .06) 100%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+	/* 顶部用遮罩把底色与磨砂一起淡出，避免出现明显的分界线 */
+	-webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 55%);
+	mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 55%);
 	animation: b 1s ease-out;
 	-webkit-animation: b 1s ease-out;
 }
 
-.h-information:hover {
-	transform: translateY(-4px);
-}
-
-/* 头像：覆盖在文字上方（z 更高），边缘羽化 + 轻微半透明，与文字交汇处自然融合 */
+/* 头像：覆盖在文字上方（z 更高），边缘羽化 + 轻微半透明，与文字交汇处自然融合；保留最初版 hover 旋转 */
 .h-information img {
 	position: relative;
 	z-index: 4;
-	opacity: .88;
+	opacity: .6;
 	-webkit-mask-image: radial-gradient(circle, #000 58%, transparent 74%);
 	mask-image: radial-gradient(circle, #000 58%, transparent 74%);
-	transition: opacity .4s var(--ease);
+	transition: all .4s ease-in-out;
+	-webkit-transition: all .4s ease-in-out;
 }
 
 .h-information img:hover {
-	opacity: 1;
+	opacity: .8;
+	transform: rotate(360deg);
+	-webkit-transform: rotate(360deg);
 }
 
-/* 签名：在头像下层穿过，与头像交汇处透出形成融合感；原版同款渐变花字 */
+/* 签名：回到头像正下方（不再与头像重叠），16px；字体风格与首屏打字机一致（白字+红青错位描边） */
 .h-information .h-description {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	right: 0;
-	margin: 0;
-	transform: translateY(-50%);
-	z-index: 1;
+	position: static;
+	margin: 20px 0 0;
 	text-align: center;
-	font-size: 36px !important;
+	font-size: 16px !important;
 	font-weight: 700;
-	line-height: 1.35;
+	line-height: 1.5;
 	letter-spacing: 4px;
-	background: linear-gradient(to right, #DF2050, #48456D);
-	-webkit-background-clip: text;
-	background-clip: text;
-	-webkit-text-fill-color: transparent;
-	color: #48456D;
-	filter: drop-shadow(0 0 14px rgba(255, 255, 255, .65));
+	color: #fff;
+	text-shadow: 1px 1px 0 #ff3f1a, -1px -1px 0 #00a7e0;
 }
 
 /* 底部波浪 */
@@ -886,13 +891,14 @@ export default {
 	}
 
 	.h-information {
-		bottom: 40px;
-		width: 88%;
-		padding: 14px 18px 12px;
+		bottom: 0;
+		width: 100%;
+		height: 200px;
+		padding: 0;
 	}
 
 	.h-information .h-description {
-		font-size: 22px !important;
+		font-size: 14px !important;
 		letter-spacing: 2px;
 	}
 

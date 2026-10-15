@@ -108,11 +108,13 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
       - name: Upload artifacts
         run: |
-          ls -R artifacts
+          ls -laR artifacts
+          test -f artifacts/backend-jars/yuuu-admin.jar || { echo "MISSING: artifacts/backend-jars/yuuu-admin.jar"; find artifacts -maxdepth 3 -type f; exit 1; }
           ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "mkdir -p ${STAGE_DIR}/{admin,frontend,jars}"
-          [ -f artifacts/backend-jars/yuuu-admin.jar ] && scp -P "${SSH_PORT}" -r artifacts/backend-jars/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/"
+          scp -P "${SSH_PORT}" -r artifacts/backend-jars/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/"
           scp -P "${SSH_PORT}" -r artifacts/admin-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/admin/"
-          [ -d artifacts/frontend-dist ] && scp -P "${SSH_PORT}" -r artifacts/frontend-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/frontend/" || true
+          if [ -d artifacts/frontend-dist ]; then scp -P "${SSH_PORT}" -r artifacts/frontend-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/frontend/"; fi
+          ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "ls -la ${STAGE_DIR}/jars/ ${STAGE_DIR}/admin/ | head -8"
         env:
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -138,13 +140,15 @@ jobs:
             rsync -a "$STAGE/frontend/" "$DEPLOY_ROOT/front/dist/"
           fi
 
-          # 3) jar（可选）
-          if [ -f "$STAGE/jars/yuuu-admin.jar" ]; then
+          # 3) jar（可选）：用 find 定位，兼容 artifact 解包后的任意层级
+          JAR_ADMIN=$(find "$STAGE/jars" -name 'yuuu-admin.jar' 2>/dev/null | head -1)
+          JAR_BLOG=$(find "$STAGE/jars" -name 'yuuu-blog.jar' 2>/dev/null | head -1)
+          if [ -n "$JAR_ADMIN" ] && [ -n "$JAR_BLOG" ]; then
             cp -a "$DEPLOY_ROOT/backend/yuuu-admin.jar" "$BK/" 2>/dev/null || true
             cp -a "$DEPLOY_ROOT/front/yuuu-blog.jar" "$BK/" 2>/dev/null || true
             systemctl stop yuuu-admin yuuu-blog || true
-            mv -f "$STAGE/jars/yuuu-admin.jar" "$DEPLOY_ROOT/backend/yuuu-admin.jar"
-            mv -f "$STAGE/jars/yuuu-blog.jar"  "$DEPLOY_ROOT/front/yuuu-blog.jar"
+            mv -f "$JAR_ADMIN" "$DEPLOY_ROOT/backend/yuuu-admin.jar"
+            mv -f "$JAR_BLOG"  "$DEPLOY_ROOT/front/yuuu-blog.jar"
             systemctl start yuuu-blog yuuu-admin
           else
             echo "no jars uploaded, skip restart"
@@ -153,10 +157,11 @@ jobs:
           # 4) config 目录必须保留（外部配置，不在仓库里）
           ls "$DEPLOY_ROOT/backend/config" "$DEPLOY_ROOT/front/config" >/dev/null
 
-          # 5) 健康检查
+          # 5) 健康检查（注意：前台 API 没有根路由，必须用真实接口）
           for i in $(seq 1 30); do
             sleep 4
-            if curl -sf -o /dev/null http://127.0.0.1:8989/ && curl -sf -o /dev/null http://127.0.0.1:7777/; then
+            if curl -sf -o /dev/null http://127.0.0.1:8989/ && \
+               curl -sf -o /dev/null "http://127.0.0.1:7777/category/getCategoryList"; then
               echo "healthcheck OK"; break
             fi
             [ $i -eq 30 ] && { echo "healthcheck FAILED"; journalctl -u yuuu-admin -u yuuu-blog -n 60 --no-pager; exit 1; }

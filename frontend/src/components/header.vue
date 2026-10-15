@@ -765,13 +765,6 @@ export default {
 	}
 }
 
-/* 签名花字：与后台管理页同一款字体（克莱因蓝的夜晚） */
-@font-face {
-	font-family: 'HeroFancy';
-	src: url('../assets/font/KeLaiYinLanDeYeWan-2.ttf') format('truetype');
-	font-display: swap;
-}
-
 /* ================= 首屏 Hero 升级 ================= */
 .headImgBox {
 	overflow: hidden;
@@ -835,29 +828,25 @@ export default {
 	transform: translateY(-4px);
 }
 
-/* 头像：毛玻璃质感（轻微磨砂 + 半透明 + 白色描边） */
+/* 头像：恢复最初的清晰样式，不加毛玻璃/半透明 */
 .h-information img {
-	opacity: .82;
-	-webkit-filter: blur(1.2px) saturate(1.06) brightness(1.04);
-	filter: blur(1.2px) saturate(1.06) brightness(1.04);
 	box-shadow: 0 8px 26px rgba(20, 30, 60, .3);
-	border: 3px solid rgba(255, 255, 255, .55);
+	border: 3px solid rgba(255, 255, 255, .85);
 }
 
-.h-information img:hover {
-	-webkit-filter: none;
-	filter: none;
-	opacity: 1;
-}
-
-/* 签名：完全在头像下方、水平居中、花字大字号 */
+/* 签名：叠在头像上方（z 轴覆盖）、水平垂直居中 */
 .h-information .h-description {
-	margin: 16px 0 0;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	margin: 0;
+	transform: translateY(-50%);
+	z-index: 3;
 	text-align: center;
-	font-family: 'HeroFancy', 'Sigmar One', cursive;
 	font-size: 36px !important;
-	font-weight: 400;
-	line-height: 1.4;
+	font-weight: 700;
+	line-height: 1.35;
 	letter-spacing: 4px;
 	color: #fff !important;
 	text-shadow: 0 2px 16px rgba(0, 0, 0, .55);

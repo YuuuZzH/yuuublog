@@ -1,0 +1,176 @@
+name: Build & Deploy yuuublog
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_frontend:
+        description: '同时部署前台门户 dist'
+        type: boolean
+        default: false
+      deploy_backend:
+        description: '同时部署后端 jar'
+        type: boolean
+        default: true
+
+concurrency:
+  group: yuuublog-deploy
+  cancel-in-progress: false
+
+env:
+  # 服务器上的部署根目录（与 nginx.conf / systemd unit 保持一致）
+  DEPLOY_ROOT: /app/blog/blog/app/app
+  # 上传暂存目录
+  STAGE_DIR: /app/deploy/incoming
+
+jobs:
+  backend:
+    if: github.event_name == 'push' || github.event.inputs.deploy_backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: temurin
+          cache: maven
+      - name: Maven package
+        run: mvn -B -ntp -DskipTests -f backend/pom.xml package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-jars
+          path: |
+            backend/yuuu-admin/target/yuuu-admin.jar
+            backend/yuuu-blog/target/yuuu-blog.jar
+          if-no-files-found: error
+
+  admin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: npm
+          cache-dependency-path: admin/package.json
+      - name: Build admin dist
+        # package-lock.json 的 tarball 地址已统一修正为 registry.npmjs.org（原淘宝/nlark 镜像证书已过期）
+        run: |
+          cd admin
+          npm install --no-audit --no-fund
+          npm run build:prod
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-dist
+          path: admin/dist
+          if-no-files-found: error
+
+  frontend:
+    # 前台门户默认不随 push 重建（线上 dist 已稳定运行，重建风险 > 收益），
+    # 需要时在 GitHub 上手动 Run workflow 勾选 deploy_frontend
+    if: github.event.inputs.deploy_frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: npm
+          cache-dependency-path: frontend/package.json
+      - name: Build frontend dist
+        run: |
+          cd frontend
+          npm install --no-audit --no-fund
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          if-no-files-found: error
+
+  deploy:
+    needs: [backend, admin, frontend]
+    if: always() && (needs.admin.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${SSH_PORT}" -H "${SERVER_HOST}" >> ~/.ssh/known_hosts
+        env:
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      - name: Upload artifacts
+        run: |
+          ls -R artifacts
+          ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "mkdir -p ${STAGE_DIR}/{admin,frontend,jars}"
+          [ -f artifacts/backend-jars/yuuu-admin.jar ] && scp -P "${SSH_PORT}" -r artifacts/backend-jars/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/"
+          scp -P "${SSH_PORT}" -r artifacts/admin-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/admin/"
+          [ -d artifacts/frontend-dist ] && scp -P "${SSH_PORT}" -r artifacts/frontend-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/frontend/" || true
+        env:
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+      - name: Apply on server
+        run: |
+          ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" 'bash -s' <<'REMOTE'
+          set -e
+          # 注意：远端脚本不继承 Actions 的 env，这里必须写死
+          DEPLOY_ROOT=/app/blog/blog/app/app
+          STAGE=/app/deploy/incoming
+          TS=$(date +%s)
+          BK=/app/deploy/backup/$TS
+          mkdir -p "$BK"
+
+          # 1) 后台 dist（总是部署）
+          cp -a "$DEPLOY_ROOT/backend/dist" "$BK/backend-dist" 2>/dev/null || true
+          rsync -a "$STAGE/admin/" "$DEPLOY_ROOT/backend/dist/"
+
+          # 2) 前台 dist（可选）
+          if [ -f "$STAGE/frontend/index.html" ]; then
+            cp -a "$DEPLOY_ROOT/front/dist" "$BK/front-dist" 2>/dev/null || true
+            rsync -a "$STAGE/frontend/" "$DEPLOY_ROOT/front/dist/"
+          fi
+
+          # 3) jar（可选）
+          if [ -f "$STAGE/jars/yuuu-admin.jar" ]; then
+            cp -a "$DEPLOY_ROOT/backend/yuuu-admin.jar" "$BK/" 2>/dev/null || true
+            cp -a "$DEPLOY_ROOT/front/yuuu-blog.jar" "$BK/" 2>/dev/null || true
+            systemctl stop yuuu-admin yuuu-blog || true
+            mv -f "$STAGE/jars/yuuu-admin.jar" "$DEPLOY_ROOT/backend/yuuu-admin.jar"
+            mv -f "$STAGE/jars/yuuu-blog.jar"  "$DEPLOY_ROOT/front/yuuu-blog.jar"
+            systemctl start yuuu-blog yuuu-admin
+          else
+            echo "no jars uploaded, skip restart"
+          fi
+
+          # 4) config 目录必须保留（外部配置，不在仓库里）
+          ls "$DEPLOY_ROOT/backend/config" "$DEPLOY_ROOT/front/config" >/dev/null
+
+          # 5) 健康检查
+          for i in $(seq 1 30); do
+            sleep 4
+            if curl -sf -o /dev/null http://127.0.0.1:8989/ && curl -sf -o /dev/null http://127.0.0.1:7777/; then
+              echo "healthcheck OK"; break
+            fi
+            [ $i -eq 30 ] && { echo "healthcheck FAILED"; journalctl -u yuuu-admin -u yuuu-blog -n 60 --no-pager; exit 1; }
+          done
+          curl -sf "https://www.yuuu.online/api/category/getCategoryList" | head -c 200; echo
+
+          # 后台 dist 冒烟：index.html 引用的 js 必须能取到（防 publicPath 配错导致全站 404 白屏）
+          JS=$(curl -sf https://www.yuuu.online:8094/ | grep -o '/static/js/app\.[^"]*\.js' | head -1)
+          if [ -z "$JS" ]; then echo "admin dist smoke FAILED: no app.js in index.html"; exit 1; fi
+          curl -sf -o /dev/null -w "admin asset $JS -> %{http_code}\n" "https://www.yuuu.online:8094$JS"
+
+          echo "backup: $BK"
+          REMOTE
+        env:
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}

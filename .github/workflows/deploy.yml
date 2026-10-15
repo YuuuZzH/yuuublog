@@ -107,14 +107,20 @@ jobs:
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
       - name: Upload artifacts
+        # 注意：download-artifact 会保留上传时的相对路径（如 backend-jars/yuuu-admin/target/xxx.jar），
+        # 因此用 find 定位 jar，并以固定文件名上传到服务器暂存区
         run: |
-          ls -laR artifacts
-          test -f artifacts/backend-jars/yuuu-admin.jar || { echo "MISSING: artifacts/backend-jars/yuuu-admin.jar"; find artifacts -maxdepth 3 -type f; exit 1; }
+          ls -la artifacts/backend-jars
+          JAR_ADMIN=$(find artifacts/backend-jars -name 'yuuu-admin.jar' | head -1)
+          JAR_BLOG=$(find artifacts/backend-jars -name 'yuuu-blog.jar' | head -1)
+          echo "JAR_ADMIN=$JAR_ADMIN JAR_BLOG=$JAR_BLOG"
+          test -n "$JAR_ADMIN" && test -n "$JAR_BLOG" || { echo "MISSING jar artifact"; exit 1; }
           ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "mkdir -p ${STAGE_DIR}/{admin,frontend,jars}"
-          scp -P "${SSH_PORT}" -r artifacts/backend-jars/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/"
+          scp -P "${SSH_PORT}" "$JAR_ADMIN" "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/yuuu-admin.jar"
+          scp -P "${SSH_PORT}" "$JAR_BLOG"  "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/yuuu-blog.jar"
           scp -P "${SSH_PORT}" -r artifacts/admin-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/admin/"
           if [ -d artifacts/frontend-dist ]; then scp -P "${SSH_PORT}" -r artifacts/frontend-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/frontend/"; fi
-          ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "ls -la ${STAGE_DIR}/jars/ ${STAGE_DIR}/admin/ | head -8"
+          ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "ls -la ${STAGE_DIR}/jars/ | head -5"
         env:
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}

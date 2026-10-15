@@ -54,7 +54,7 @@ public class SystemConstants {
         /**
          * 域名地址
          */
-        public static final String URL_PATH = "http://qiniu.yuuu.online/";
+        public static final String URL_PATH = "https://qiniu.yuuu.online/";
 
 
         /**

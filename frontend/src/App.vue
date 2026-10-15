@@ -9,7 +9,6 @@
                 <router-view></router-view>
             </keep-alive>
         </transition>
-        <BackToTop></BackToTop>
 
         <el-tooltip class="item" effect="dark" content="Hi,我是YuuuChat，快来和我聊天吧！" placement="right">
             <img id="fix-image" src="../static/img/yuuu.png" title="" alt="小yu机器人" style="position: fixed;
@@ -29,7 +28,6 @@
 import Chat from './components/Chat.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import ScrollProgress from './components/ScrollProgress.vue'
-import BackToTop from './components/BackToTop.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import CursorFx from './components/CursorFx.vue'
 import { getStoredTheme, setStoredTheme, applyTheme } from './utils/theme.js'
@@ -111,7 +109,6 @@ export default {
         Chat,
         ThemeToggle,
         ScrollProgress,
-        BackToTop,
         CommandPalette,
         CursorFx
     },

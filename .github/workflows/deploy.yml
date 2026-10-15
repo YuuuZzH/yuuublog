@@ -159,7 +159,7 @@ jobs:
           JAR_ADMIN=$(find artifacts/backend-jars -name 'yuuu-admin.jar' 2>/dev/null | head -1)
           JAR_BLOG=$(find artifacts/backend-jars -name 'yuuu-blog.jar' 2>/dev/null | head -1)
           echo "JAR_ADMIN=$JAR_ADMIN JAR_BLOG=$JAR_BLOG"
-          if [ -z "$JAR_ADMIN" ] && [ -z "$JAR_BLOG" ] && [ ! -d artifacts/admin-dist ]; then
+          if [ -z "$JAR_ADMIN" ] && [ -z "$JAR_BLOG" ] && [ ! -d artifacts/admin-dist ] && [ ! -d artifacts/frontend-dist ]; then
             echo "nothing to deploy"; exit 1
           fi
           R="rsync -e \"ssh -p ${SSH_PORT}\" -c --inplace --partial --timeout 600"
@@ -238,10 +238,15 @@ jobs:
           fi
           curl -sf "https://www.yuuu.online/api/category/getCategoryList" | head -c 200; echo
 
+          # 前台 dist 冒烟：首页必须可取到（防止 rsync 目标目录错/资源未同步）
+          curl -sf -o /dev/null -w "frontend / -> %{http_code}\n" https://www.yuuu.online/ || echo "frontend smoke WARN"
+
           # 后台 dist 冒烟：index.html 引用的 js 必须能取到（防 publicPath 配错导致全站 404 白屏）
-          JS=$(curl -sf https://www.yuuu.online:8094/ | grep -o '/static/js/app\.[^"]*\.js' | head -1)
-          if [ -z "$JS" ]; then echo "admin dist smoke FAILED: no app.js in index.html"; exit 1; fi
-          curl -sf -o /dev/null -w "admin asset $JS -> %{http_code}\n" "https://www.yuuu.online:8094$JS"
+          if [ -f "$STAGE/admin/index.html" ]; then
+            JS=$(curl -sf https://www.yuuu.online:8094/ | grep -o '/static/js/app\.[^"]*\.js' | head -1)
+            if [ -z "$JS" ]; then echo "admin dist smoke FAILED: no app.js in index.html"; exit 1; fi
+            curl -sf -o /dev/null -w "admin asset $JS -> %{http_code}\n" "https://www.yuuu.online:8094$JS"
+          fi
 
           echo "backup: $BK"
           REMOTE

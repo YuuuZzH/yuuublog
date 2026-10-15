@@ -2,6 +2,8 @@
     <div id="app">
         <ScrollProgress></ScrollProgress>
         <ThemeToggle></ThemeToggle>
+        <CommandPalette></CommandPalette>
+        <CursorFx></CursorFx>
         <transition name="page" mode="out-in">
             <keep-alive :include="['Aboutme', 'Message', 'FriendsLink', 'Reward']">
                 <router-view></router-view>
@@ -28,6 +30,9 @@ import Chat from './components/Chat.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import ScrollProgress from './components/ScrollProgress.vue'
 import BackToTop from './components/BackToTop.vue'
+import CommandPalette from './components/CommandPalette.vue'
+import CursorFx from './components/CursorFx.vue'
+import { getStoredTheme, setStoredTheme, applyTheme } from './utils/theme.js'
 export default {
     name: 'App',
     data() {
@@ -88,21 +93,38 @@ export default {
                 this.closeChat();
             }
         },
+        // 快捷键：T 循环切换主题（输入态下不拦截）
+        onHotkey(e) {
+            const el = e.target || {};
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable) return;
+            if (e.metaKey || e.ctrlKey || e.altKey) return;
+            if (e.key === 't' || e.key === 'T') {
+                const order = ['auto', 'light', 'dark'];
+                const next = order[(order.indexOf(getStoredTheme()) + 1) % order.length];
+                setStoredTheme(next);
+                const real = applyTheme(next);
+                this.$message.success('主题已切换：' + (real === 'dark' ? '暗色' : '亮色'));
+            }
+        },
     },
     components: {
         Chat,
         ThemeToggle,
         ScrollProgress,
-        BackToTop
+        BackToTop,
+        CommandPalette,
+        CursorFx
     },
     mounted() {
         window.addEventListener('scroll', this.handleScroll);
         window.addEventListener('click', this.handleClick);
+        window.addEventListener('keydown', this.onHotkey);
         this.handleScroll();
     },
     destroyed() {
         window.removeEventListener('scroll', this.handleScroll);
         window.removeEventListener('click', this.handleClick);
+        window.removeEventListener('keydown', this.onHotkey);
     },
 }
 </script>

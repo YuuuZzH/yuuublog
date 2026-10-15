@@ -1,13 +1,14 @@
-<!-- 文章悬浮目录：宽屏左侧固定，滚动高亮当前小节 -->
+<!-- 文章目录：宽屏（≥1661px）浮在正文左侧留白，窄屏作为正文上方的卡片 -->
 <template>
   <transition name="toc-fade">
     <nav class="article-toc glass" v-if="toc && toc.length > 1">
-      <div class="toc-head">
+      <div class="toc-head" @click="open = !open">
         <span class="toc-title">目录</span>
         <span class="toc-pct">{{ percent }}%</span>
+        <i :class="['fa', open ? 'fa-chevron-up' : 'fa-chevron-down', 'toc-fold']"></i>
       </div>
       <div class="toc-track"><i :style="{ height: percent + '%' }"></i></div>
-      <ul class="toc-list">
+      <ul class="toc-list" v-show="open">
         <li v-for="item in toc" :key="item.id" :class="['toc-item', 'lv' + item.level, { active: activeId === item.id }]">
           <a :href="'#' + item.id" :title="item.text" @click.prevent="jump(item)">{{ item.text }}</a>
         </li>
@@ -28,6 +29,7 @@ export default {
     return {
       activeId: '',
       percent: 0,
+      open: true,
       ticking: false
     }
   },
@@ -90,18 +92,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+/* 默认（窄屏）：正文上方的卡片 */
 .article-toc {
-  position: fixed;
-  /* 贴着内容区左侧留白摆放，不遮正文 */
-  left: calc((100vw - var(--maxw)) / 2 - 232px);
-  top: 50%;
-  transform: translateY(-50%);
-  width: 216px;
-  max-height: 62vh;
-  padding: 14px 8px 14px 14px;
+  position: relative;
+  margin: 16px 0 6px;
+  padding: 12px 14px;
   border-radius: var(--radius);
   box-shadow: var(--shadow-1);
-  z-index: 60;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -109,9 +106,8 @@ export default {
   .toc-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-right: 6px;
-    margin-bottom: 10px;
+    gap: 10px;
+    cursor: pointer;
 
     .toc-title {
       font-size: 13px;
@@ -125,41 +121,23 @@ export default {
       color: var(--brand);
       font-variant-numeric: tabular-nums;
     }
-  }
 
-  .toc-track {
-    position: absolute;
-    left: 6px;
-    top: 44px;
-    bottom: 14px;
-    width: 2px;
-    background: var(--border);
-    border-radius: 2px;
-
-    i {
-      display: block;
-      width: 100%;
-      background: linear-gradient(180deg, var(--brand), var(--brand-2));
-      border-radius: 2px;
-      transition: height .2s var(--ease);
+    .toc-fold {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--text-weak);
     }
   }
+
+  .toc-track { display: none; }
 
   .toc-list {
     list-style: none;
-    margin: 0;
-    padding: 0 6px 0 10px;
+    margin: 8px 0 0;
+    padding: 0;
+    max-height: 34vh;
     overflow-y: auto;
     scrollbar-width: thin;
-
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--border-strong);
-      border-radius: 4px;
-    }
   }
 
   .toc-item {
@@ -174,13 +152,13 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      transition: color .25s var(--ease), transform .25s var(--ease);
+      transition: color .25s var(--ease);
     }
 
     &.lv3 a { padding-left: 10px; font-size: 12px; }
     &.lv4 a { padding-left: 20px; font-size: 11.5px; opacity: .9; }
 
-    &:hover a { color: var(--text); transform: translateX(2px); }
+    &:hover a { color: var(--text); }
 
     &.active a {
       color: var(--brand);
@@ -189,20 +167,61 @@ export default {
   }
 }
 
+/* 宽屏：浮到正文左侧留白 */
+@media (min-width: 1661px) {
+  .article-toc {
+    position: fixed;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 216px;
+    max-height: 62vh;
+    margin: 0;
+    padding: 14px 8px 14px 14px;
+    z-index: 60;
+
+    .toc-head { cursor: default; margin-bottom: 10px; padding-right: 6px; }
+    .toc-fold { display: none; }
+
+    .toc-track {
+      display: block;
+      position: absolute;
+      left: 6px;
+      top: 44px;
+      bottom: 14px;
+      width: 2px;
+      background: var(--border);
+      border-radius: 2px;
+
+      i {
+        display: block;
+        width: 100%;
+        background: linear-gradient(180deg, var(--brand), var(--brand-2));
+        border-radius: 2px;
+        transition: height .2s var(--ease);
+      }
+    }
+
+    .toc-list {
+      max-height: none;
+      padding: 0 6px 0 10px;
+
+      &::-webkit-scrollbar { width: 4px; }
+      &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+    }
+
+    .toc-item:hover a { transform: translateX(2px); }
+  }
+}
+
 .toc-fade-enter-active,
 .toc-fade-leave-active {
-  transition: opacity .3s var(--ease), transform .3s var(--ease);
+  transition: opacity .3s var(--ease);
 }
 
 .toc-fade-enter,
 .toc-fade-leave-to {
   opacity: 0;
-  transform: translateY(-50%) translateX(-12px);
-}
-
-/* 视口不够宽时左侧留白放不下目录，直接隐藏 */
-@media (max-width: 1600px) {
-  .article-toc { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

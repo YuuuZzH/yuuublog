@@ -8,6 +8,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './assets/css/style.less'
 // 设计系统：主题变量与通用动效（必须在其它样式之前，供后续变量覆盖）
 import './assets/css/theme.less'
+// Element UI 组件在暗色主题下的适配（必须在 element-ui 的 theme-chalk 之后）
+import './assets/css/element-dark.less'
 import { initTheme } from './utils/theme'
 import reveal from './directives/reveal'
 import store from './store'

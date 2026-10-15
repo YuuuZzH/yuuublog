@@ -370,7 +370,7 @@ export default {
   text-align: center;
   vertical-align: middle;
   margin: 4px;
-  background: #fff;
+  background: var(--surface);
   transition: background 0.6s ease-out;
 }
 

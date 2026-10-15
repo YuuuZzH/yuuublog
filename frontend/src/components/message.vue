@@ -451,7 +451,7 @@ export default {
 <style>
 .tmsgBox {
     position: relative;
-    background: #fff;
+    background: var(--surface);
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 5px;
@@ -484,7 +484,7 @@ export default {
     border-radius: 4px;
     color: #444;
     display: inline-block;
-    background: #fff;
+    background: var(--surface);
     border: 1px solid #ddd;
     font-size: 13px;
     padding: 0 6px;
@@ -502,7 +502,7 @@ export default {
 
 .OwO .OwO-body {
     position: absolute;
-    background: #fff;
+    background: var(--surface);
     border: 1px solid #ddd;
     z-index: 1;
     top: 29px;
@@ -557,7 +557,7 @@ export default {
     width: 100%;
     height: 30px;
     border-top: 1px solid #ddd;
-    background: #fff;
+    background: var(--surface);
     border-radius: 0 0 4px 4px;
     color: #444;
 }

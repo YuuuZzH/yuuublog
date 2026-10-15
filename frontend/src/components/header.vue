@@ -765,10 +765,10 @@ export default {
 	}
 }
 
-/* 签名花字（本地子集字体，仅 119KB） */
+/* 签名花字：与后台管理页同一款字体（克莱因蓝的夜晚） */
 @font-face {
 	font-family: 'HeroFancy';
-	src: url('../assets/font/ShangShouZhiZunShuFaTi/No.39-ShangShouZhiZunShuFaTi-2.ttf') format('truetype');
+	src: url('../assets/font/KeLaiYinLanDeYeWan-2.ttf') format('truetype');
 	font-display: swap;
 }
 
@@ -835,24 +835,32 @@ export default {
 	transform: translateY(-4px);
 }
 
-/* 头像半透明，透出底下的签名文字 */
+/* 头像：毛玻璃质感（轻微磨砂 + 半透明 + 白色描边） */
 .h-information img {
-	opacity: .8;
+	opacity: .82;
+	-webkit-filter: blur(1.2px) saturate(1.06) brightness(1.04);
+	filter: blur(1.2px) saturate(1.06) brightness(1.04);
 	box-shadow: 0 8px 26px rgba(20, 30, 60, .3);
 	border: 3px solid rgba(255, 255, 255, .55);
 }
 
-/* 签名：花字 + 大字号，压在头像底部 */
+.h-information img:hover {
+	-webkit-filter: none;
+	filter: none;
+	opacity: 1;
+}
+
+/* 签名：完全在头像下方、水平居中、花字大字号 */
 .h-information .h-description {
-	margin-top: -26px;
-	position: relative;
-	z-index: 2;
+	margin: 16px 0 0;
+	text-align: center;
 	font-family: 'HeroFancy', 'Sigmar One', cursive;
-	font-size: 26px !important;
+	font-size: 36px !important;
 	font-weight: 400;
-	letter-spacing: 3px;
+	line-height: 1.4;
+	letter-spacing: 4px;
 	color: #fff !important;
-	text-shadow: 0 2px 14px rgba(0, 0, 0, .55);
+	text-shadow: 0 2px 16px rgba(0, 0, 0, .55);
 }
 
 /* 底部波浪 */
@@ -884,7 +892,7 @@ export default {
 	}
 
 	.h-information .h-description {
-		font-size: 20px !important;
+		font-size: 22px !important;
 		letter-spacing: 2px;
 	}
 

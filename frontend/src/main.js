@@ -6,12 +6,22 @@ import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import './assets/css/style.less'
+// 设计系统：主题变量与通用动效（必须在其它样式之前，供后续变量覆盖）
+import './assets/css/theme.less'
+import { initTheme } from './utils/theme'
+import reveal from './directives/reveal'
 import store from './store'
 import MavonEditor from 'mavon-editor'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(MavonEditor)
+
+// 滚动入场动效指令：<div v-reveal>
+Vue.directive('reveal', reveal)
+
+// 主题必须在挂载前应用，避免首屏闪白
+initTheme()
 
 /* eslint-disable no-new */
 new Vue({

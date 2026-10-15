@@ -1,0 +1,195 @@
+/* ===========================================================
+   设计系统：变量 / 亮暗主题 / 通用动效
+   =========================================================== */
+
+:root {
+  /* 品牌色 */
+  --brand: #4f8cff;
+  --brand-2: #7b6cff;
+  --accent: #ff7ac6;
+
+  /* 背景与表面 */
+  --bg: #f5f7fb;
+  --bg-soft: #eaf0fa;
+  --surface: #ffffff;
+  --surface-2: rgba(255, 255, 255, .72);
+  --surface-3: rgba(255, 255, 255, .5);
+
+  /* 文字 */
+  --text: #1d2433;
+  --text-weak: #64708a;
+  --text-invert: #ffffff;
+
+  /* 边框与阴影 */
+  --border: rgba(20, 30, 60, .08);
+  --border-strong: rgba(20, 30, 60, .16);
+  --shadow-1: 0 1px 2px rgba(20, 30, 60, .06), 0 8px 24px rgba(20, 30, 60, .06);
+  --shadow-2: 0 10px 34px rgba(31, 45, 80, .14);
+  --shadow-glow: 0 12px 40px rgba(79, 140, 255, .28);
+
+  /* 形状 */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --maxw: 1180px;
+
+  /* 动效 */
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --dur: .45s;
+}
+
+[data-theme='dark'] {
+  --brand: #6ea8ff;
+  --brand-2: #9d8bff;
+  --accent: #ff8fd0;
+
+  --bg: #0d1220;
+  --bg-soft: #131a2c;
+  --surface: #161d30;
+  --surface-2: rgba(22, 29, 48, .72);
+  --surface-3: rgba(22, 29, 48, .5);
+
+  --text: #e8edf7;
+  --text-weak: #98a4bd;
+  --text-invert: #0d1220;
+
+  --border: rgba(255, 255, 255, .09);
+  --border-strong: rgba(255, 255, 255, .18);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+  --shadow-2: 0 10px 34px rgba(0, 0, 0, .5);
+  --shadow-glow: 0 12px 40px rgba(110, 168, 255, .3);
+}
+
+/* ---------- 主题切换过渡（切换瞬间，不要影响日常交互） ---------- */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color .32s var(--ease), border-color .32s var(--ease), color .32s var(--ease),
+    box-shadow .32s var(--ease) !important;
+}
+
+/* ---------- 滚动入场（配合 v-reveal 指令） ---------- */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition: opacity .7s var(--ease), transform .7s var(--ease);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- 路由切换 ---------- */
+.page-enter-active {
+  transition: opacity .35s var(--ease), transform .35s var(--ease);
+}
+
+.page-leave-active {
+  transition: opacity .2s var(--ease), transform .2s var(--ease);
+}
+
+.page-enter {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translate3d(0, -10px, 0);
+}
+
+/* ---------- 通用视觉类 ---------- */
+.glass {
+  background: var(--surface-2);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  border: 1px solid var(--border);
+}
+
+.grad-text {
+  background: linear-gradient(120deg, var(--brand), var(--brand-2) 45%, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hover-lift {
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-2);
+}
+
+/* 骨架屏微光 */
+@keyframes shimmer {
+  0% {
+    background-position: -420px 0;
+  }
+
+  100% {
+    background-position: 420px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-soft) 0%, var(--surface) 40%, var(--bg-soft) 80%);
+  background-size: 840px 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* 浮动 */
+@keyframes floaty {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.floaty {
+  animation: floaty 3.6s ease-in-out infinite;
+}
+
+/* 渐变流动 */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.grad-flow {
+  background: linear-gradient(120deg, var(--brand), var(--brand-2), var(--accent), var(--brand));
+  background-size: 300% 300%;
+  animation: gradientShift 12s ease infinite;
+}
+
+/* 尊重系统「减少动效」设置 */
+@media (prefers-reduced-motion: reduce) {
+
+  .reveal,
+  .floaty,
+  .grad-flow {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

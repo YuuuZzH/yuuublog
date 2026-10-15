@@ -34,6 +34,7 @@ jobs:
     outputs:
       backend: ${{ steps.flags.outputs.backend }}
       admin: ${{ steps.flags.outputs.admin }}
+      frontend: ${{ steps.flags.outputs.frontend }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,18 +47,23 @@ jobs:
               - 'backend/**'
             admin:
               - 'admin/**'
+            frontend:
+              - 'frontend/**'
       - name: Resolve build flags
         id: flags
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             B="${{ inputs.force_backend }}"
             A="${{ inputs.force_admin }}"
+            F="${{ inputs.deploy_frontend }}"
           else
             B="${{ steps.filter.outputs.backend }}"
             A="${{ steps.filter.outputs.admin }}"
+            F="${{ steps.filter.outputs.frontend }}"
           fi
           echo "backend=$B" >> "$GITHUB_OUTPUT"
           echo "admin=$A" >> "$GITHUB_OUTPUT"
+          echo "frontend=$F" >> "$GITHUB_OUTPUT"
 
   backend:
     needs: changes
@@ -104,9 +110,9 @@ jobs:
           if-no-files-found: error
 
   frontend:
-    # 前台门户默认不随 push 重建（线上 dist 已稳定运行，重建风险 > 收益），
-    # 需要时在 GitHub 上手动 Run workflow 勾选 deploy_frontend
-    if: github.event.inputs.deploy_frontend == 'true'
+    # 改了 frontend/** 就自动重建部署；也可手动 Run workflow 勾选 deploy_frontend 强制部署
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +134,7 @@ jobs:
 
   deploy:
     needs: [changes, backend, admin, frontend]
-    if: always() && (needs.backend.result == 'success' || needs.admin.result == 'success')
+    if: always() && (needs.backend.result == 'success' || needs.admin.result == 'success' || needs.frontend.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

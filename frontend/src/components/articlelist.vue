@@ -19,8 +19,11 @@
 
         <el-col :span="24" v-for="(item,index) in articleList" :key="'article'+index">
             <article class="article-card hover-lift" v-reveal="Math.min(index,5)*70">
-                <a class="card-cover" v-if="item.thumbnail" :href="'#/DetailArticle?aid='+item.id" target="_blank">
-                    <img :src="item.thumbnail" :alt="item.title" loading="lazy">
+                <a class="card-cover" :href="'#/DetailArticle?aid='+item.id" target="_blank">
+                    <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" loading="lazy">
+                    <span v-else class="cover-fallback" :style="coverStyle(item.title)">
+                        <i>{{ coverInitial(item.title) }}</i>
+                    </span>
                     <span class="cover-date">
                         <b v-html="showInitDate(item.createTime,'month')+'月'"></b>
                         <i v-html="showInitDate(item.createTime,'date')"></i>
@@ -58,6 +61,7 @@
 <script>
 import { initDate } from '../utils/server.js'
 import { articleList } from '../api/article'
+import { coverStyle, coverInitial } from '../utils/cover.js'
 export default {
     name: 'Share',
     data() { //选项 / 数据
@@ -77,6 +81,12 @@ export default {
     methods: { //事件处理器
         showInitDate: function (oldDate, full) {
             return initDate(oldDate, full)
+        },
+        coverStyle: function (title) {
+            return coverStyle(title)
+        },
+        coverInitial: function (title) {
+            return coverInitial(title)
         },
         getList() {
             this.loading = true
@@ -179,6 +189,29 @@ export default {
 
 .article-card:hover .card-cover img {
     transform: scale(1.07);
+}
+
+/* 无封面时的哈希渐变兜底图 */
+.cover-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    transition: transform .6s var(--ease);
+
+    i {
+        font-style: normal;
+        font-size: 52px;
+        font-weight: 800;
+        color: rgba(255, 255, 255, .92);
+        text-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+        letter-spacing: 2px;
+    }
+}
+
+.article-card:hover .cover-fallback {
+    transform: scale(1.06);
 }
 
 .cover-date {

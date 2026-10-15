@@ -4,6 +4,7 @@
         <ThemeToggle></ThemeToggle>
         <CommandPalette></CommandPalette>
         <CursorFx></CursorFx>
+        <MobileTabBar></MobileTabBar>
         <transition name="page" mode="out-in">
             <keep-alive :include="['Aboutme', 'Message', 'FriendsLink', 'Reward']">
                 <router-view></router-view>
@@ -30,6 +31,7 @@ import ThemeToggle from './components/ThemeToggle.vue'
 import ScrollProgress from './components/ScrollProgress.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import CursorFx from './components/CursorFx.vue'
+import MobileTabBar from './components/MobileTabBar.vue'
 import { getStoredTheme, setStoredTheme, applyTheme } from './utils/theme.js'
 export default {
     name: 'App',
@@ -39,7 +41,10 @@ export default {
             showChat: false,
             chatData: [],
             input: '',
-            messages: []
+            messages: [],
+            touchStartX: null,
+            touchStartY: 0,
+            touchEdge: false
         }
     },
     methods: {
@@ -91,6 +96,29 @@ export default {
                 this.closeChat();
             }
         },
+        // 移动端手势返回：从屏幕左边缘右滑 >80px 触发
+        onTouchStart(e) {
+            const t = e.touches && e.touches[0]
+            if (!t) return
+            this.touchStartX = t.clientX
+            this.touchStartY = t.clientY
+            this.touchEdge = t.clientX <= 40
+        },
+        onTouchEnd(e) {
+            if (this.touchStartX === null) return
+            const t = (e.changedTouches && e.changedTouches[0]) || {}
+            const dx = (t.clientX || 0) - this.touchStartX
+            const dy = (t.clientY || 0) - this.touchStartY
+            this.touchStartX = null
+            // 仅左边缘起手、横向位移够大且纵向不明显的滑动才算返回手势
+            if (this.touchEdge && dx > 80 && Math.abs(dy) < 50) {
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.$router.push({ path: '/Home' })
+                }
+            }
+        },
         // 快捷键：T 循环切换主题（输入态下不拦截）
         onHotkey(e) {
             const el = e.target || {};
@@ -110,18 +138,23 @@ export default {
         ThemeToggle,
         ScrollProgress,
         CommandPalette,
-        CursorFx
+        CursorFx,
+        MobileTabBar
     },
     mounted() {
         window.addEventListener('scroll', this.handleScroll);
         window.addEventListener('click', this.handleClick);
         window.addEventListener('keydown', this.onHotkey);
+        window.addEventListener('touchstart', this.onTouchStart, { passive: true });
+        window.addEventListener('touchend', this.onTouchEnd, { passive: true });
         this.handleScroll();
     },
     destroyed() {
         window.removeEventListener('scroll', this.handleScroll);
         window.removeEventListener('click', this.handleClick);
         window.removeEventListener('keydown', this.onHotkey);
+        window.removeEventListener('touchstart', this.onTouchStart);
+        window.removeEventListener('touchend', this.onTouchEnd);
     },
 }
 </script>

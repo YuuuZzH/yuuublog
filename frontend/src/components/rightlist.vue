@@ -479,4 +479,138 @@ export default {
 .goTophui {
   bottom: 120vh;
 }
+
+/* ================= 侧栏统一到新设计系统 ================= */
+.rightlistBox section {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  padding: 18px;
+  background: var(--surface);
+}
+
+.rightlistBox section:hover {
+  transform: translate(0, -2px);
+  box-shadow: var(--shadow-2);
+}
+
+.rightlistBox .r1-head img {
+  border-radius: 50%;
+  box-shadow: 0 8px 22px rgba(20, 30, 60, .16);
+}
+
+.rightlistBox .r1-head h1 span {
+  color: var(--text);
+}
+
+.rightlistBox .r1-body p {
+  color: var(--text-weak);
+}
+
+/* 小标题统一为胶囊标签 */
+.rightlistBox section h2.ui.label,
+.rightlistBox .rs4 h2.ui.label {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--brand);
+  background: rgba(79, 140, 255, .12);
+}
+
+/* 联系我：圆形按钮 */
+.rightlistBox .r1-body .catch-me {
+  justify-content: center;
+}
+
+.rightlistBox .r1-body .catch-me a {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  color: var(--text-weak);
+  transition: transform .25s var(--ease), color .25s var(--ease), background .25s var(--ease);
+}
+
+.rightlistBox .r1-body .catch-me a:hover {
+  color: #fff;
+  background: linear-gradient(120deg, var(--brand), var(--brand-2));
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+
+.rightlistBox .r1-body .catch-me a:hover i {
+  color: #fff;
+}
+
+.rightlistBox .r1-body .catch-me a i {
+  color: inherit;
+  font-size: 15px;
+  transition: none;
+  transform: none;
+}
+
+/* 列表项：hover 位移 + 品牌色 */
+.rightlistBox .rs4 li a,
+.rightlistBox .rs3 .rs3-item a {
+  color: var(--text-weak);
+  transition: color .25s var(--ease), padding-left .25s var(--ease);
+}
+
+.rightlistBox .rs4 li a:hover,
+.rightlistBox .rs3 .rs3-item a:hover {
+  color: var(--brand);
+  padding-left: 4px;
+}
+
+.rightlistBox .rs4 li {
+  border-bottom: 1px dashed var(--border);
+}
+
+.rightlistBox .rs4 li:last-child {
+  border-bottom: none;
+}
+
+/* 心动按钮动效 */
+.rightlistBox .rs2 div i.heart {
+  transition: transform .3s var(--ease), color .3s var(--ease);
+}
+
+.rightlistBox .rs2 div i.heart:hover {
+  transform: scale(1.18);
+}
+
+.rightlistBox .rs2 div i.heart.active {
+  color: var(--brand);
+  animation: heartPop .5s var(--ease);
+}
+
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  70% { transform: scale(.92); }
+  100% { transform: scale(1); }
+}
+
+.rightlistBox .rs2 div span {
+  color: var(--text-weak);
+}
+
+/* 登录信息 */
+.rightlistBox .rs4 div span,
+.rightlistBox .rs4 p {
+  color: var(--text-weak);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rightlistBox section,
+  .rightlistBox .rs2 div i.heart,
+  .rightlistBox .rs4 li a { transition: none; }
+
+  .rightlistBox .rs2 div i.heart.active { animation: none; }
+}
 </style>

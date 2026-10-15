@@ -59,7 +59,7 @@
                                     <div>
                                         <img width="20px" height="20px"
                                             :src="isLiked[item.id] ? 'static/img/yzpl.png' : 'static/img/wzpl.png'"
-                                            @click="toggleLike(item.id)" />
+                                            @click="toggleLike(item.id, $event)" />
                                     </div>
                                     <!-- <div style="margin-top: 3px;" v-if="likes[index].likes != 0">
                                         {{ likes[index].likes }}
@@ -97,7 +97,7 @@
                                                 <div>
                                                     <img width="20px" height="20px"
                                                         :src="isLiked[citem.id] ? 'static/img/yzpl.png' : 'static/img/wzpl.png'"
-                                                        @click="toggleLike(citem.id)" />
+                                                        @click="toggleLike(citem.id, $event)" />
                                                 </div>
                                                 <div style="margin-top: 3px;">
                                                     <span v-for="e in likes" :key="e.id">
@@ -281,7 +281,16 @@ export default {
                     })
             }
         },
-        toggleLike(id) {
+        //点赞动效：先移除再强制重排，保证连点也能重播
+        playLikePop(e) {
+            if (!e || !e.currentTarget) return
+            const el = e.currentTarget
+            el.classList.remove('like-pop')
+            void el.offsetWidth
+            el.classList.add('like-pop')
+        },
+        toggleLike(id, e) {
+            this.playLikePop(e)
             // Check if the comment is already liked
             if (this.isLiked[id]) {
                 // If liked, send a request to unlike
@@ -1188,5 +1197,93 @@ export default {
     font-size: 12px;
     color: #64609E;
     cursor: pointer;
+}
+
+/* ================= 留言/评论：点赞动效 + 表情面板适配 ================= */
+.tmsgBox img[src*="zpl.png"] {
+    cursor: pointer;
+    transition: transform .25s var(--ease);
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.tmsgBox img[src*="zpl.png"]:hover {
+    transform: scale(1.12);
+}
+
+img.like-pop {
+    animation: likePop .45s var(--ease);
+}
+
+@keyframes likePop {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.42);
+    }
+
+    70% {
+        transform: scale(.9);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* OwO 表情面板 */
+.OwO-logo {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-weak);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color .25s var(--ease), border-color .25s var(--ease);
+}
+
+.OwO-logo:hover {
+    color: var(--brand);
+    border-color: var(--brand);
+}
+
+.OwO-body {
+    border-color: var(--border);
+    box-shadow: var(--shadow-1);
+}
+
+.OwO-bar {
+    border-top-color: var(--border);
+}
+
+.OwO-package-active {
+    color: var(--brand);
+}
+
+[data-theme='dark'] .OwO-body {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme='dark'] .OwO-items {
+    background: transparent;
+}
+
+[data-theme='dark'] .OwO-bar {
+    background: var(--bg-soft);
+    border-top-color: var(--border);
+}
+
+[data-theme='dark'] .OwO-package-active {
+    color: var(--brand);
+}
+
+[data-theme='dark'] .OwO-logo {
+    color: var(--text-weak);
+    border-color: var(--border-strong);
 }
 </style>

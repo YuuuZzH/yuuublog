@@ -867,9 +867,60 @@ export default {
 	}
 }
 
+/* ================= 导航统一到新设计系统 ================= */
+.headBox>ul>li.el-menu-item,
+.headBox>ul>.el-submenu>.el-submenu__title {
+	border-radius: 999px !important;
+	margin: 0 2px;
+	transition: background .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+
+.headBox>ul>li.el-menu-item:hover,
+.headBox>ul>.el-submenu:hover>.el-submenu__title {
+	background: rgba(255, 255, 255, .18) !important;
+	transform: translateY(-1px);
+}
+
+/* 当前页：渐变胶囊 + 光晕 */
+.headBox>ul>li.el-menu-item.is-active {
+	background: linear-gradient(120deg, var(--brand), var(--brand-2)) !important;
+	color: #fff !important;
+	box-shadow: var(--shadow-glow);
+}
+
+/* 分类下拉：改用卡片风格 */
+.headBox>ul .el-submenu .el-menu {
+	background: var(--surface) !important;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: var(--shadow-2);
+	padding: 4px 0;
+}
+
+.headBox>ul .el-submenu .el-menu .el-menu-item {
+	background: transparent !important;
+	color: var(--text) !important;
+}
+
+.headBox>ul .el-submenu .el-menu .el-menu-item:hover {
+	background: var(--bg-soft) !important;
+	color: var(--brand) !important;
+}
+
+/* 搜索框 */
+.headBox .pcsearchbox .el-input__inner,
+.headBox .el-input__inner {
+	border-radius: 999px;
+	box-shadow: var(--shadow-1);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.hero-bg {
 		transform: none !important;
+	}
+
+	.headBox>ul>li.el-menu-item {
+		transition: none;
 	}
 }
 </style>

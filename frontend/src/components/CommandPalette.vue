@@ -191,6 +191,7 @@ export default {
   position: fixed;
   right: 22px;
   top: 66px;
+  border: none;
   z-index: 1200;
   height: 34px;
   padding: 0 12px;

@@ -1,20 +1,30 @@
-<!-- 文章目录：宽屏（≥1661px）浮在正文左侧留白，窄屏作为正文上方的卡片 -->
+<!-- 文章目录：宽屏（≥1661px）默认收起为悬浮按钮，展开后浮在正文左侧；窄屏作为正文上方的卡片 -->
 <template>
-  <transition name="toc-fade">
-    <nav class="article-toc glass" v-if="toc && toc.length > 1">
-      <div class="toc-head" @click="open = !open">
-        <span class="toc-title">目录</span>
-        <span class="toc-pct">{{ percent }}%</span>
-        <i :class="['fa', open ? 'fa-chevron-up' : 'fa-chevron-down', 'toc-fold']"></i>
-      </div>
-      <div class="toc-track"><i :style="{ height: percent + '%' }"></i></div>
-      <ul class="toc-list" v-show="open">
-        <li v-for="item in toc" :key="item.id" :class="['toc-item', 'lv' + item.level, { active: activeId === item.id }]">
-          <a :href="'#' + item.id" :title="item.text" @click.prevent="jump(item)">{{ item.text }}</a>
-        </li>
-      </ul>
-    </nav>
-  </transition>
+  <div>
+    <transition name="toc-fade">
+      <nav class="article-toc glass" v-if="toc && toc.length > 1 && panelOpen">
+        <div class="toc-head" @click="listOpen = !listOpen">
+          <span class="toc-title">目录</span>
+          <span class="toc-pct">{{ percent }}%</span>
+          <i :class="['fa', listOpen ? 'fa-chevron-up' : 'fa-chevron-down', 'toc-fold']"></i>
+          <i v-if="floating" class="fa fa-times toc-close" title="隐藏目录" @click.stop="panelOpen = false"></i>
+        </div>
+        <div class="toc-track"><i :style="{ height: percent + '%' }"></i></div>
+        <ul class="toc-list" v-show="listOpen">
+          <li v-for="item in toc" :key="item.id" :class="['toc-item', 'lv' + item.level, { active: activeId === item.id }]">
+            <a :href="'#' + item.id" :title="item.text" @click.prevent="jump(item)">{{ item.text }}</a>
+          </li>
+        </ul>
+      </nav>
+    </transition>
+
+    <transition name="toc-fade">
+      <button class="toc-fab glass" v-if="toc && toc.length > 1 && floating && !panelOpen" @click="panelOpen = true"
+        title="打开目录">
+        <i class="fa fa-list-ul"></i><span>目录</span>
+      </button>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -29,7 +39,10 @@ export default {
     return {
       activeId: '',
       percent: 0,
-      open: true,
+      listOpen: true,
+      panelOpen: true,
+      floating: false,
+      mq: null,
       ticking: false
     }
   },
@@ -77,16 +90,32 @@ export default {
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
       window.scrollTo({ top: top, behavior: reduce ? 'auto' : 'smooth' })
       this.activeId = item.id
+    },
+    onMqChange: function (e) {
+      this.floating = e.matches
+      // 宽屏默认收起（避免遮挡正文），窄屏必须内联展示
+      this.panelOpen = !e.matches
     }
   },
   mounted() {
     window.addEventListener('scroll', this.onScroll, { passive: true })
     window.addEventListener('resize', this.onScroll)
+    if (window.matchMedia) {
+      this.mq = window.matchMedia('(min-width: 1661px)')
+      this.floating = this.mq.matches
+      this.panelOpen = !this.floating
+      if (this.mq.addEventListener) this.mq.addEventListener('change', this.onMqChange)
+      else if (this.mq.addListener) this.mq.addListener(this.onMqChange)
+    }
     this.$nextTick(this.onScroll)
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.onScroll)
     window.removeEventListener('resize', this.onScroll)
+    if (this.mq) {
+      if (this.mq.removeEventListener) this.mq.removeEventListener('change', this.onMqChange)
+      else if (this.mq.removeListener) this.mq.removeListener(this.onMqChange)
+    }
   }
 }
 </script>
@@ -127,6 +156,8 @@ export default {
       font-size: 11px;
       color: var(--text-weak);
     }
+
+    .toc-close { display: none; }
   }
 
   .toc-track { display: none; }
@@ -167,7 +198,7 @@ export default {
   }
 }
 
-/* 宽屏：浮到正文左侧留白 */
+/* 宽屏：悬浮在正文左侧，默认收起为按钮 */
 @media (min-width: 1661px) {
   .article-toc {
     position: fixed;
@@ -180,8 +211,20 @@ export default {
     padding: 14px 8px 14px 14px;
     z-index: 60;
 
-    .toc-head { cursor: default; margin-bottom: 10px; padding-right: 6px; }
-    .toc-fold { display: none; }
+    .toc-head {
+      cursor: default;
+      margin-bottom: 10px;
+      padding-right: 6px;
+
+      .toc-close {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 12px;
+        color: var(--text-weak);
+
+        &:hover { color: var(--brand); }
+      }
+    }
 
     .toc-track {
       display: block;
@@ -212,6 +255,32 @@ export default {
 
     .toc-item:hover a { transform: translateX(2px); }
   }
+
+  .toc-fab {
+    position: fixed;
+    left: 16px;
+    bottom: 120px;
+    border: none;
+    z-index: 60;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-weak);
+    cursor: pointer;
+    box-shadow: var(--shadow-1);
+    transition: color .25s var(--ease), transform .25s var(--ease);
+
+    i { color: var(--brand); }
+
+    &:hover {
+      color: var(--brand);
+      transform: translateY(-2px);
+    }
+  }
 }
 
 .toc-fade-enter-active,
@@ -225,6 +294,7 @@ export default {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .article-toc { transition: none; }
+  .article-toc,
+  .toc-fab { transition: none; }
 }
 </style>

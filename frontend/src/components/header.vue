@@ -63,8 +63,14 @@
 				</el-col>
 			</el-row>
 		</div>
-		<div class="headImgBox"
-			:style="{ backgroundImage: this.$store.state.themeObj.top_image ? 'url(' + this.$store.state.themeObj.top_image + ')' : 'url(static/img/headbg05.jpg)' }">
+		<div class="headImgBox">
+			<!-- 视差背景层 -->
+			<div class="hero-bg" :style="heroBgStyle"></div>
+			<!-- 渐变与暗角，保证文字可读 -->
+			<div class="hero-veil"></div>
+			<!-- 星空粒子 -->
+			<StarField class="hero-stars"></StarField>
+
 			<div class="scene">
 				<div><span id="luke"></span></div>
 			</div>
@@ -78,6 +84,17 @@
 
 				</h2>
 			</div>
+
+			<!-- 底部波浪 -->
+			<svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+				<path d="M0,64 C240,110 480,10 720,48 C960,86 1200,120 1440,72 L1440,120 L0,120 Z"></path>
+			</svg>
+
+			<!-- 向下滚动提示 -->
+			<a class="scroll-hint" href="javascript:void(0);" title="向下浏览" @click="scrollDown">
+				<span class="mouse"><i></i></span>
+				<em>向下滚动</em>
+			</a>
 		</div>
 	</div>
 </template>
@@ -90,6 +107,7 @@ import request from "@/utils/request.js"
 import {
 	Typeit
 } from '../utils/plug.js'
+import StarField from './StarField.vue'
 export default {
 	data() { //选项 / 数据
 		return {
@@ -107,7 +125,9 @@ export default {
 			projectList: '', //项目列表
 			inputValue: '',//搜索关键字
 			suggestions: [],//关键字返回列表,
-			aid: ''
+			aid: '',
+			heroShift: 0, //首屏视差位移（px）
+			heroTicking: false
 		}
 	},
 	methods: { //事件处理器
@@ -253,10 +273,41 @@ export default {
 				this.input = '';
 				this.$store.state.keywords = '';
 			}
+		},
+		// 首屏视差：rAF 节流，避免滚动时频繁重排
+		onScroll() {
+			if (this.heroTicking) return;
+			var that = this;
+			this.heroTicking = true;
+			window.requestAnimationFrame(function () {
+				var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+				that.heroShift = y > 900 ? 900 : y;
+				that.heroTicking = false;
+			});
+		},
+		scrollDown() {
+			var box = this.$el.querySelector('.headImgBox');
+			var top = box ? box.offsetHeight - 60 : 600;
+			try {
+				window.scrollTo({ top: top, behavior: 'smooth' });
+			} catch (e) {
+				window.scrollTo(0, top);
+			}
 		}
 	},
 	components: { //定义组件
-
+		StarField
+	},
+	computed: {
+		heroBgStyle() {
+			var bg = this.$store.state.themeObj.top_image
+				? 'url(' + this.$store.state.themeObj.top_image + ')'
+				: 'url(static/img/headbg05.jpg)';
+			return {
+				backgroundImage: bg,
+				transform: 'translate3d(0,' + (this.heroShift * 0.32).toFixed(1) + 'px,0) scale(1.08)'
+			};
+		}
 	},
 	watch: {
 		// 如果路由有变化，会再次执行该方法
@@ -293,6 +344,11 @@ export default {
 			Typeit(that.$store.state.themeObj.user_start, "#luke"); //打字机效果
 			clearTimeout(timer);
 		}, 500);
+		this.onScroll();
+		window.addEventListener('scroll', this.onScroll, { passive: true });
+	},
+	destroyed() {
+		window.removeEventListener('scroll', this.onScroll);
 	}
 }
 </script>
@@ -724,6 +780,190 @@ export default {
 
 	50% {
 		opacity: 0;
+	}
+}
+
+/* ================= 首屏 Hero 升级 ================= */
+.headImgBox {
+	overflow: hidden;
+	margin-bottom: 60px;
+}
+
+/* 视差背景层 */
+.hero-bg {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-size: cover;
+	background-position: center 50%;
+	background-repeat: no-repeat;
+	will-change: transform;
+	transform-origin: center center;
+}
+
+/* 渐变 + 暗角，确保文字在任何头图下都可读 */
+.hero-veil {
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(120% 80% at 50% 0%, rgba(12, 18, 40, 0) 0%, rgba(12, 18, 40, .45) 70%, rgba(12, 18, 40, .68) 100%),
+		linear-gradient(180deg, rgba(12, 18, 40, .28) 0%, rgba(12, 18, 40, 0) 30%, rgba(12, 18, 40, .35) 100%);
+	pointer-events: none;
+}
+
+.hero-stars {
+	z-index: 1;
+}
+
+/* 场景文字与信息卡需要在遮罩之上 */
+.scene,
+.h-information {
+	z-index: 2;
+}
+
+/* 信息卡：玻璃拟态 */
+.h-information {
+	top: 460px;
+	width: min(70%, 620px);
+	padding: 26px 30px;
+	border-radius: var(--radius, 16px);
+	background: var(--surface-2, rgba(255, 255, 255, .72));
+	-webkit-backdrop-filter: saturate(180%) blur(16px);
+	backdrop-filter: saturate(180%) blur(16px);
+	border: 1px solid var(--border, rgba(255, 255, 255, .35));
+	box-shadow: var(--shadow-2, 0 18px 50px rgba(20, 30, 60, .28));
+	color: var(--text);
+	transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+	animation: b 1s ease-out;
+	-webkit-animation: b 1s ease-out;
+}
+
+.h-information:hover {
+	transform: translateY(-4px);
+}
+
+.h-information img {
+	box-shadow: 0 8px 26px rgba(20, 30, 60, .3);
+	border: 3px solid rgba(255, 255, 255, .85);
+}
+
+.h-description {
+	color: var(--text);
+	font-size: 17px !important;
+	letter-spacing: .5px;
+}
+
+/* 底部波浪 */
+.hero-wave {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	width: 100%;
+	height: 90px;
+	z-index: 3;
+	pointer-events: none;
+}
+
+.hero-wave path {
+	fill: var(--bg, #f5f7fb);
+}
+
+/* 向下滚动提示 */
+.scroll-hint {
+	position: absolute;
+	left: 50%;
+	bottom: 108px;
+	transform: translateX(-50%);
+	z-index: 4;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	color: rgba(255, 255, 255, .92);
+	text-decoration: none;
+	opacity: .9;
+	transition: opacity .3s var(--ease), transform .3s var(--ease);
+}
+
+.scroll-hint:hover {
+	opacity: 1;
+	transform: translateX(-50%) translateY(4px);
+}
+
+.scroll-hint em {
+	font-style: normal;
+	font-size: 12px;
+	letter-spacing: 2px;
+}
+
+.scroll-hint .mouse {
+	width: 24px;
+	height: 38px;
+	border: 2px solid rgba(255, 255, 255, .85);
+	border-radius: 14px;
+	position: relative;
+	display: block;
+}
+
+.scroll-hint .mouse i {
+	position: absolute;
+	left: 50%;
+	top: 7px;
+	width: 3px;
+	height: 8px;
+	margin-left: -1.5px;
+	border-radius: 2px;
+	background: rgba(255, 255, 255, .95);
+	animation: wheel 1.6s var(--ease) infinite;
+}
+
+@keyframes wheel {
+	0% {
+		opacity: 0;
+		transform: translateY(0);
+	}
+
+	40% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+}
+
+@media (max-width: 768px) {
+	.headImgBox {
+		height: 420px;
+		margin-bottom: 40px;
+	}
+
+	.h-information {
+		top: 250px;
+		width: 88%;
+		padding: 18px;
+	}
+
+	.hero-wave {
+		height: 56px;
+	}
+
+	.scroll-hint {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero-bg {
+		transform: none !important;
+	}
+
+	.scroll-hint .mouse i {
+		animation: none;
 	}
 }
 </style>

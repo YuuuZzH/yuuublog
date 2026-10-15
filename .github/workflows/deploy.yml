@@ -5,14 +5,18 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      force_backend:
+        description: '强制重建并部署后端 jar'
+        type: boolean
+        default: false
+      force_admin:
+        description: '强制重建并部署后台 dist'
+        type: boolean
+        default: false
       deploy_frontend:
         description: '同时部署前台门户 dist'
         type: boolean
         default: false
-      deploy_backend:
-        description: '同时部署后端 jar'
-        type: boolean
-        default: true
 
 concurrency:
   group: yuuublog-deploy
@@ -21,12 +25,43 @@ concurrency:
 env:
   # 服务器上的部署根目录（与 nginx.conf / systemd unit 保持一致）
   DEPLOY_ROOT: /app/blog/blog/app/app
-  # 上传暂存目录
+  # 上传暂存目录（保留上次上传的 jar 作为 rsync 增量基准，勿删）
   STAGE_DIR: /app/deploy/incoming
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.flags.outputs.backend }}
+      admin: ${{ steps.flags.outputs.admin }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # paths-filter 需要与上一个 commit 做 diff
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            admin:
+              - 'admin/**'
+      - name: Resolve build flags
+        id: flags
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            B="${{ inputs.force_backend }}"
+            A="${{ inputs.force_admin }}"
+          else
+            B="${{ steps.filter.outputs.backend }}"
+            A="${{ steps.filter.outputs.admin }}"
+          fi
+          echo "backend=$B" >> "$GITHUB_OUTPUT"
+          echo "admin=$A" >> "$GITHUB_OUTPUT"
+
   backend:
-    if: github.event_name == 'push' || github.event.inputs.deploy_backend == 'true'
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,6 +81,8 @@ jobs:
           if-no-files-found: error
 
   admin:
+    needs: changes
+    if: needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -90,8 +127,8 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    needs: [backend, admin, frontend]
-    if: always() && (needs.admin.result == 'success')
+    needs: [changes, backend, admin, frontend]
+    if: always() && (needs.backend.result == 'success' || needs.admin.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -107,20 +144,32 @@ jobs:
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
       - name: Upload artifacts
-        # 注意：download-artifact 会保留上传时的相对路径（如 backend-jars/yuuu-admin/target/xxx.jar），
-        # 因此用 find 定位 jar，并以固定文件名上传到服务器暂存区
+        # jar 用 rsync 增量传输（-c 校验 + --inplace 只传差异块）：
+        # Spring Boot jar 内依赖库基本不变，跨境链路上比 scp 全量快 1~2 个数量级。
+        # 暂存区必须保留旧 jar（apply 阶段用 cp 不用 mv）才能作为增量基准。
         run: |
-          ls -la artifacts/backend-jars
-          JAR_ADMIN=$(find artifacts/backend-jars -name 'yuuu-admin.jar' | head -1)
-          JAR_BLOG=$(find artifacts/backend-jars -name 'yuuu-blog.jar' | head -1)
+          ls -la artifacts/ || true
+          JAR_ADMIN=$(find artifacts/backend-jars -name 'yuuu-admin.jar' 2>/dev/null | head -1)
+          JAR_BLOG=$(find artifacts/backend-jars -name 'yuuu-blog.jar' 2>/dev/null | head -1)
           echo "JAR_ADMIN=$JAR_ADMIN JAR_BLOG=$JAR_BLOG"
-          test -n "$JAR_ADMIN" && test -n "$JAR_BLOG" || { echo "MISSING jar artifact"; exit 1; }
+          if [ -z "$JAR_ADMIN" ] && [ -z "$JAR_BLOG" ] && [ ! -d artifacts/admin-dist ]; then
+            echo "nothing to deploy"; exit 1
+          fi
+          R="rsync -e \"ssh -p ${SSH_PORT}\" -c --inplace --partial --timeout 600"
           ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "mkdir -p ${STAGE_DIR}/{admin,frontend,jars}"
-          scp -P "${SSH_PORT}" "$JAR_ADMIN" "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/yuuu-admin.jar"
-          scp -P "${SSH_PORT}" "$JAR_BLOG"  "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/yuuu-blog.jar"
-          scp -P "${SSH_PORT}" -r artifacts/admin-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/admin/"
-          if [ -d artifacts/frontend-dist ]; then scp -P "${SSH_PORT}" -r artifacts/frontend-dist/. "${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/frontend/"; fi
-          ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "ls -la ${STAGE_DIR}/jars/ | head -5"
+          if [ -d artifacts/admin-dist ]; then
+            eval "$R artifacts/admin-dist/ \"${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/admin/\""
+          fi
+          if [ -n "$JAR_ADMIN" ]; then
+            eval "$R \"$JAR_ADMIN\" \"${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/yuuu-admin.jar\""
+          fi
+          if [ -n "$JAR_BLOG" ]; then
+            eval "$R \"$JAR_BLOG\" \"${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/jars/yuuu-blog.jar\""
+          fi
+          if [ -d artifacts/frontend-dist ]; then
+            eval "$R artifacts/frontend-dist/ \"${SERVER_USER}@${SERVER_HOST}:${STAGE_DIR}/frontend/\""
+          fi
+          ssh -p "${SSH_PORT}" "${SERVER_USER}@${SERVER_HOST}" "ls -la ${STAGE_DIR}/jars/ ${STAGE_DIR}/admin/ | head -10"
         env:
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -136,42 +185,50 @@ jobs:
           BK=/app/deploy/backup/$TS
           mkdir -p "$BK"
 
-          # 1) 后台 dist（总是部署）
-          cp -a "$DEPLOY_ROOT/backend/dist" "$BK/backend-dist" 2>/dev/null || true
-          rsync -a "$STAGE/admin/" "$DEPLOY_ROOT/backend/dist/"
+          # 1) 后台 dist（总是部署，静态资源无需重启服务）
+          if [ -f "$STAGE/admin/index.html" ]; then
+            cp -a "$DEPLOY_ROOT/backend/dist" "$BK/backend-dist" 2>/dev/null || true
+            rsync -a "$STAGE/admin/" "$DEPLOY_ROOT/backend/dist/"
+            echo "admin dist deployed"
+          fi
 
           # 2) 前台 dist（可选）
           if [ -f "$STAGE/frontend/index.html" ]; then
             cp -a "$DEPLOY_ROOT/front/dist" "$BK/front-dist" 2>/dev/null || true
             rsync -a "$STAGE/frontend/" "$DEPLOY_ROOT/front/dist/"
+            echo "frontend dist deployed"
           fi
 
-          # 3) jar（可选）：用 find 定位，兼容 artifact 解包后的任意层级
+          # 3) jar（可选）：cp 替换而非 mv，保留暂存区文件作为下次 rsync 增量基准
           JAR_ADMIN=$(find "$STAGE/jars" -name 'yuuu-admin.jar' 2>/dev/null | head -1)
           JAR_BLOG=$(find "$STAGE/jars" -name 'yuuu-blog.jar' 2>/dev/null | head -1)
           if [ -n "$JAR_ADMIN" ] && [ -n "$JAR_BLOG" ]; then
             cp -a "$DEPLOY_ROOT/backend/yuuu-admin.jar" "$BK/" 2>/dev/null || true
             cp -a "$DEPLOY_ROOT/front/yuuu-blog.jar" "$BK/" 2>/dev/null || true
             systemctl stop yuuu-admin yuuu-blog || true
-            mv -f "$JAR_ADMIN" "$DEPLOY_ROOT/backend/yuuu-admin.jar"
-            mv -f "$JAR_BLOG"  "$DEPLOY_ROOT/front/yuuu-blog.jar"
+            cp -f "$JAR_ADMIN" "$DEPLOY_ROOT/backend/yuuu-admin.jar"
+            cp -f "$JAR_BLOG"  "$DEPLOY_ROOT/front/yuuu-blog.jar"
             systemctl start yuuu-blog yuuu-admin
+            RESTARTED=1
           else
             echo "no jars uploaded, skip restart"
+            RESTARTED=0
           fi
 
           # 4) config 目录必须保留（外部配置，不在仓库里）
           ls "$DEPLOY_ROOT/backend/config" "$DEPLOY_ROOT/front/config" >/dev/null
 
-          # 5) 健康检查（注意：前台 API 没有根路由，必须用真实接口）
-          for i in $(seq 1 30); do
-            sleep 4
-            if curl -sf -o /dev/null http://127.0.0.1:8989/ && \
-               curl -sf -o /dev/null "http://127.0.0.1:7777/category/getCategoryList"; then
-              echo "healthcheck OK"; break
-            fi
-            [ $i -eq 30 ] && { echo "healthcheck FAILED"; journalctl -u yuuu-admin -u yuuu-blog -n 60 --no-pager; exit 1; }
-          done
+          # 5) 健康检查（仅在有 jar 更新时；注意：前台 API 没有根路由，必须用真实接口）
+          if [ "$RESTARTED" = "1" ]; then
+            for i in $(seq 1 30); do
+              sleep 4
+              if curl -sf -o /dev/null http://127.0.0.1:8989/ && \
+                 curl -sf -o /dev/null "http://127.0.0.1:7777/category/getCategoryList"; then
+                echo "healthcheck OK"; break
+              fi
+              [ $i -eq 30 ] && { echo "healthcheck FAILED"; journalctl -u yuuu-admin -u yuuu-blog -n 60 --no-pager; exit 1; }
+            done
+          fi
           curl -sf "https://www.yuuu.online/api/category/getCategoryList" | head -c 200; echo
 
           # 后台 dist 冒烟：index.html 引用的 js 必须能取到（防 publicPath 配错导致全站 404 白屏）

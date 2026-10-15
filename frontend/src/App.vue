@@ -1,8 +1,13 @@
 <template>
     <div id="app">
-        <keep-alive :include="['Aboutme', 'Message', 'FriendsLink', 'Reward']">
-            <router-view></router-view>
-        </keep-alive>
+        <ScrollProgress></ScrollProgress>
+        <ThemeToggle></ThemeToggle>
+        <transition name="page" mode="out-in">
+            <keep-alive :include="['Aboutme', 'Message', 'FriendsLink', 'Reward']">
+                <router-view></router-view>
+            </keep-alive>
+        </transition>
+        <BackToTop></BackToTop>
 
         <el-tooltip class="item" effect="dark" content="Hi,我是YuuuChat，快来和我聊天吧！" placement="right">
             <img id="fix-image" src="../static/img/yuuu.png" title="" alt="小yu机器人" style="position: fixed;
@@ -20,6 +25,9 @@
 
 <script>
 import Chat from './components/Chat.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
+import ScrollProgress from './components/ScrollProgress.vue'
+import BackToTop from './components/BackToTop.vue'
 export default {
     name: 'App',
     data() {
@@ -82,7 +90,10 @@ export default {
         },
     },
     components: {
-        Chat
+        Chat,
+        ThemeToggle,
+        ScrollProgress,
+        BackToTop
     },
     mounted() {
         window.addEventListener('scroll', this.handleScroll);

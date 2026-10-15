@@ -155,9 +155,9 @@ export default {
     width: 25%;
     // height: 50%;
     z-index: 9998;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-strong);
     border-radius: 5px;
-    background-color: #fff;
+    background-color: var(--surface);
 
 }
 
@@ -249,9 +249,9 @@ video {
 
 body {
     font-family: Arial, "STHeiti", Helvetica, sans-serif;
-    background: #efefef;
+    background: var(--bg);
     font-size: 14px;
-    color: #444 !important;
+    color: var(--text) !important;
     min-height: 100vh;
     width: 100%;
     overflow-x: hidden;
@@ -384,11 +384,12 @@ a {
     word-wrap: break-word;
     word-break: break-all;
     position: relative;
-    background: #fff;
+    background: var(--surface);
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 40px;
     font-size: 15px;
+    box-shadow: var(--shadow-1);
 }
 
 .tcommonBox header {

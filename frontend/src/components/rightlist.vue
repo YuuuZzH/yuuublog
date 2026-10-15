@@ -213,7 +213,7 @@ export default {
 .rightlistBox section {
   transition: all 0.2s linear;
   position: relative;
-  background: #fff;
+  background: var(--surface);
   padding: 15px;
   margin-bottom: 20px;
   border-radius: 5px;

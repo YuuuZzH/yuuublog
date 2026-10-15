@@ -498,7 +498,7 @@ export default {
 .loginBox,
 .changePasswordBox,
 .registerBox {
-    background: #fff;
+    background: var(--surface);
     padding: 40px;
     max-width: 320px;
     margin: 0 auto;

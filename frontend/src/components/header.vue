@@ -496,7 +496,8 @@ export default {
 .headBox .el-input__inner {
 	height: 30px;
 	border: none;
-	background: #fff;
+	background: var(--surface);
+	color: var(--text);
 	/*border: 1px solid #333;*/
 	border-radius: 2px;
 	padding-right: 10px;

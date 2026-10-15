@@ -18,12 +18,16 @@
         <i class="fa fa-fw fa-user"></i>发表于 <span>{{ detailObj.createTime }}</span> •
         <i class="fa fa-fw fa-eye"></i>{{ detailObj.viewCount }} 次围观 •
         <i class="fa fa-fw fa-heart"></i>{{ detailObj.likes }} 次点赞 •
+        <i class="fa fa-fw fa-clock-o"></i>约 {{ minutes }} 分钟读完（{{ words }} 字）
       </h2>
       <div class="ui label">
         <a :href="'#/Share?classId=' + detailObj.categoryId">{{ detailObj.categoryName }}</a>
       </div>
     </header>
-    <div class="article-content markdown-body" v-html="detailObj.content"></div>
+    <div class="article-content markdown-body" ref="content" v-html="detailObj.content" @click="onContentClick"></div>
+
+    <ArticleToc :toc="toc" />
+    <ImageLightbox :visible.sync="lbVisible" :list="lbList" :index.sync="lbIndex" />
 
     <div class="donate">
       <div class="donate-word">
@@ -66,6 +70,9 @@ import { mavonEditor } from 'mavon-editor'
 import * as FileSaver from 'file-saver';
 import request from "@/utils/request.js"
 import mammoth from 'mammoth'
+import ArticleToc from './ArticleToc.vue'
+import ImageLightbox from './ImageLightbox.vue'
+import { buildToc, enhanceCodeBlocks, countWords } from '../utils/articleEnhance.js'
 export default {
   data() { //选项 / 数据
     return {
@@ -79,6 +86,12 @@ export default {
       iconSrcDis: "static/img/wdc.png",
       isLiked: false, // User's like status
       isDisLiked: false, // User's like status
+      toc: [],//正文目录
+      words: 0,//正文字数
+      minutes: 1,//预计阅读时长
+      lbVisible: false,//图片灯箱
+      lbList: [],
+      lbIndex: 0,
     }
   },
   methods: { //事件处理器
@@ -163,12 +176,46 @@ export default {
       alert("当前文章链接已复制，快去分享给小伙伴吧！");
     },
 
+    // 正文渲染完成后的增强：目录锚点 / 代码块工具栏 / 图片灯箱 / 字数统计
+    decorate: function () {
+      const root = this.$refs.content
+      if (!root) return
+      this.toc = buildToc(root)
+      enhanceCodeBlocks(root)
+      const stat = countWords(root)
+      this.words = stat.words
+      this.minutes = stat.minutes
+      const imgs = root.querySelectorAll('img')
+      Array.prototype.forEach.call(imgs, function (img) {
+        if (img.getAttribute('src')) img.classList.add('zoomable')
+      })
+    },
+    onContentClick: function (e) {
+      const el = e.target
+      if (!el || el.tagName !== 'IMG') return
+      const root = this.$refs.content
+      const src = el.getAttribute('src')
+      if (!root || !src) return
+      const imgs = root.querySelectorAll('img')
+      const list = []
+      let index = 0
+      Array.prototype.forEach.call(imgs, function (img, i) {
+        const s = img.getAttribute('src')
+        if (!s) return
+        if (img === el) index = list.length
+        list.push(s)
+      })
+      this.lbList = list
+      this.lbIndex = index
+      this.lbVisible = true
+    },
     getArticleDetail: function () {
       getArticle(this.aid).then((response) => {
         this.detailObj = response
         const markdownIt = mavonEditor.getMarkdownIt()
         // markdownIt.re
         this.detailObj.content = markdownIt.render(response.content);
+        this.$nextTick(this.decorate)
       }).catch(
         (error) => {
           this.$router.push({ name: 'NotFind' });
@@ -190,6 +237,13 @@ export default {
       } else {
         that.haslogin = false;
       }
+      //切换文章时重置正文增强状态
+      this.toc = [];
+      this.words = 0;
+      this.minutes = 1;
+      this.lbVisible = false;
+      this.lbList = [];
+      this.lbIndex = 0;
       //获取详情接口 
       this.getArticleDetail();
       updateViewCount(that.aid)
@@ -200,7 +254,8 @@ export default {
     '$route': 'routeChange'
   },
   components: { //定义组件
-
+    ArticleToc,
+    ImageLightbox,
   },
   created() { //生命周期函数
     var that = this;
@@ -1155,5 +1210,142 @@ export default {
 
 .markdown-body hr {
   border-bottom-color: #eee;
+}
+
+/* ===========================================================
+   正文增强：代码块工具栏 / 图片灯箱 / 暗色适配
+   =========================================================== */
+.article-content .code-block {
+  position: relative;
+  margin: 18px 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.article-content .code-block pre {
+  margin: 0;
+  background: transparent;
+  border: 0;
+}
+
+.article-content .code-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.article-content .code-lang {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--brand);
+  margin-right: auto;
+}
+
+.article-content .code-copy,
+.article-content .code-toggle {
+  font-size: 11px;
+  line-height: 1;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-weak);
+  cursor: pointer;
+  transition: color .25s var(--ease), border-color .25s var(--ease), transform .25s var(--ease);
+
+  &:hover {
+    color: var(--brand);
+    border-color: var(--brand);
+    transform: translateY(-1px);
+  }
+
+  &.is-done {
+    color: #22c55e;
+    border-color: #22c55e;
+  }
+}
+
+.article-content .code-block.is-collapsed pre {
+  max-height: 340px;
+  overflow: hidden;
+}
+
+.article-content .code-block.is-collapsed::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 90px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+}
+
+.article-content img.zoomable {
+  cursor: zoom-in;
+  border-radius: var(--radius-sm);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+
+  &:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-2);
+  }
+}
+
+/* 暗色模式下 GitHub markdown 硬编码的浅色底需要覆盖 */
+[data-theme='dark'] .markdown-body {
+  color: var(--text);
+
+  pre,
+  .highlight pre {
+    background: #111827 !important;
+    color: #e6edf3 !important;
+  }
+
+  code {
+    background: rgba(127, 140, 170, .16);
+    color: #ff9ec7;
+  }
+
+  blockquote {
+    color: var(--text-weak);
+    border-left-color: var(--brand);
+  }
+
+  table tr {
+    background: transparent;
+    border-top-color: var(--border);
+  }
+
+  table tr:nth-child(2n) {
+    background: rgba(255, 255, 255, .04);
+  }
+
+  table td,
+  table th {
+    border-color: var(--border);
+  }
+
+  h1,
+  h2 {
+    border-bottom-color: var(--border);
+  }
+
+  hr {
+    background: var(--border);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article-content img.zoomable {
+    transition: none;
+  }
 }
 </style>

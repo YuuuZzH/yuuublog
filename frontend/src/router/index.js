@@ -109,6 +109,14 @@ export default new Router({
 			},
 			name: 'UserInfo'
 		}, //用户个人中心
+		{
+			path: '*',
+			component: resolve => require(['../pages/NotFind.vue'], resolve),
+			meta: {
+				auth: true
+			},
+			name: 'NotFound'
+		}, //未匹配的路径统一走 404
 
 	]
 })

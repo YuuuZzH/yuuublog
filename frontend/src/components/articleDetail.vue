@@ -24,9 +24,10 @@
         <a :href="'#/Share?classId=' + detailObj.categoryId">{{ detailObj.categoryName }}</a>
       </div>
     </header>
+    <ArticleToc :toc="toc" />
+
     <div class="article-content markdown-body" ref="content" v-html="detailObj.content" @click="onContentClick"></div>
 
-    <ArticleToc :toc="toc" />
     <ImageLightbox :visible.sync="lbVisible" :list="lbList" :index.sync="lbIndex" />
 
     <div class="donate">

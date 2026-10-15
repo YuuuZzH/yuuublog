@@ -765,6 +765,13 @@ export default {
 	}
 }
 
+/* 签名花字（本地子集字体，仅 119KB） */
+@font-face {
+	font-family: 'HeroFancy';
+	src: url('../assets/font/ShangShouZhiZunShuFaTi/No.39-ShangShouZhiZunShuFaTi-2.ttf') format('truetype');
+	font-display: swap;
+}
+
 /* ================= 首屏 Hero 升级 ================= */
 .headImgBox {
 	overflow: hidden;
@@ -802,19 +809,23 @@ export default {
 	z-index: 2;
 }
 
-/* 信息卡：玻璃拟态 */
-/* top 不能太大：容器 650px + overflow:hidden 会把签名文本裁掉（原版无 overflow 所以看不出来） */
+/* 信息卡：半透明玻璃，锚定首屏底部；签名文字压在半透明头像上，不再被容器裁切 */
 .h-information {
-	top: 430px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: auto;
+	bottom: 100px;
 	width: min(70%, 620px);
-	padding: 26px 30px;
+	margin: auto;
+	padding: 20px 30px 16px;
 	border-radius: var(--radius, 16px);
-	background: var(--surface-2, rgba(255, 255, 255, .72));
-	-webkit-backdrop-filter: saturate(180%) blur(16px);
-	backdrop-filter: saturate(180%) blur(16px);
-	border: 1px solid var(--border, rgba(255, 255, 255, .35));
+	background: rgba(255, 255, 255, .16);
+	-webkit-backdrop-filter: saturate(160%) blur(12px);
+	backdrop-filter: saturate(160%) blur(12px);
+	border: 1px solid rgba(255, 255, 255, .35);
 	box-shadow: var(--shadow-2, 0 18px 50px rgba(20, 30, 60, .28));
-	color: var(--text);
+	color: #fff;
 	transition: transform .4s var(--ease), box-shadow .4s var(--ease);
 	animation: b 1s ease-out;
 	-webkit-animation: b 1s ease-out;
@@ -824,15 +835,24 @@ export default {
 	transform: translateY(-4px);
 }
 
+/* 头像半透明，透出底下的签名文字 */
 .h-information img {
+	opacity: .8;
 	box-shadow: 0 8px 26px rgba(20, 30, 60, .3);
-	border: 3px solid rgba(255, 255, 255, .85);
+	border: 3px solid rgba(255, 255, 255, .55);
 }
 
-.h-description {
-	color: var(--text);
-	font-size: 17px !important;
-	letter-spacing: .5px;
+/* 签名：花字 + 大字号，压在头像底部 */
+.h-information .h-description {
+	margin-top: -26px;
+	position: relative;
+	z-index: 2;
+	font-family: 'HeroFancy', 'Sigmar One', cursive;
+	font-size: 26px !important;
+	font-weight: 400;
+	letter-spacing: 3px;
+	color: #fff !important;
+	text-shadow: 0 2px 14px rgba(0, 0, 0, .55);
 }
 
 /* 底部波浪 */
@@ -858,9 +878,14 @@ export default {
 	}
 
 	.h-information {
-		top: 200px;
+		bottom: 40px;
 		width: 88%;
-		padding: 16px 18px;
+		padding: 14px 18px 12px;
+	}
+
+	.h-information .h-description {
+		font-size: 20px !important;
+		letter-spacing: 2px;
 	}
 
 	.hero-wave {

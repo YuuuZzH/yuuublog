@@ -216,8 +216,9 @@ export const loadView = (view) => {
   if (process.env.NODE_ENV === 'development') {
     return (resolve) => require([`@/views/${view}`], resolve)
   } else {
-    // 使用 import 实现生产环境的路由懒加载
-    // return () => import(`@/views/${view}`)
+    // 生产环境同样使用 require 懒加载（webpack context module），
+    // 不能留空：留空会导致所有动态菜单页面 component 为 undefined，页面白屏且不调接口
+    return (resolve) => require([`@/views/${view}`], resolve)
   }
 }
 

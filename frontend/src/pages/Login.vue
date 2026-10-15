@@ -384,8 +384,11 @@ export default {
                 setToken(response.token)
                 // 存储用户信息
                 localStorage.setItem("userInfo", JSON.stringify(response.userInfo))
-                if (localStorage.getItem('logUrl')) {
-                    this.$router.push({ path: localStorage.getItem('logUrl') });
+                // 登录成功后跳回登录前的页面；logUrl 是登录页自身或不存在时回首页（避免原地重复跳转不生效）
+                var logUrl = localStorage.getItem('logUrl');
+                localStorage.removeItem('logUrl');
+                if (logUrl && logUrl.indexOf('/Login') !== 0) {
+                    this.$router.push(logUrl);
                 } else {
                     this.$router.push({ path: '/' });
                 }

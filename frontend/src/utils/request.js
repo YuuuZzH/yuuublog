@@ -8,6 +8,9 @@ import errorCode from '@/utils/errorCode'
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 //这个封装了axios
 
+// 401 弹框去重标记：首页并发多个请求同时 401 时，只弹一次，避免 Element MessageBox 排队连弹
+let isReloginShow = false
+
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
@@ -59,19 +62,26 @@ service.interceptors.response.use(res => {
   // 获取错误信息
   const msg = errorCode[code] || res.data.msg || errorCode['default']
   if (code === 401) {
-    MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
-      confirmButtonText: '重新登录',
-      cancelButtonText: '取消',
-      type: 'warning'
+    // 已经在登录页时不弹框、不记录回跳地址，避免把 logUrl 覆盖成登录页自身
+    if (!isReloginShow && router.currentRoute.path !== '/Login') {
+      isReloginShow = true
+      MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+        confirmButtonText: '重新登录',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+      ).then(() => {
+        isReloginShow = false
+        localStorage.setItem('logUrl', router.currentRoute.fullPath);
+        router.push({
+          path: '/Login',
+          query: { login: 1 }
+        });
+
+      }).catch(() => {
+        isReloginShow = false
+      })
     }
-    ).then(() => {
-
-      localStorage.setItem('logUrl', router.currentRoute.fullPath);
-      router.push({
-        path: '/Login?login=1'
-      });
-
-    }).catch(() => { })
     return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
   } else if (code === 500) {
     Message({

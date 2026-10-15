@@ -802,7 +802,7 @@ export default {
 	z-index: 2;
 }
 
-/* 信息卡：半透明玻璃，锚定首屏底部；签名文字压在半透明头像上，不再被容器裁切 */
+/* 信息卡：接近原版的浅蓝半透明玻璃，锚定首屏底部 */
 .h-information {
 	position: absolute;
 	left: 0;
@@ -813,12 +813,11 @@ export default {
 	margin: auto;
 	padding: 20px 30px 16px;
 	border-radius: var(--radius, 16px);
-	background: rgba(255, 255, 255, .16);
-	-webkit-backdrop-filter: saturate(160%) blur(12px);
-	backdrop-filter: saturate(160%) blur(12px);
-	border: 1px solid rgba(255, 255, 255, .35);
+	background: rgba(234, 244, 250, .5);
+	-webkit-backdrop-filter: saturate(160%) blur(14px);
+	backdrop-filter: saturate(160%) blur(14px);
+	border: 1px solid rgba(255, 255, 255, .45);
 	box-shadow: var(--shadow-2, 0 18px 50px rgba(20, 30, 60, .28));
-	color: #fff;
 	transition: transform .4s var(--ease), box-shadow .4s var(--ease);
 	animation: b 1s ease-out;
 	-webkit-animation: b 1s ease-out;
@@ -828,13 +827,21 @@ export default {
 	transform: translateY(-4px);
 }
 
-/* 头像：恢复最初的清晰样式，不加毛玻璃/半透明 */
+/* 头像：覆盖在文字上方（z 更高），边缘羽化 + 轻微半透明，与文字交汇处自然融合 */
 .h-information img {
-	box-shadow: 0 8px 26px rgba(20, 30, 60, .3);
-	border: 3px solid rgba(255, 255, 255, .85);
+	position: relative;
+	z-index: 4;
+	opacity: .88;
+	-webkit-mask-image: radial-gradient(circle, #000 58%, transparent 74%);
+	mask-image: radial-gradient(circle, #000 58%, transparent 74%);
+	transition: opacity .4s var(--ease);
 }
 
-/* 签名：叠在头像上方（z 轴覆盖）、水平垂直居中 */
+.h-information img:hover {
+	opacity: 1;
+}
+
+/* 签名：在头像下层穿过，与头像交汇处透出形成融合感；原版同款渐变花字 */
 .h-information .h-description {
 	position: absolute;
 	top: 50%;
@@ -842,14 +849,18 @@ export default {
 	right: 0;
 	margin: 0;
 	transform: translateY(-50%);
-	z-index: 3;
+	z-index: 1;
 	text-align: center;
 	font-size: 36px !important;
 	font-weight: 700;
 	line-height: 1.35;
 	letter-spacing: 4px;
-	color: #fff !important;
-	text-shadow: 0 2px 16px rgba(0, 0, 0, .55);
+	background: linear-gradient(to right, #DF2050, #48456D);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: #48456D;
+	filter: drop-shadow(0 0 14px rgba(255, 255, 255, .65));
 }
 
 /* 底部波浪 */

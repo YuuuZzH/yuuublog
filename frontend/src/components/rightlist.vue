@@ -493,10 +493,7 @@ export default {
   box-shadow: var(--shadow-2);
 }
 
-.rightlistBox .r1-head img {
-  border-radius: 50%;
-  box-shadow: 0 8px 22px rgba(20, 30, 60, .16);
-}
+/* 头图保持原状（矩形通栏，不做圆形裁切） */
 
 .rightlistBox .r1-head h1 span {
   color: var(--text);
@@ -520,38 +517,18 @@ export default {
   background: rgba(79, 140, 255, .12);
 }
 
-/* 联系我：圆形按钮 */
-.rightlistBox .r1-body .catch-me {
-  justify-content: center;
-}
-
-.rightlistBox .r1-body .catch-me a {
-  width: 34px;
-  height: 34px;
-  line-height: 34px;
-  text-align: center;
-  border-radius: 50%;
-  background: var(--bg-soft);
-  color: var(--text-weak);
-  transition: transform .25s var(--ease), color .25s var(--ease), background .25s var(--ease);
-}
-
-.rightlistBox .r1-body .catch-me a:hover {
+/* 联系我：只在原 42px 圆形图标上换配色，避免与 a 层样式叠出重影 */
+.rightlistBox .r1-body .catch-me a:hover i {
   color: #fff;
   background: linear-gradient(120deg, var(--brand), var(--brand-2));
-  transform: translateY(-3px);
   box-shadow: var(--shadow-glow);
 }
 
-.rightlistBox .r1-body .catch-me a:hover i {
-  color: #fff;
-}
-
-.rightlistBox .r1-body .catch-me a i {
-  color: inherit;
-  font-size: 15px;
-  transition: none;
-  transform: none;
+/* 分隔线与卡片风格统一 */
+.rightlistBox hr {
+  border: none;
+  border-top: 1px dashed var(--border);
+  margin: 20px 0;
 }
 
 /* 列表项：hover 位移 + 品牌色 */

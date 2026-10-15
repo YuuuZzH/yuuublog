@@ -803,8 +803,9 @@ export default {
 }
 
 /* 信息卡：玻璃拟态 */
+/* top 不能太大：容器 650px + overflow:hidden 会把签名文本裁掉（原版无 overflow 所以看不出来） */
 .h-information {
-	top: 460px;
+	top: 430px;
 	width: min(70%, 620px);
 	padding: 26px 30px;
 	border-radius: var(--radius, 16px);
@@ -857,9 +858,9 @@ export default {
 	}
 
 	.h-information {
-		top: 250px;
+		top: 200px;
 		width: 88%;
-		padding: 18px;
+		padding: 16px 18px;
 	}
 
 	.hero-wave {

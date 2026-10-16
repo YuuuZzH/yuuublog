@@ -808,7 +808,7 @@ export default {
 	z-index: 4;
 }
 
-/* 信息卡：通栏玻璃底条，固定 300px 高，贴住首屏底部，内容垂直居中 */
+/* 信息卡：通栏玻璃底条，固定 300px 高，贴住首屏底部；内容偏上（中心约在条高 1/3 处） */
 .h-information {
 	position: absolute;
 	left: 0;
@@ -824,9 +824,9 @@ export default {
 	flex-direction: column;
 	-webkit-align-items: center;
 	align-items: center;
-	-webkit-justify-content: center;
-	justify-content: center;
-	padding: 0;
+	-webkit-justify-content: flex-start;
+	justify-content: flex-start;
+	padding: 28px 0 0;
 	border-radius: 0;
 	background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .06) 100%);
 	-webkit-backdrop-filter: blur(4px);
@@ -887,17 +887,30 @@ export default {
 @media (max-width: 768px) {
 	.headImgBox {
 		height: 420px;
-		margin-bottom: 40px;
+		/* 覆盖 App.vue 老规则的 -140px：移动端文章卡片只探进波浪一点，不再盖住头像与签名 */
+		margin-bottom: -40px !important;
 	}
 
 	.h-information {
 		bottom: 0;
 		width: 100%;
-		height: 200px;
+		height: 260px;
 		padding: 0;
+		-webkit-justify-content: center;
+		justify-content: center;
+	}
+
+	/* 移动端头像恢复清晰不透明（羽化半透明在玻璃条上显得像被遮挡），并缩小让内容整体上移 */
+	.h-information img {
+		width: 80px;
+		height: 80px;
+		opacity: 1;
+		-webkit-mask-image: none;
+		mask-image: none;
 	}
 
 	.h-information .h-description {
+		margin-top: 14px;
 		font-size: 14px !important;
 		letter-spacing: 2px;
 	}

@@ -154,6 +154,9 @@ import store from '../store'
                     })
                 }else{
                     that.haslogin = false;
+                    // 未登录不允许进入个人中心：跳转登录页，登录成功后跳回
+                    localStorage.setItem('logUrl', that.$route.fullPath);
+                    that.$router.replace({ path: '/Login', query: { login: 1 } });
                 }
 
             }

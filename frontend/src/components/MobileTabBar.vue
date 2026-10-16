@@ -15,6 +15,7 @@ const TABS = [
     { key: 'share', label: '归档', icon: 'fa-archive', path: '/Share?classId=0', match: ['/Share'] },
     { key: 'word', label: '留言', icon: 'fa-comments', path: '/WordBoard', match: ['/WordBoard'] },
     { key: 'link', label: '友链', icon: 'fa-link', path: '/FriendsLink', match: ['/FriendsLink'] },
+    { key: 'about', label: '关于', icon: 'fa-id-card', path: '/About', match: ['/About'] },
     { key: 'me', label: '我的', icon: 'fa-user', path: '/UserInfo', match: ['/UserInfo', '/Login'] }
 ]
 

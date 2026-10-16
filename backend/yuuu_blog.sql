@@ -612,3 +612,37 @@ INSERT INTO `yuuu_tag` VALUES (20, '3', 1, '2023-03-16 05:50:59', NULL, '2023-03
 INSERT INTO `yuuu_tag` VALUES (21, '1234', 1, '2023-03-17 00:56:03', NULL, '2023-03-17 00:56:03', 0, '1234');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ----------------------------
+-- 关于我（单条配置，站点只维护 id=1 一条记录）
+-- ----------------------------
+DROP TABLE IF EXISTS `yuuu_about`;
+CREATE TABLE `yuuu_about`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '称呼/昵称',
+  `title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '一句话头衔，如：后端工程师 / 摄影爱好者',
+  `avatar` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '头像地址',
+  `cover` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '关于我页面顶部封面图',
+  `summary` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '签名/座右铭',
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '个人介绍正文（Markdown）',
+  `skills` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '技能标签，逗号分隔，支持「名称:熟练度」写法',
+  `location` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '所在城市',
+  `email` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '邮箱',
+  `github` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT 'GitHub 主页',
+  `website` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '个人网站',
+  `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
+  `create_by` bigint NULL DEFAULT NULL,
+  `create_time` datetime NULL DEFAULT NULL,
+  `update_by` bigint NULL DEFAULT NULL,
+  `update_time` datetime NULL DEFAULT NULL,
+  `del_flag` int NULL DEFAULT 0 COMMENT '删除标志（0未删除 1已删除）',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '关于我' ROW_FORMAT = Dynamic;
+
+INSERT INTO `yuuu_about` (`id`, `name`, `title`, `avatar`, `cover`, `summary`, `content`, `skills`, `location`, `email`, `github`, `website`, `status`, `create_time`, `update_time`, `del_flag`)
+VALUES (1, 'yuuu', '一直在路上', '', '', '生命的意义在于不顺从', '', '', '', '', '', '', '0', NOW(), NOW(), 0);
+
+-- 后台菜单：关于我（父级为「内容管理」2017）
+INSERT INTO `sys_menu` VALUES (2070, '关于我', 2017, 5, 'about', 'content/about/index', 1, 'C', '0', '0', 'content:about:list', 'user', 1, NOW(), 1, NOW(), '', '0');
+INSERT INTO `sys_menu` VALUES (2071, '关于我查询', 2070, 1, '', NULL, 1, 'F', '0', '0', 'content:about:query', '#', 1, NOW(), 1, NOW(), '', '0');
+INSERT INTO `sys_menu` VALUES (2072, '关于我修改', 2070, 2, '', NULL, 1, 'F', '0', '0', 'content:about:edit', '#', 1, NOW(), 1, NOW(), '', '0');

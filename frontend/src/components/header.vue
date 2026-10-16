@@ -887,8 +887,8 @@ export default {
 @media (max-width: 768px) {
 	.headImgBox {
 		height: 420px;
-		/* 覆盖 App.vue 老规则的 -140px：移动端文章卡片只探进波浪一点，不再盖住头像与签名 */
-		margin-bottom: -40px !important;
+		/* 覆盖 App.vue 老规则的 -140px：内容不再与首屏重叠（每个页面都会渲染首屏） */
+		margin-bottom: 0 !important;
 	}
 
 	.h-information {

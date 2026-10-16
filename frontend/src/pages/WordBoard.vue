@@ -138,5 +138,30 @@ input:focus {
 .myBodyRight {
     width: 30%;
 }
+
+/* 移动端：去掉右侧信息栏，弹幕与留言输入占满整屏 */
+@media screen and (max-width: 768px) {
+    .myBodyBg {
+        /* 信息栏隐藏后页面高度需自行撑起，否则容器塌成 0 高，背景/弹幕全部消失 */
+        min-height: 100vh;
+    }
+
+    .myBody {
+        display: none;
+    }
+
+    .yuuuDanmaku {
+        height: 100vh;
+    }
+
+    input {
+        width: 60vw;
+        max-width: 300px;
+    }
+
+    .wenzi {
+        font-size: 24px;
+    }
+}
 </style>
     

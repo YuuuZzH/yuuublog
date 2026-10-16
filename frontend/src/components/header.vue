@@ -235,6 +235,10 @@ export default {
 			});
 
 		},
+			// 会话失效被 request.js 清理本地登录态时，导航栏立即切换为「登录」
+		syncLoginState: function () {
+			this.haslogin = !!localStorage.getItem('userInfo');
+		},
 		routeChange: function () {
 			var that = this;
 			that.pMenu = true
@@ -320,6 +324,7 @@ export default {
 			}
 		}
 		document.addEventListener(visibilityChangeEvent, onVisibilityChange);
+		window.addEventListener('user-auth-changed', this.syncLoginState);
 		// console.log();
 		this.routeChange();
 
@@ -337,6 +342,7 @@ export default {
 	},
 	destroyed() {
 		window.removeEventListener('scroll', this.onScroll);
+		window.removeEventListener('user-auth-changed', this.syncLoginState);
 	}
 }
 </script>

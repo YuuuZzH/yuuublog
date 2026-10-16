@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Notification, MessageBox, Message } from 'element-ui'
 import router from '@/router'
 import store from '../store'
-import { getToken } from '@/utils/auth'
+import { getToken, removeToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
@@ -62,6 +62,12 @@ service.interceptors.response.use(res => {
   // 获取错误信息
   const msg = errorCode[code] || res.data.msg || errorCode['default']
   if (code === 401) {
+    // 会话已失效：先清理本地登录态，并通知导航栏刷新为「登录」（点取消留在页面时也保持一致）
+    removeToken();
+    if (localStorage.getItem('userInfo')) {
+      localStorage.removeItem('userInfo');
+      window.dispatchEvent(new Event('user-auth-changed'));
+    }
     // 已经在登录页时不弹框、不记录回跳地址，避免把 logUrl 覆盖成登录页自身
     if (!isReloginShow && router.currentRoute.path !== '/Login') {
       isReloginShow = true

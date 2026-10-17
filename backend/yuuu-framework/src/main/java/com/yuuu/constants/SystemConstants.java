@@ -116,7 +116,7 @@ public class SystemConstants {
         public static final String ABOUT_KEY = "about:front";
 
         /** 缓存有效期（分钟）：变动较频繁的列表/详情 */
-        public static final long CACHE_TTL_SHORT = 10L;
+        public static final Integer CACHE_TTL_SHORT = 10;
         /** 缓存有效期（分钟）：配置型数据 */
-        public static final long CACHE_TTL_LONG = 30L;
+        public static final Integer CACHE_TTL_LONG = 30;
 }

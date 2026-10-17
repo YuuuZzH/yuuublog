@@ -38,8 +38,8 @@ public class BlogCacheManager {
     /**
      * 写缓存，统一带 TTL，避免无过期时间的脏数据长期残留
      */
-    public void set(String key, Object value, long minutes) {
-        if (value == null) {
+    public void set(String key, Object value, Integer minutes) {
+        if (value == null || minutes == null) {
             return;
         }
         redisCache.setCacheObject(key, value, minutes, TimeUnit.MINUTES);

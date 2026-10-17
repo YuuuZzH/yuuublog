@@ -24,6 +24,8 @@ import com.yuuu.utils.RedisCache;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -63,6 +65,8 @@ import static com.yuuu.constants.SystemConstants.ARTICLE_STATUS_NORMAL;
  */
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+
+    private static final Logger log = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
     @Autowired
     private CategoryService categoryService;
@@ -149,8 +153,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (Objects.isNull(article)) {
             return ResponseResult.errorResult(AppHttpCodeEnum.NO_ARTICLE);
         }
-        // 从redis中查询viewCount
-        Integer viewCount = redisCache.getCacheMapValue(SystemConstants.VIEW_COUNT, id.toString());
+        // 从redis中查询viewCount，Redis 异常时降级用库里的值
+        Integer viewCount = null;
+        try {
+            viewCount = redisCache.getCacheMapValue(SystemConstants.VIEW_COUNT, id.toString());
+        } catch (Exception e) {
+            log.warn("读取浏览量缓存失败，降级使用库内浏览量：articleId={}, err={}", id, e.getMessage());
+        }
+        if (viewCount == null) {
+            viewCount = article.getViewCount() == null ? 0 : Integer.parseInt(String.valueOf(article.getViewCount()));
+        }
         // 封装Vo
         ArticleDetailVo articleDetailVo = BeanCopyUtils.copyBean(article, ArticleDetailVo.class);
         articleDetailVo.setViewCount(viewCount.longValue());
@@ -167,7 +179,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public ResponseResult updateViewCount(Long articleId) {
-        redisCache.incrementCacheMapValue(SystemConstants.VIEW_COUNT, articleId.toString(), 1);
+        try {
+            redisCache.incrementCacheMapValue(SystemConstants.VIEW_COUNT, articleId.toString(), 1);
+        } catch (Exception e) {
+            // 浏览量只是统计值，Redis 异常时丢弃这次累加，不影响文章访问
+            log.warn("累加浏览量失败，本次不计：articleId={}, err={}", articleId, e.getMessage());
+        }
         return ResponseResult.okResult();
     }
 

@@ -24,7 +24,14 @@ public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
     private Class<T> clazz;
 
     static {
-        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        // 关闭全局 autoType 支持：Fastjson 反序列化 RCE 的经典高危开关
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(false);
+        // 改为白名单：只放行本项目类型与 JDK 基础容器/类型，缓存仍能还原为具体 VO
+        ParserConfig.getGlobalInstance().addAccept("com.yuuu.");
+        ParserConfig.getGlobalInstance().addAccept("java.util.");
+        ParserConfig.getGlobalInstance().addAccept("java.lang.");
+        ParserConfig.getGlobalInstance().addAccept("java.time.");
+        ParserConfig.getGlobalInstance().addAccept("java.math.");
     }
 
     public FastJsonRedisSerializer(Class<T> clazz) {

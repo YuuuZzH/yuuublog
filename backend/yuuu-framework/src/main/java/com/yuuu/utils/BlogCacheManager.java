@@ -1,6 +1,8 @@
 package com.yuuu.utils;
 
 import com.yuuu.constants.SystemConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,9 +15,14 @@ import java.util.concurrent.TimeUnit;
  * 失效放在 framework 层（前台与后台共用同一份 Service 实现），
  * 后台进程写库后直接删除 Redis 中的缓存 key，前台进程下一次读即回源。
  * 前提：前台(yuuu-blog)与后台(yuuu-admin)必须使用同一个 Redis database。
+ *
+ * 所有 Redis 操作都做降级：Redis 不可用时缓存视为未命中/忽略失效，直接走数据库，
+ * 避免缓存故障放大成接口 500。
  */
 @Component
 public class BlogCacheManager {
+
+    private static final Logger log = LoggerFactory.getLogger(BlogCacheManager.class);
 
     @Autowired
     private RedisCache redisCache;
@@ -24,15 +31,22 @@ public class BlogCacheManager {
      * 读缓存，类型不匹配时当作未命中（并清理脏数据），避免 Fastjson 反序列化类型漂移导致强转异常
      */
     public <T> T get(String key, Class<T> type) {
-        Object cache = redisCache.getCacheObject(key);
-        if (cache == null) {
+        try {
+            Object cache = redisCache.getCacheObject(key);
+            if (cache == null) {
+                return null;
+            }
+            if (!type.isInstance(cache)) {
+                log.warn("缓存类型不匹配，按未命中处理并清理：key={}, expect={}, actual={}",
+                        key, type.getName(), cache.getClass().getName());
+                redisCache.deleteObject(key);
+                return null;
+            }
+            return type.cast(cache);
+        } catch (Exception e) {
+            log.warn("读取缓存失败，降级走数据库：key={}, err={}", key, e.getMessage());
             return null;
         }
-        if (!type.isInstance(cache)) {
-            redisCache.deleteObject(key);
-            return null;
-        }
-        return type.cast(cache);
     }
 
     /**
@@ -42,40 +56,60 @@ public class BlogCacheManager {
         if (value == null || minutes == null) {
             return;
         }
-        redisCache.setCacheObject(key, value, minutes, TimeUnit.MINUTES);
+        try {
+            redisCache.setCacheObject(key, value, minutes, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.warn("写入缓存失败，忽略：key={}, err={}", key, e.getMessage());
+        }
     }
 
     /**
      * 文章新增/修改/删除后失效：详情、热门榜、所有分页列表
      */
     public void evictArticle(Long articleId) {
-        if (articleId != null) {
-            redisCache.deleteObject(SystemConstants.ARTICLE_DETAIL_KEY + articleId);
+        try {
+            if (articleId != null) {
+                redisCache.deleteObject(SystemConstants.ARTICLE_DETAIL_KEY + articleId);
+            }
+            redisCache.deleteObject(SystemConstants.HOT_ARTICLE_KEY);
+            deleteByPrefix(SystemConstants.ARTICLE_LIST_KEY);
+        } catch (Exception e) {
+            log.warn("失效文章缓存失败（数据以数据库为准）：articleId={}, err={}", articleId, e.getMessage());
         }
-        redisCache.deleteObject(SystemConstants.HOT_ARTICLE_KEY);
-        deleteByPrefix(SystemConstants.ARTICLE_LIST_KEY);
     }
 
     /**
      * 分类新增/修改/删除/改状态后失效：分类列表 + 文章列表（列表返回体含 categoryName）
      */
     public void evictCategory() {
-        redisCache.deleteObject(SystemConstants.CATEGORY_LIST_KEY);
-        deleteByPrefix(SystemConstants.ARTICLE_LIST_KEY);
+        try {
+            redisCache.deleteObject(SystemConstants.CATEGORY_LIST_KEY);
+            deleteByPrefix(SystemConstants.ARTICLE_LIST_KEY);
+        } catch (Exception e) {
+            log.warn("失效分类缓存失败（数据以数据库为准）：err={}", e.getMessage());
+        }
     }
 
     /**
      * 友链新增/修改/删除后失效
      */
     public void evictLink() {
-        redisCache.deleteObject(SystemConstants.LINK_LIST_KEY);
+        try {
+            redisCache.deleteObject(SystemConstants.LINK_LIST_KEY);
+        } catch (Exception e) {
+            log.warn("失效友链缓存失败（数据以数据库为准）：err={}", e.getMessage());
+        }
     }
 
     /**
      * 关于我保存后失效
      */
     public void evictAbout() {
-        redisCache.deleteObject(SystemConstants.ABOUT_KEY);
+        try {
+            redisCache.deleteObject(SystemConstants.ABOUT_KEY);
+        } catch (Exception e) {
+            log.warn("失效关于我缓存失败（数据以数据库为准）：err={}", e.getMessage());
+        }
     }
 
     /**

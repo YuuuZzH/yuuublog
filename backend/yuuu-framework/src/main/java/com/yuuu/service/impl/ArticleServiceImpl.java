@@ -19,6 +19,7 @@ import com.yuuu.service.ArticleTagService;
 import com.yuuu.service.CategoryService;
 import com.yuuu.service.LikedService;
 import com.yuuu.utils.BeanCopyUtils;
+import com.yuuu.utils.BlogCacheManager;
 import com.yuuu.utils.RedisCache;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -75,8 +76,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Autowired
     private RedisCache redisCache;
 
+    @Autowired
+    private BlogCacheManager blogCacheManager;
+
     @Override
     public ResponseResult hotArticleList() {
+        // 热门文章：读穿缓存
+        Object hotCache = blogCacheManager.get(SystemConstants.HOT_ARTICLE_KEY, List.class);
+        if (hotCache != null) {
+            return ResponseResult.okResult(hotCache);
+        }
         // 查询热门文章，返回ResponseResult结果
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         // 1.正式发布
@@ -89,11 +98,18 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         List<Article> articles = page.getRecords();
         // bean复制
         List<HotArticleVo> articleVoList = BeanCopyUtils.copyBeanList(articles, HotArticleVo.class);
+        blogCacheManager.set(SystemConstants.HOT_ARTICLE_KEY, articleVoList, SystemConstants.CACHE_TTL_SHORT);
         return ResponseResult.okResult(articleVoList);
     }
 
     @Override
     public ResponseResult articleList(Integer pageNum, Integer pageSize, Long categoryId) {
+        // 文章列表：按 分类+分页 维度缓存
+        String listKey = SystemConstants.ARTICLE_LIST_KEY + categoryId + ":" + pageNum + ":" + pageSize;
+        Object listCache = blogCacheManager.get(listKey, PageVo.class);
+        if (listCache != null) {
+            return ResponseResult.okResult(listCache);
+        }
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         // 分类条件
         queryWrapper.eq(Objects.nonNull(categoryId) && categoryId > 0, Article::getCategoryId, categoryId);
@@ -116,11 +132,18 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 封装查询结果
         List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(records, ArticleListVo.class);
         PageVo pageVo = new PageVo(articleListVos, page.getTotal());
+        blogCacheManager.set(listKey, pageVo, SystemConstants.CACHE_TTL_SHORT);
         return ResponseResult.okResult(pageVo);
     }
 
     @Override
     public ResponseResult articleDetailById(Long id) {
+        // 文章详情：读穿缓存
+        String detailKey = SystemConstants.ARTICLE_DETAIL_KEY + id;
+        ArticleDetailVo detailCache = blogCacheManager.get(detailKey, ArticleDetailVo.class);
+        if (detailCache != null) {
+            return ResponseResult.okResult(detailCache);
+        }
         // 查询文章
         Article article = getById(id);
         if (Objects.isNull(article)) {
@@ -137,6 +160,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (category != null) {
             articleDetailVo.setCategoryName(category.getName());
         }
+        blogCacheManager.set(detailKey, articleDetailVo, SystemConstants.CACHE_TTL_SHORT);
         return ResponseResult.okResult(articleDetailVo);
     }
 
@@ -164,6 +188,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 添加 博客和标签的关联
         articleTagService.saveBatch(articleTags);
+        // 新增后失效前台缓存：列表/详情/热门/分类（分类列表源自发布文章）
+        blogCacheManager.evictArticle(article.getId());
+        blogCacheManager.evictCategory();
         return ResponseResult.okResult();
     }
 
@@ -213,6 +240,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         } else {
             baseMapper.deleteArticleTagById(article.getId());
         }
+        // 修改后失效前台缓存（标题/置顶/状态/分类都可能在本次变更）
+        blogCacheManager.evictArticle(article.getId());
+        blogCacheManager.evictCategory();
         return ResponseResult.okResult();
 
     }
@@ -221,6 +251,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ResponseResult deleteArticle(Long id) {
         boolean b = removeById(id);
         if (b) {
+            // 逻辑删除后必须失效前台缓存，否则已删文章仍会出现在列表/详情
+            blogCacheManager.evictArticle(id);
+            blogCacheManager.evictCategory();
             return ResponseResult.okResult();
         } else {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);

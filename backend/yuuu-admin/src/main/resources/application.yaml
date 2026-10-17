@@ -13,7 +13,8 @@ spring:
   redis:
     host: 192.168.202.128
     password:
-    database: 2
+    # 必须与前台(yuuu-blog)同一 database，否则后台写库后无法失效前台缓存
+    database: 5
 
 mybatis-plus:
   configuration:

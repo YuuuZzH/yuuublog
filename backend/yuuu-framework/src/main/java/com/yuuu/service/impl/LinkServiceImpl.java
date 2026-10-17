@@ -15,7 +15,9 @@ import com.yuuu.domain.vo.PageVo;
 import com.yuuu.enums.AppHttpCodeEnum;
 import com.yuuu.mapper.LinkMapper;
 import com.yuuu.utils.BeanCopyUtils;
+import com.yuuu.utils.BlogCacheManager;
 import com.yuuu.utils.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -31,8 +33,16 @@ import java.util.List;
 @Service("linkService")
 public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements LinkService {
 
+    @Autowired
+    private BlogCacheManager blogCacheManager;
+
     @Override
     public ResponseResult getAllLink() {
+        // 友链列表：读穿缓存
+        Object linkCache = blogCacheManager.get(SystemConstants.LINK_LIST_KEY, List.class);
+        if (linkCache != null) {
+            return ResponseResult.okResult(linkCache);
+        }
         //查询所有审核通过的友链
         LambdaQueryWrapper<Link> queryWrapper = new LambdaQueryWrapper<>();
         //审核通过条件
@@ -40,6 +50,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         List<Link> list = list(queryWrapper);
         //转换Vo
         List<LinkVo> linkVos = BeanCopyUtils.copyBeanList(list, LinkVo.class);
+        blogCacheManager.set(SystemConstants.LINK_LIST_KEY, linkVos, SystemConstants.CACHE_TTL_LONG);
         return ResponseResult.okResult(linkVos);
     }
 
@@ -75,6 +86,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         link.setUpdateTime(new Date());
         boolean save = save(link);
         if (save){
+            blogCacheManager.evictLink();
             return ResponseResult.okResult();
         }else {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -102,6 +114,8 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         link.setStatus(updateLinkDto.getStatus());
         boolean b = updateById(link);
         if (b){
+            // 审核状态/内容变更都会影响前台展示
+            blogCacheManager.evictLink();
             return ResponseResult.okResult();
         }else {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);
@@ -112,6 +126,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     public ResponseResult deleteLinkById(Long id) {
         boolean b = removeById(id);
         if (b){
+            blogCacheManager.evictLink();
             return ResponseResult.okResult();
         }else{
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);

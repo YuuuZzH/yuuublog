@@ -12,6 +12,7 @@ import com.yuuu.mapper.LikedMapper;
 import com.yuuu.service.ArticleService;
 import com.yuuu.service.CommentService;
 import com.yuuu.service.LikedService;
+import com.yuuu.utils.BlogCacheManager;
 import com.yuuu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class LikedServiceImpl extends ServiceImpl<LikedMapper, Liked> implements
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private BlogCacheManager blogCacheManager;
+
     @Override
     public ResponseResult articleLike(Long id) {
         Article article = articleService.getById(id);
@@ -54,6 +58,8 @@ public class LikedServiceImpl extends ServiceImpl<LikedMapper, Liked> implements
             boolean save = save(liked);
             article.setLikes(article.getLikes() + 1);
             articleService.updateById(article);
+            // 点赞数变化：失效这篇文章的详情缓存，否则前台点赞数会回退
+            blogCacheManager.evictArticle(id);
             if (save) {
                 return ResponseResult.okResult();
             } else {
@@ -67,11 +73,15 @@ public class LikedServiceImpl extends ServiceImpl<LikedMapper, Liked> implements
                 updateById(liked);
                 article.setLikes(article.getLikes() - 1);
                 articleService.updateById(article);
+            // 点赞数变化：失效这篇文章的详情缓存，否则前台点赞数会回退
+            blogCacheManager.evictArticle(id);
             } else {//点赞
                 liked.setIsLikeA(1);
                 updateById(liked);
                 article.setLikes(article.getLikes() + 1);
                 articleService.updateById(article);
+            // 点赞数变化：失效这篇文章的详情缓存，否则前台点赞数会回退
+            blogCacheManager.evictArticle(id);
             }
         }
         return ResponseResult.okResult();

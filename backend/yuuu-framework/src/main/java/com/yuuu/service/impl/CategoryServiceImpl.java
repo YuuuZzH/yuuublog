@@ -17,6 +17,7 @@ import com.yuuu.mapper.CategoryMapper;
 import com.yuuu.service.ArticleService;
 import com.yuuu.service.CategoryService;
 import com.yuuu.utils.BeanCopyUtils;
+import com.yuuu.utils.BlogCacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -37,8 +38,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> im
     @Autowired
     private ArticleService articleService;
 
+    @Autowired
+    private BlogCacheManager blogCacheManager;
+
     @Override
     public ResponseResult getCategoryList() {
+        // 分类列表：全表扫文章去重，开销大，强缓存
+        Object categoryCache = blogCacheManager.get(SystemConstants.CATEGORY_LIST_KEY, List.class);
+        if (categoryCache != null) {
+            return ResponseResult.okResult(categoryCache);
+        }
         //查询发布的文章
         LambdaQueryWrapper<Article> articleQueryWrapper = new LambdaQueryWrapper<>();
         articleQueryWrapper.eq(Article::getStatus, SystemConstants.ARTICLE_STATUS_NORMAL);
@@ -51,6 +60,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> im
                 .filter(category -> SystemConstants.CATEGORY_STATUS_NORMAL.equals(category.getStatus()))
                 .collect(Collectors.toList());
         List<CategoryVo> categoryVos = BeanCopyUtils.copyBeanList(categories, CategoryVo.class);
+        blogCacheManager.set(SystemConstants.CATEGORY_LIST_KEY, categoryVos, SystemConstants.CACHE_TTL_LONG);
         return ResponseResult.okResult(categoryVos);
     }
 
@@ -81,6 +91,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> im
     public ResponseResult addCategory(CategoryDto categoryDto) {
         Category category = BeanCopyUtils.copyBean(categoryDto, Category.class);
         save(category);
+        blogCacheManager.evictCategory();
         return ResponseResult.okResult();
     }
 
@@ -95,12 +106,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> im
     public ResponseResult updateCategory(CategoryByIdVo category) {
         Category category1 = BeanCopyUtils.copyBean(category, Category.class);
         updateById(category1);
+        // 分类改名会连带影响文章列表里的 categoryName
+        blogCacheManager.evictCategory();
         return ResponseResult.okResult();
     }
 
     @Override
     public ResponseResult deleteCategory(Long id) {
         removeById(id);
+        blogCacheManager.evictCategory();
         return ResponseResult.okResult();
     }
 
@@ -110,6 +124,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> im
         category.setStatus(categoryByIdVo.getStatus());
         boolean b = updateById(category);
         if (b){
+            // 启用/停用会立刻改变前台分类列表
+            blogCacheManager.evictCategory();
             return ResponseResult.okResult();
         }else{
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);

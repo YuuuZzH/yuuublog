@@ -100,4 +100,23 @@ public class SystemConstants {
 
         public static final String MAIL_KEY_0 = "mail:register:";
         public static final String MAIL_KEY_1 = "mail:upwd:";
+
+        /* ==================== 前台热点缓存 key ==================== */
+        /** 前台文章列表：article:list:{categoryId}:{pageNum}:{pageSize} */
+        public static final String ARTICLE_LIST_KEY = "article:list:";
+        /** 前台文章详情：article:detail:{id} */
+        public static final String ARTICLE_DETAIL_KEY = "article:detail:";
+        /** 前台热门文章 */
+        public static final String HOT_ARTICLE_KEY = "article:hot";
+        /** 前台分类列表 */
+        public static final String CATEGORY_LIST_KEY = "category:list";
+        /** 前台友链列表 */
+        public static final String LINK_LIST_KEY = "link:list";
+        /** 前台关于我 */
+        public static final String ABOUT_KEY = "about:front";
+
+        /** 缓存有效期（分钟）：变动较频繁的列表/详情 */
+        public static final long CACHE_TTL_SHORT = 10L;
+        /** 缓存有效期（分钟）：配置型数据 */
+        public static final long CACHE_TTL_LONG = 30L;
 }

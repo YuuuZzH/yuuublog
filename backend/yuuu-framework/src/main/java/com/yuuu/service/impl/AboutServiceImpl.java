@@ -2,10 +2,13 @@ package com.yuuu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yuuu.constants.SystemConstants;
 import com.yuuu.domain.ResponseResult;
 import com.yuuu.domain.entity.About;
 import com.yuuu.mapper.AboutMapper;
 import com.yuuu.service.AboutService;
+import com.yuuu.utils.BlogCacheManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,8 +17,12 @@ import org.springframework.stereotype.Service;
 @Service("aboutService")
 public class AboutServiceImpl extends ServiceImpl<AboutMapper, About> implements AboutService {
 
+    @Autowired
+    private BlogCacheManager blogCacheManager;
+
     @Override
     public ResponseResult getAbout() {
+        // 后台读取：不做缓存，避免后台改完看不到最新值
         LambdaQueryWrapper<About> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByAsc(About::getId);
         // 只取第一条：站点关于我只有一份配置
@@ -40,16 +47,25 @@ public class AboutServiceImpl extends ServiceImpl<AboutMapper, About> implements
         if (!result) {
             return ResponseResult.errorResult(500, "保存失败");
         }
+        // 保存后失效前台缓存（后台保存是唯一写入口）
+        blogCacheManager.evictAbout();
         return ResponseResult.okResult(about);
     }
 
     @Override
     public ResponseResult getAboutForFront() {
+        // 前台展示：单条配置，读写比极高，缓存后失效在 saveAbout 里
+        About cache = blogCacheManager.get(SystemConstants.ABOUT_KEY, About.class);
+        if (cache != null) {
+            return ResponseResult.okResult(cache);
+        }
         LambdaQueryWrapper<About> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(About::getStatus, "0");
         queryWrapper.orderByAsc(About::getId);
         queryWrapper.last("limit 1");
         About about = getOne(queryWrapper);
-        return ResponseResult.okResult(about == null ? new About() : about);
+        About result = about == null ? new About() : about;
+        blogCacheManager.set(SystemConstants.ABOUT_KEY, result, SystemConstants.CACHE_TTL_LONG);
+        return ResponseResult.okResult(result);
     }
 }

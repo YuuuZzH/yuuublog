@@ -6,7 +6,7 @@
 				<el-col :span="24">
 					<!-- pc端导航 -->
 					<div class="headBox">
-						<el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect"
+						<el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
 							:router="true">
 							<el-menu-item index="/Home"><i class="fa fa-wa fa-home"></i> 首页</el-menu-item>
 							<el-submenu index="/Share">
@@ -18,22 +18,6 @@
 							<el-menu-item index="/Friendslink"><i class="fa fa-wa fa-users"></i>友链</el-menu-item>
 							<el-menu-item index="/WordBoard"><i class="fa fa-wa fa-users"></i>留言板</el-menu-item>
 						<el-menu-item index="/About"><i class="fa fa-wa fa-id-card"></i>关于我</el-menu-item>
-							<div style="margin-top: 0.4%; margin-left: 50%; width: 25%;display: flex; align-items: center;">
-								
-								<el-col :span="12" class="input-close">
-									<el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch"
-										placeholder="输入搜索内容" :trigger-on-focus="false" @select="handleSelect" clearable>
-										<template slot-scope="{ item }">
-											<div v-if="item.value === '没有匹配项'" class="disabled-item">{{ item.value }}</div>
-											<div v-else>{{ item.value }}</div>
-										</template>
-									</el-autocomplete>
-								</el-col>
-
-								<el-button type="primary" size="small" icon="el-icon-search"
-									@click="searchContent()">搜索</el-button>
-									
-							</div>
 							
 							
 							<div class="userInfo">
@@ -96,7 +80,6 @@ import { logout } from '../api/user'
 import { removeToken } from '../utils/auth'
 import { getCategoryList } from '../api/category'
 import { getUserInfo } from '../api/user.js'//获取用户信息，保存用户信息
-import request from "@/utils/request.js"
 import {
 	Typeit,
 	TypeitLine
@@ -116,33 +99,11 @@ export default {
 			headBg: 'url(static/img/headbg05.jpg)', //头部背景图
 			headTou: '', //头像
 			projectList: '', //项目列表
-			inputValue: '',//搜索关键字
-			suggestions: [],//关键字返回列表,
-			aid: '',
 			heroShift: 0, //首屏视差位移（px）
 			heroTicking: false
 		}
 	},
 	methods: { //事件处理器
-		querySearch(queryString, cb) {
-			// var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-			request.get('/article/getArticleByInput', { params: { inputValue: queryString } })
-				.then(response => {
-					if (response.length > 0) {
-						let l = []
-						for (let i = 0; i < response.length; i++) {
-							l.push({ "value": response[i].title, "id": response[i].id });
-						}
-						this.suggestions = l;
-					} else {
-						this.suggestions = [{ "value": "没有匹配项" }];
-					}
-					cb(this.suggestions);
-				})
-				.catch(error => {
-					console.error('Error fetching data:', error);
-				});
-		},
 		handleOpen(key, keyPath) { //分组菜单打开
 			// console.log(key, keyPath);
 		},
@@ -161,22 +122,6 @@ export default {
 				this.classListObj = response
 			})
 		},
-		handleSelect(item) { //pc菜单选择
-			// console.log("item",item)
-			if (item.value === '没有匹配项') {
-				event.preventDefault()
-			} else {
-				this.aid = item.id
-			}
-		},
-		shouldSelectItem(item) {
-			// 如果输入建议列表为空，那么不允许将输入建议合并到输入框中
-			if (this.suggestions.length === 0) {
-				return false;
-			}
-			// 其他情况下允许将输入建议合并到输入框中
-			return true;
-		},
 		logoinFun: function (msg) { //用户登录和注册跳转
 			// console.log(msg);
 			localStorage.setItem('logUrl', this.$route.fullPath);
@@ -189,20 +134,6 @@ export default {
 				this.$router.push({
 					path: '/Login?login=1'
 				});
-			}
-		},
-		searchContent() {//按关键字搜索文章
-			// this.$router.push({ name: 'DetailArticle', params: { inputValue: inputValue } });
-			if (this.aid === undefined || this.aid === '' || this.inputValue === '') {
-				this.$router.push({ name: 'NotFind' });
-				this.inputValue = '';
-				setTimeout(() => {
-					this.$router.push({ path: '/' });
-				}, 3000);
-			} else {
-				const routeData = this.$router.resolve({ name: 'DetailArticle', query: { aid: this.aid } });
-				this.inputValue = '';
-				window.open(routeData.href, '_blank');
 			}
 		},
 		// 用户退出登录
@@ -349,11 +280,6 @@ export default {
 
 <style>
 /*********头部导航栏********/
-.input-close{
-	.el-input__suffix{
-		transform:translateY(-4px);
-	}
-}
 /*头部导航栏盒子*/
 
 .headBack {
@@ -411,11 +337,6 @@ export default {
 	top: 38px;
 	border: none;
 	padding: 0;
-}
-
-.disabled-item {
-	color: #ccc;
-	cursor: not-allowed;
 }
 
 .headBox>ul li.el-menu-item:hover,
